@@ -7,6 +7,8 @@ public class AppConfig {
     private static Repository repository = null;
     public static final boolean IS_DEMO_MODE = true;
 
+    public AppConfig(){}
+
     public static Repository getRepository(){
         if(repository == null){
             if(IS_DEMO_MODE){
