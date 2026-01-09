@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshiftsv2.graphController.HomeGC">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="20.0" style="-fx-background-color: #4B4488;">
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+            <Label text="E-Shifts" textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER" spacing="10.0">
+                <Button fx:id="btnHome" text="Home" style="-fx-background-color: #6A62B3; -fx-text-fill: white; -fx-background-radius: 10;" />
+                <Button fx:id="btnShifts" text="Shifts" style="-fx-background-color: transparent; -fx-text-fill: white;" onAction="#onShiftsclicked" />
+                <Button fx:id="btnSettings" text="Settings" style="-fx-background-color: transparent; -fx-text-fill: white;" onAction="#onSettingsclicked" />
+                <Button fx:id="btnWorkers" text="Workers" style="-fx-background-color: transparent; -fx-text-fill: white;" onAction="#onWorkersclicked" />
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER" spacing="10.0">
+                <Circle fill="DODGERBLUE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+                <Button text="Logout" style="-fx-background-color: transparent; -fx-text-fill: white;" onAction="#onLogoutClicked" />
+            </HBox>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="40.0" alignment="CENTER">
+            <padding>
+                <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+            </padding>
+
+            <VBox alignment="TOP_CENTER" spacing="15.0" HBox.hgrow="ALWAYS">
+                <VBox alignment="TOP_CENTER" spacing="15.0" style="-fx-background-color: #8379B5; -fx-background-radius: 20;" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                    <Label text="Find Workplaces" textFill="BLACK" style="-fx-font-size: 24; -fx-font-weight: bold;" maxWidth="Infinity" alignment="CENTER" />
+                    <TextField fx:id="searchField" promptText="Search Workplace" style="-fx-background-radius: 15;" maxWidth="Infinity" />
+
+                    <VBox alignment="CENTER" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 10;" maxWidth="Infinity">
+                        <ListView fx:id="workplaceListView" VBox.vgrow="ALWAYS" style="-fx-background-radius: 10; -fx-background-color: transparent;" />
+                    </VBox>
+                </VBox>
+                <Button fx:id="btnNewWorkplace" text="New Workplace" style="-fx-background-color: #6a4c93; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: bold; -fx-font-size: 14;" prefWidth="180.0" onAction="#newWpClicked" />
+            </VBox>
+
+            <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <Label text="Your scheduled shifts" alignment="CENTER" maxWidth="Infinity" style="-fx-font-size: 20;" />
+                    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-radius: 15; -fx-border-color: gray; -fx-border-radius: 15; -fx-background-color: transparent;">
+                        <GridPane fx:id="shiftsGrid" hgap="10" vgap="10">
+                            <padding>
+                                <Insets/>
+                            </padding>
+                        </GridPane>
+                    </ScrollPane>
+                </VBox>
+
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                        <Label text="Your Workplaces" alignment="CENTER" maxWidth="Infinity" />
+                        <ListView fx:id="ownedWorkplaceList" VBox.vgrow="ALWAYS" style="-fx-background-radius: 15; -fx-border-color: gray; -fx-border-radius: 15;" />
+                    </VBox>
+
+                    <VBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                        <Label text="E-Shifts" style="-fx-font-size: 40; -fx-font-weight: bold;" />
+                        <Label text="Faster is Better"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

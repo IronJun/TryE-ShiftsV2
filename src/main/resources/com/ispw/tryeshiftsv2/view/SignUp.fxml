@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane fx:controller="com.ispw.tryeshiftsv2.graphController.SignUpGC"
+          xmlns="http://javafx.com/javafx/21"
+          xmlns:fx="http://javafx.com/fxml/1"
+          prefWidth="900.0" prefHeight="600.0"
+          style="-fx-background-color: #ffffff;">
+
+    <columnConstraints>
+        <ColumnConstraints percentWidth="40.0" hgrow="ALWAYS"/>
+        <ColumnConstraints percentWidth="60.0" hgrow="ALWAYS"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints percentHeight="88.0" vgrow="ALWAYS"/>
+        <RowConstraints percentHeight="12.0" vgrow="NEVER"/>
+    </rowConstraints>
+
+    <padding>
+        <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <!-- Colonna sinistra: box viola con contenuti -->
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS"
+          maxWidth="Infinity" maxHeight="Infinity"
+          alignment="CENTER"
+          spacing="10.0"
+          style="-fx-background-color: #6a4c93; -fx-background-radius: 16;">
+        <padding>
+            <Insets top="24.0" right="32.0" bottom="24.0" left="32.0"/>
+        </padding>
+
+        <Label text="E-Shifts" textFill="BLACK">
+            <font>
+                <Font name="System Bold" size="36.0"/>
+            </font>
+        </Label>
+
+        <!-- Sottotitolo richiesto: "SignUp" sotto al nome applicazione -->
+        <Label text="SignUp" textFill="BLACK">
+            <font>
+                <Font name="System Bold" size="20.0"/>
+            </font>
+            <VBox.margin>
+                <Insets bottom="10.0"/>
+            </VBox.margin>
+        </Label>
+
+        <TextField fx:id="emailField" promptText="e-mail address">
+            <VBox.margin>
+                <Insets top="8.0"/>
+            </VBox.margin>
+        </TextField>
+        <TextField fx:id="nameField" promptText="Name"/>
+        <TextField fx:id="surnameField" promptText="Surname"/>
+        <PasswordField fx:id="passwordField" promptText="Password"/>
+        <PasswordField fx:id="repeatPasswordField" promptText="Repeat Password"/>
+
+        <!-- Messaggio di errore per campi mancanti (inizialmente nascosto) -->
+        <Label fx:id="errorLabel" textFill="red" visible="false" managed="false"
+               text="Per favore, compila tutti i campi.">
+            <font>
+                <Font size="12.0" />
+            </font>
+            <VBox.margin>
+                <Insets top="6.0" bottom="2.0"/>
+            </VBox.margin>
+        </Label>
+
+        <!-- Testo tra l'ultimo campo e i loghi -->
+        <Label text="-- or sign up with --" textFill="BLACK">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <VBox.margin>
+                <Insets top="8.0" bottom="6.0"/>
+            </VBox.margin>
+        </Label>
+
+        <!-- Loghi più vicini sulla stessa riga -->
+        <HBox alignment="CENTER" spacing="10.0">
+            <VBox.margin>
+                <Insets top="2.0"/>
+            </VBox.margin>
+
+            <!-- Apple -->
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <ImageView preserveRatio="true" fitHeight="25.0" pickOnBounds="true">
+                        <image>
+                            <Image url="@assets/logoApple.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Facebook -->
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <ImageView preserveRatio="true" fitHeight="50.0" pickOnBounds="true">
+                        <image>
+                            <Image url="@assets/logofacebook.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Google -->
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <ImageView preserveRatio="true" fitHeight="25.0" pickOnBounds="true">
+                        <image>
+                            <Image url="@assets/logoGoogle.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+
+    <!-- Colonna destra: area bianca con logo completo E-Shifts -->
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" alignment="CENTER">
+        <ImageView preserveRatio="true" pickOnBounds="true" fitWidth="420.0" fitHeight="420.0">
+            <image>
+                <Image url="@assets/logoCompletoE-Shifts.png"/>
+            </image>
+        </ImageView>
+    </VBox>
+
+    <!-- Riga in basso: bottone Sign-up centrato e distanziato dai bordi -->
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2" alignment="CENTER">
+        <Button fx:id="signUpButton"
+                text="Sign-up"
+                textFill="WHITE"
+                style="-fx-background-color: #6a4c93; -fx-background-radius: 6;"
+                prefWidth="180.0"
+                onAction="#onSignUpclicked">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Button>
+    </VBox>
+
+</GridPane>
