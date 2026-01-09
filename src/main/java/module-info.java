@@ -15,6 +15,14 @@ module com.ispw.tryeshiftsv2 {
     opens com.ispw.tryeshiftsv2 to javafx.fxml;
     opens com.ispw.tryeshiftsv2.view  to javafx.fxml;
     opens com.ispw.tryeshiftsv2.graphController to javafx.fxml;
+    opens com.ispw.tryeshiftsv2.bean to javafx.base;
+
     exports com.ispw.tryeshiftsv2;
+    exports com.ispw.tryeshiftsv2.graphController;
+    exports com.ispw.tryeshiftsv2.appController;
+    exports com.ispw.tryeshiftsv2.entity;
+    exports com.ispw.tryeshiftsv2.excpetion;
+    exports com.ispw.tryeshiftsv2.bean;
+    exports com.ispw.tryeshiftsv2.dao;
 
 }
