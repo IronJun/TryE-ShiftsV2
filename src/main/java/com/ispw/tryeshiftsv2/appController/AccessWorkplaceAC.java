@@ -11,7 +11,14 @@ import com.ispw.tryeshiftsv2.excpetion.EntityNotFoundException;
 import com.ispw.tryeshiftsv2.excpetion.MembershipPendingException;
 import com.ispw.tryeshiftsv2.excpetion.UserNotMemberException;
 
+import java.util.logging.Logger;
+
 public class AccessWorkplaceAC {
+    private static final Logger LOGGER = Logger.getLogger(AccessWorkplaceAC.class.getName());
+
+    private AccessWorkplaceAC(){
+        throw new IllegalStateException("Utility class");
+    }
     public static WorkplaceBean canAccess(UserBean user, String workplaceName) throws UserNotMemberException, MembershipPendingException, EntityNotFoundException, DAOException {
         Repository repo = AppConfig.getRepository();
         Membership membership = repo.findMembership(user.getEmail(),workplaceName);

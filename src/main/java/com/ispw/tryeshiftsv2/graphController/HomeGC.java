@@ -98,8 +98,8 @@ public class HomeGC {
 
     public void handleWorkplaceSelection(String workplaceName) {
         try{
-            AccessWorkplaceAC ac = new AccessWorkplaceAC();
-            WorkplaceBean wpBean = ac.canAccess(this.loggedUser, workplaceName);
+            //AccessWorkplaceAC ac = new AccessWorkplaceAC();
+            WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         }catch (Exception e){
