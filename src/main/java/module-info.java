@@ -1,4 +1,4 @@
-module com.ispw.tryeshiftsv2 {
+module com.ispw.tryeshifts {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -13,17 +13,17 @@ module com.ispw.tryeshiftsv2 {
     requires java.desktop;
     requires java.logging;
 
-    opens com.ispw.tryeshiftsv2 to javafx.fxml;
-    opens com.ispw.tryeshiftsv2.view  to javafx.fxml;
-    opens com.ispw.tryeshiftsv2.graphController to javafx.fxml;
-    opens com.ispw.tryeshiftsv2.bean to javafx.base;
+    opens com.ispw.tryeshifts to javafx.fxml;
+    opens com.ispw.tryeshifts.view  to javafx.fxml;
+    opens com.ispw.tryeshifts.graphController to javafx.fxml;
+    opens com.ispw.tryeshifts.bean to javafx.base;
 
-    exports com.ispw.tryeshiftsv2;
-    exports com.ispw.tryeshiftsv2.graphController;
-    exports com.ispw.tryeshiftsv2.appController;
-    exports com.ispw.tryeshiftsv2.entity;
-    exports com.ispw.tryeshiftsv2.excpetion;
-    exports com.ispw.tryeshiftsv2.bean;
-    exports com.ispw.tryeshiftsv2.dao;
+    exports com.ispw.tryeshifts;
+    exports com.ispw.tryeshifts.graphController;
+    exports com.ispw.tryeshifts.appController;
+    exports com.ispw.tryeshifts.entity;
+    exports com.ispw.tryeshifts.excpetion;
+    exports com.ispw.tryeshifts.bean;
+    exports com.ispw.tryeshifts.dao;
 
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ComboBox?>
+<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-border-color: #4B4488; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphController.NewWorkplaceGC">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Configura Nuovo Workplace" />
+        <TextField fx:id="nameField" promptText="Nome Workplace" />
+        <TextField fx:id="addressField" promptText="Indirizzo" />
+        <Label text="Giorni di Apertura:" style="-fx-font-weight: bold;" />
+        <HBox spacing="10">
+            <CheckBox fx:id="checkMon" text="Lun" />
+            <CheckBox fx:id="checkTue" text="Mar" />
+            <CheckBox fx:id="checkWed" text="Mer" />
+            <CheckBox fx:id="checkThu" text="Gio" />
+            <CheckBox fx:id="checkFri" text="Ven" />
+            <CheckBox fx:id="checkSat" text="Sab" />
+            <CheckBox fx:id="checkSun" text="Dom" />
+        </HBox>
+
+        <Separator />
+        <VBox spacing="10">
+            <HBox spacing="10" alignment="BOTTOM_LEFT">
+                <VBox spacing="5">
+                    <Label text="Inizio turno:" style="-fx-font-weight: bold;"/>
+                    <HBox spacing="5">
+                        <ComboBox fx:id="startHourCombo" promptText="HH" prefWidth="70"/>
+                        <ComboBox fx:id="startMinuteCombo" promptText="mm" prefWidth="70"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Fine turno:" style="-fx-font-weight: bold;"/>
+                    <HBox spacing="5">
+                        <ComboBox fx:id="endHourCombo" promptText="HH" prefWidth="70"/>
+                        <ComboBox fx:id="endMinuteCombo" promptText="mm" prefWidth="70"/>
+                    </HBox>
+                </VBox>
+                <Button fx:id="btnAddShift" text="+" onAction="#addShiftToList"
+                        style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+            </HBox>
+            <Label fx:id="errorLabel" textFill="red" visible="false" managed="false" text="Inserzione orari non valida. Orario chiusura precedente a quello apertura"/>
+
+<!--            <ListView fx:id="addedShiftsList" prefHeight="100" />-->
+        </VBox>
+<!--        <Label text="Configura Fasce Orarie (es. 09:00 - 13:00):" style="-fx-font-weight: bold;" />-->
+<!--        <HBox spacing="10" alignment="CENTER_LEFT">-->
+<!--            <children>-->
+<!--                <ComboBox fx:id="hourComboBox" prefWidth="70.0" promptText="HH" />-->
+<!--                <Label text=":" />-->
+<!--                <ComboBox fx:id="minuteComboBox" prefWidth="70.0" promptText="mm" />-->
+<!--            </children>-->
+<!--        </HBox>-->
+        <ListView fx:id="shiftsListView" prefHeight="100" />
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <children>
+                <Button onAction="#onCancel" style="-fx-background-color: transparent; -fx-text-fill: gray;" text="Annulla" />
+                <Button onAction="#onSave" style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-font-weight: bold;" text="Crea" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
