@@ -31,7 +31,7 @@ public enum SceneManager {
     }
 
     // Metodo per inizializzare lo Stage principale
-    public void setPrimaryStage(Stage stage) {
+    void setPrimaryStage(Stage stage) {
         if(this.primaryStage == null){
             this.primaryStage = stage;
         }else{
