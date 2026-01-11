@@ -11,7 +11,7 @@ public class AppConfig {
     private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
 
-    public AppConfig(){
+    private AppConfig(){
         throw new IllegalStateException("Utility class");
     }
 

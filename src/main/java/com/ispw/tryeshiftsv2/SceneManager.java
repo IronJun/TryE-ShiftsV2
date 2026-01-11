@@ -8,25 +8,27 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 
 // Singleton initialization
 public class SceneManager {
-    private static SceneManager  instance;
+    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
+
 
     private Stage primaryStage;
 
     //Costrutture
     private SceneManager() {
-        // Opzionale: inizializzazioni qui
+        LOGGER.info("SceneManager initialized");
     }
 
+    private static class Holder{
+        private static final SceneManager INSTANCE = new SceneManager();
+    }
     // singleton method
     public static SceneManager getInstance() {
-        if(instance == null){
-            instance = new SceneManager();
-        }
-        return instance;
+        return Holder.INSTANCE;
     }
 
     // Metodo per inizializzare lo Stage principale
@@ -80,7 +82,7 @@ public class SceneManager {
             fxmlLoader.getController();
 
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento del file FXML: " + fxmlFileName);
+            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName);
             e.printStackTrace();
         }
     }
@@ -110,7 +112,7 @@ public class SceneManager {
             return controller;
 
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento del popup: " + fxmlFileName);
+            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName);
             e.printStackTrace();
             return null;
         }
