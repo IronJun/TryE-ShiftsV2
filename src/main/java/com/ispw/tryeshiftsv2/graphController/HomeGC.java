@@ -69,7 +69,7 @@ public class HomeGC {
         }catch(MembershipPendingException e){
             SceneManager.getInstance().showInfoAlert("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
         }catch (EntityNotFoundException | DAOException e){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace "+workplaceName);
+            SceneManager.getInstance().showErrorAlert("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
         }
     }
 
@@ -86,13 +86,11 @@ public class HomeGC {
                     ac.requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException e){
-                    SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace "+workplaceName);
+                    SceneManager.getInstance().showErrorAlert("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
                 }catch(DAOException e){
                     SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile inviare la richiesta");
                 }
-//                ManageMembersAC membershipAC = new ManageMembersAC();
-//                membershipAC.requestJoin(this.loggedUser,workplaceName);
-//                SceneManager.getInstance().showInfoAlert("Richiesto inviata", "La tua riechiesta è stata inolstrata con successo");
+
             }
         });
     }
@@ -166,7 +164,7 @@ public class HomeGC {
                 ownedWorkplaceList.getItems().add(wp.getWorkplaceName());
             }
         }catch(DAOException e){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile recuperare i workplace del loggedUser");
+            SceneManager.getInstance().showErrorAlert("Errore Workplace 3","Impossibile recuperare i workplace del loggedUser");
         }
     }
 
