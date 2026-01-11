@@ -10,7 +10,7 @@ import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
 
 public class CreateWorkplaceAC {
-    public static boolean createWorkplace(WorkplaceBean wp) throws InvalidDataException, DuplicateEntityException, UserNotFoundException ,DAOException{
+    public static void createWorkplace(WorkplaceBean wp) throws InvalidDataException, DuplicateEntityException, UserNotFoundException ,DAOException{
         if(wp.getWorkplaceName().isEmpty()){throw new InvalidDataException("Workplace name cannot be empty");}
 
         Repository repo = AppConfig.getRepository();
@@ -19,24 +19,21 @@ public class CreateWorkplaceAC {
         UserInfo owner;
         try{
             owner = repo.findByEmail(wp.getOwnerEmail());
-        }catch(EntityNotFoundException e){
+        }catch(EntityNotFoundException confidentiality){
             throw new UserNotFoundException("Owner not found");
         }
 
 
         Workplace newWp = new Workplace(wp.getWorkplaceName(),wp.getAddress(),wp.getSelectedDays(),wp.getShiftsBean(),wp.getOwnerEmail());
-        //newWp.setName(wp.getWorkplaceName());
         newWp.setId(java.util.UUID.randomUUID().toString());
 
         Membership membership = new Membership(owner,newWp,"MANAGER",true);
 
         repo.saveWorkplace(newWp);
         repo.saveMembership(membership);
-
-        return true;
     }
 
-    public void updateWorkplaceAC(WorkplaceBean wp,String oldname) throws InvalidDataException, DuplicateEntityException, UserNotFoundException, DAOException, EntityNotFoundException {
+    public void updateWorkplaceAC(WorkplaceBean wp,String oldname) throws DuplicateEntityException, UserNotFoundException, DAOException, EntityNotFoundException {
         var repo = AppConfig.getRepository();
         Workplace workplace = repo.findWorkplaceByName(oldname);
         if(workplace == null) throw new EntityNotFoundException("Workplace not found");
@@ -47,11 +44,7 @@ public class CreateWorkplaceAC {
         workplace.setShifts(wp.getShiftsBean());
 
         repo.updateWorkplace(workplace, oldname);
-//        if (!wp.getWorkplaceName().equals(oldname)) {
-//            // Opzionale: implementa un metodo nel DAO che rinomina il workplaceName
-//            // in tutte le Availability associate a oldName.
-//            repo.renameWorkplaceInAvailabilities(oldName, updatedBean.getWorkplaceName());
-//        }
+
         SessionContext.getInstance().setLoggedWorkplace(wp);
     }
 }

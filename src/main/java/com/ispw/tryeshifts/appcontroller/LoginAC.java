@@ -8,6 +8,7 @@ import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.excpetion.*;
 
 public class LoginAC {
+    private LoginAC(){};
     public static UserBean loginUser(UserBean userBean) throws UserNotFoundException, InvalidCredentialException, DAOException {
 
         Repository repository = AppConfig.getRepository();
@@ -15,7 +16,7 @@ public class LoginAC {
         UserInfo savedUser;
         try{
             savedUser=repository.findByEmail(userBean.getEmail());
-        }catch(EntityNotFoundException e){
+        }catch(EntityNotFoundException entity){
             throw new UserNotFoundException("Errore di recupero utente");
         }
 

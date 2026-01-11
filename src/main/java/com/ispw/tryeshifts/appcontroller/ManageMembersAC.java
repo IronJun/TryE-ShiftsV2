@@ -64,14 +64,14 @@ public class ManageMembersAC {
 
     }
 
-    public List<UserBean> getPendingRequests(String WorkplaceName) throws DAOException,EntityNotFoundException{
+    public List<UserBean> getPendingRequests(String workplaceName) throws DAOException,EntityNotFoundException{
         var repo = AppConfig.getRepository();
 
-        if(repo.findWorkplaceByName(WorkplaceName) == null){
-            throw new EntityNotFoundException("Workplace: "+WorkplaceName+" not found");
+        if(repo.findWorkplaceByName(workplaceName) == null){
+            throw new EntityNotFoundException("Workplace: "+workplaceName+" not found");
         }
 
-        List<Membership> allMembers = repo.getMembershipsByWorkplace(WorkplaceName);
+        List<Membership> allMembers = repo.getMembershipsByWorkplace(workplaceName);
         List<UserBean> beans = new ArrayList<>();
 
         for (Membership m : allMembers) {
@@ -80,11 +80,7 @@ public class ManageMembersAC {
                 ub.setEmail(m.getUser().getEmail());
                 beans.add(ub);
             }
-//            UserBean bean = new WorkplaceBean();
-//            bean.setWorkplaceName(m.getWorkplace().getName());
-//            // Riutilizziamo il campo ownerEmail per metterci l'email di chi fa la richiesta
-//            bean.setOwnerEmail(m.getUser().getEmail());
-//            beans.add(bean);
+
         }
         return beans;
     }

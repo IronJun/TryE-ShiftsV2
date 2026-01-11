@@ -14,11 +14,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ManageShiftsAC {
+    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
+
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace) throws DAOException, EntityNotFoundException {
         if(workplace == null||user == null){throw new DAOException("Workplace or User not found");}
-        //System.out.println("CHECK RUOLO: Utente Loggato=" + user.getEmail() + " | Owner WP=" + workplace.getOwnerEmail());
         var repo = AppConfig.getRepository();
         Map<String, List<String>> viewMap = new HashMap<>();
 
@@ -47,7 +49,7 @@ public class ManageShiftsAC {
     }
 
     public void saveAvailabilities(List<AvailabilityBean> beans) throws ShiftPersistenceException {
-        System.out.println("LOG AC: Ricevuti " + beans.size() + " bean da salvare");
+        LOGGER.info("salvataggio turni");
         if(beans == null){throw new ShiftPersistenceException("Bean non valido");}
 
         try {
@@ -67,7 +69,7 @@ public class ManageShiftsAC {
 
             // 2. SALVATAGGIO: Trasformiamo i Bean in Entity e le salviamo nel Repository
             for (AvailabilityBean bean : beans) {
-                System.out.println("LOG AC: Salvataggio per " + bean.getUserEmail() + " al " + bean.getDay());
+                LOGGER.info("LOG AC: Salvataggio per " + bean.getUserEmail() + " al " + bean.getDay());
                 Availability entity = new Availability(
                         bean.getUserEmail(),
                         bean.getWorkplaceName(),
@@ -77,7 +79,7 @@ public class ManageShiftsAC {
                 );
                 repo.saveAvailability(entity);
             }
-        }catch(DAOException e){
+        }catch(DAOException persistence){
             throw new ShiftPersistenceException("Errire tecnico durante salvataggio disponibilità");
         }
     }
