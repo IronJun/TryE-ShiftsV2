@@ -215,6 +215,7 @@ public class ShiftsGC {
 
 
     public void onPublic(ActionEvent actionEvent) {
+        SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
 
     public void onWorkersclicked(ActionEvent actionEvent) {
@@ -226,9 +227,9 @@ public class ShiftsGC {
         }
     }
     public void goToHome(ActionEvent actionEvent) {
-        //SessionContext.getInstance().setLoggeduser(loggedUser);
+
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
-        //setLoggedUser(loggedUser);
+
     }
 
     public void onSettingsclicked(ActionEvent actionEvent) {

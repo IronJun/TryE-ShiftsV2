@@ -140,9 +140,6 @@ public class HomeGC {
         }
     }
 
-    public HomeGC() {
-    }
-
     private void refreshWorkplaceList() {
         if (this.loggedUser == null) {
             System.out.println("DEBUG HOME: Impossibile fare refresh, loggedUser è NULL");
