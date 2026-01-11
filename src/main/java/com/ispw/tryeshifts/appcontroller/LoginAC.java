@@ -10,7 +10,7 @@ import com.ispw.tryeshifts.excpetion.*;
 public class LoginAC {
     private LoginAC(){
         throw new IllegalStateException("Utility class");
-    };
+    }
     public static UserBean loginUser(UserBean userBean) throws UserNotFoundException, InvalidCredentialException, DAOException {
 
         Repository repository = AppConfig.getRepository();
