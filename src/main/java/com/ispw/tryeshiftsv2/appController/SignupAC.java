@@ -12,9 +12,6 @@ import com.ispw.tryeshiftsv2.excpetion.UserAlreadyExistsException;
 
 public class SignupAC {
 
-    public SignupAC(){
-
-    }
 
     public static void registerUser(UserBean userbean) throws InvalidDataException, UserAlreadyExistsException, DAOException {
 
