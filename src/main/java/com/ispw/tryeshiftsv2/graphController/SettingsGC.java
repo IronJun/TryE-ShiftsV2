@@ -116,7 +116,7 @@ public class SettingsGC {
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 
         }catch(Exception e){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile aggiornare il workplace");
+            SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
         }
     }
     public void onShiftsClicked(ActionEvent actionEvent) {
@@ -156,11 +156,11 @@ public class SettingsGC {
 
             if (!newPwd.isEmpty()) {
                 if (!newPwd.equals(confirmPwd)) {
-                    SceneManager.getInstance().showErrorAlert("Errore", "Le password non coincidono!");
+                    SceneManager.getInstance().showErrorAlert("Errore Pswd", "Le password non coincidono!");
                     return;
                 }
                 if (newPwd.length() < 6) {
-                    SceneManager.getInstance().showErrorAlert("Errore", "La password deve essere di almeno 6 caratteri.");
+                    SceneManager.getInstance().showErrorAlert("Errore Pswd 2", "La password deve essere di almeno 6 caratteri.");
                     return;
                 }
             }
@@ -181,7 +181,7 @@ public class SettingsGC {
             newPasswordField.clear();
             confirmPasswordField.clear();
         }catch(Exception e){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile aggiornare il profilo");
+            SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2","Impossibile aggiornare il profilo");
         }
     }
 }

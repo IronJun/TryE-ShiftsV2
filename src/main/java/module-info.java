@@ -11,6 +11,7 @@ module com.ispw.tryeshiftsv2 {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires java.logging;
 
     opens com.ispw.tryeshiftsv2 to javafx.fxml;
     opens com.ispw.tryeshiftsv2.view  to javafx.fxml;
