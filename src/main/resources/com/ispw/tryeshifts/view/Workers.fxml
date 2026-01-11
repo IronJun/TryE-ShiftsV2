@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.geometry.Insets?>
-<BorderPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphController.WorkersGC">
+<BorderPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphcontroller.WorkersGC">
 
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="20.0" style="-fx-background-color: #4B4488;">

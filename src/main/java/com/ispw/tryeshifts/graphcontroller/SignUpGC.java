@@ -1,7 +1,7 @@
-package com.ispw.tryeshifts.graphController;
+package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
-import com.ispw.tryeshifts.appController.SignupAC;
+import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.InvalidDataException;

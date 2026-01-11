@@ -1,14 +1,14 @@
-package com.ispw.tryeshifts.graphController;
+package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
-import com.ispw.tryeshifts.appController.ManageShiftsAC;
+import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.graphController.utilities.*;
+import com.ispw.tryeshifts.graphcontroller.utilities.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;

@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.appController;
+package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.SessionContext;

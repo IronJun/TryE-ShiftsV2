@@ -1,10 +1,10 @@
-package com.ispw.tryeshifts.graphController;
+package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
-import com.ispw.tryeshifts.appController.AccessWorkplaceAC;
-import com.ispw.tryeshifts.appController.ManageMembersAC;
-import com.ispw.tryeshifts.appController.SearchWorkplacesAC;
-import com.ispw.tryeshifts.appController.getOwnedWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.AccessWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
+import com.ispw.tryeshifts.appcontroller.SearchWorkplacesAC;
+import com.ispw.tryeshifts.appcontroller.getOwnedWorkplaceAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
