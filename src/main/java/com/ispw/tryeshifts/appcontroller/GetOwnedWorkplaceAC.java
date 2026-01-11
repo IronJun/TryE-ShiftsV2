@@ -11,8 +11,11 @@ import com.ispw.tryeshifts.excpetion.DAOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class getOwnedWorkplaceAC {
+public class GetOwnedWorkplaceAC {
 
+    private GetOwnedWorkplaceAC(){
+        throw new IllegalStateException("Utility class");
+    }
     public static List<WorkplaceBean> getForUser(UserBean user) throws DAOException{
         if(user == null || user.getEmail() == null){
             throw new DAOException("User not found");

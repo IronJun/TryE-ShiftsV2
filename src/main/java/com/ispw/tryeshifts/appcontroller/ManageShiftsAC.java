@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {
-    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace) throws DAOException, EntityNotFoundException {
         if(workplace == null||user == null){throw new DAOException("Workplace or User not found");}
@@ -79,7 +79,7 @@ public class ManageShiftsAC {
                 );
                 repo.saveAvailability(entity);
             }
-        }catch(DAOException persistence){
+        }catch(DAOException _){
             throw new ShiftPersistenceException("Errire tecnico durante salvataggio disponibilità");
         }
     }

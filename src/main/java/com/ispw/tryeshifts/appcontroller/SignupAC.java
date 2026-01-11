@@ -10,14 +10,22 @@ import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.InvalidDataException;
 import com.ispw.tryeshifts.excpetion.UserAlreadyExistsException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SignupAC {
+    private static final Logger LOGGER = Logger.getLogger(SignupAC.class.getName());
+
+    private SignupAC(){
+        throw new IllegalStateException("Utility class");
+    }
 
 
     public static void registerUser(UserBean userbean) throws InvalidDataException, UserAlreadyExistsException, DAOException {
 
         if (isDataInvalid(userbean)) {
             throw new InvalidDataException("Dati non validi");
-        } else if (PwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
+        } else if (pwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
             throw new InvalidDataException("Le password non corrispondono");
         }
 
@@ -28,7 +36,7 @@ public class SignupAC {
                 throw new UserAlreadyExistsException("L'email: "+userbean.getEmail()+" è già in uso");
             }
         }catch (EntityNotFoundException _){
-
+            LOGGER.log(Level.INFO, "Owner non trovato, procedo con i valori di default.");
         }
         UserInfo userentity = new UserInfo(userbean.getEmail(), userbean.getName(), userbean.getSurname());
 
@@ -44,7 +52,7 @@ public class SignupAC {
         return bean.getEmail().isEmpty() || bean.getName().isEmpty() ||
                 bean.getPassword().isEmpty() || bean.getSurname().isEmpty();
     }
-    private static boolean PwdNotMatch(String pwd, String pwd2) {
+    private static boolean pwdNotMatch(String pwd, String pwd2) {
         return !pwd.equals(pwd2);
     }
 }

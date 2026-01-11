@@ -21,7 +21,7 @@ public class SearchWorkplacesAC {
                 resultBeans.add(wpbean);
             }
             return resultBeans;
-        }catch(Exception e){
+        }catch(Exception _){
             throw new DAOException("Errore di recupero dei workplace");
         }
     }
@@ -43,7 +43,7 @@ public class SearchWorkplacesAC {
                 result.add(wpbean);
             }
             return result;
-        }catch(Exception e){
+        }catch(Exception _){
             throw new DAOException("Errore di ricerca dei workplace");
         }
     }

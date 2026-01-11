@@ -19,7 +19,7 @@ public class CreateWorkplaceAC {
         UserInfo owner;
         try{
             owner = repo.findByEmail(wp.getOwnerEmail());
-        }catch(EntityNotFoundException confidentiality){
+        }catch(EntityNotFoundException _){
             throw new UserNotFoundException("Owner not found");
         }
 

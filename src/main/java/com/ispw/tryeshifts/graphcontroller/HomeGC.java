@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.AccessWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
 import com.ispw.tryeshifts.appcontroller.SearchWorkplacesAC;
-import com.ispw.tryeshifts.appcontroller.getOwnedWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.GetOwnedWorkplaceAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -154,7 +154,7 @@ public class HomeGC {
             for (WorkplaceBean wp : allWorkplaces) {
                 workplaceListView.getItems().add(wp.getWorkplaceName());
             }
-            getOwnedWorkplaceAC ac = new getOwnedWorkplaceAC();
+            GetOwnedWorkplaceAC ac = new GetOwnedWorkplaceAC();
             List<WorkplaceBean> myWorkplaces = ac.getForUser(this.loggedUser);
             ownedWorkplaceList.getItems().clear();
             for (WorkplaceBean wp : myWorkplaces) {
