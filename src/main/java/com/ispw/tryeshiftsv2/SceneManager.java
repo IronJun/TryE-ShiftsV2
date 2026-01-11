@@ -13,19 +13,23 @@ import java.util.logging.Logger;
 
 // Singleton initialization
 public class SceneManager {
-    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SceneManager.class.getName());
 
 
     private Stage primaryStage;
 
-    //Costrutture
-    private SceneManager() {
-        LOGGER.info("SceneManager initialized");
-    }
-
     private static class Holder{
         private static final SceneManager INSTANCE = new SceneManager();
     }
+    //Costrutture
+    private SceneManager() {
+        if (Holder.INSTANCE != null) {
+            throw new IllegalStateException("Already initialized");
+        }
+        LOGGER.info("SceneManager initialized");
+    }
+
+
     // singleton method
     public static SceneManager getInstance() {
         return Holder.INSTANCE;
@@ -39,6 +43,10 @@ public class SceneManager {
     // Metodo per ottenere lo Stage (utile per chiudere l'applicazione o Stage multipli)
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
     }
 
     // Metodo principale per caricare un FXML e cambiare la scena
