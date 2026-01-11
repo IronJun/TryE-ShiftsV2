@@ -32,7 +32,11 @@ public enum SceneManager {
 
     // Metodo per inizializzare lo Stage principale
     public void setPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
+        if(this.primaryStage == null){
+            this.primaryStage = stage;
+        }else{
+            LOGGER.warning("Tentativo di sovrascrizione dello stage principale.");
+        }
     }
 
     // Metodo per ottenere lo Stage (utile per chiudere l'applicazione o Stage multipli)
