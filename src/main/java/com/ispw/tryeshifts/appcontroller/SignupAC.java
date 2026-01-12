@@ -5,10 +5,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.Repository;
 import com.ispw.tryeshifts.dao.SecurityUtils;
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.excpetion.InvalidDataException;
-import com.ispw.tryeshifts.excpetion.UserAlreadyExistsException;
+import com.ispw.tryeshifts.excpetion.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,10 +37,12 @@ public class SignupAC {
         }
         UserInfo userentity = new UserInfo(userbean.getEmail(), userbean.getName(), userbean.getSurname());
 
-
-        String hashedPass = SecurityUtils.hashPassword(userbean.getPassword());
-        userentity.setPasswordHash(hashedPass);
-
+        try {
+            String hashedPass = SecurityUtils.hashPassword(userbean.getPassword());
+            userentity.setPasswordHash(hashedPass);
+        }catch(FetchDataException _){
+            LOGGER.info("Errore nella creazione dell' hash password");
+        }
 
         repository.save(userentity);
 

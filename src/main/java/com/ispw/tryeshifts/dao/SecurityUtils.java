@@ -1,11 +1,16 @@
 package com.ispw.tryeshifts.dao;
 
+import com.ispw.tryeshifts.excpetion.FetchDataException;
+
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 
 public class SecurityUtils{
 
-    public static String hashPassword(String password) {
+    private SecurityUtils(){
+        throw new IllegalStateException("Utility class");
+    }
+    public static String hashPassword(String password) throws FetchDataException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
@@ -18,7 +23,7 @@ public class SecurityUtils{
             }
             return hexString.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Errore critico durante l'hashing", e);
+            throw new FetchDataException("Errore critico durante l'hashing");
         }
     }
 }

@@ -1,18 +1,16 @@
 package com.ispw.tryeshifts.entity;
 
 public class UserInfo{
-    //private int id;
     private String nome;
     private String cognome;
     private String email;
     private String passwordHash;
-    private Membership membership;
 
 
     public UserInfo(){}
-    public UserInfo(String email, String Name,String Surname){
-        this.nome = Name;
-        this.cognome = Surname;
+    public UserInfo(String email, String name,String surname){
+        this.nome = name;
+        this.cognome = surname;
         this.email = email;
 
     }
@@ -44,10 +42,4 @@ public class UserInfo{
         this.passwordHash = passwordHash;
     }
 
-    public Membership getMembership() {
-        return membership;
-    }
-    public void setMembership(Membership membership) {
-        this.membership = membership;
-    }
 }

@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller;
 
+import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.AccessWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
@@ -20,9 +21,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 
 public class HomeGC {
+    private static final Logger LOGGER = Logger.getLogger(HomeGC.class.getName());
+
     private UserBean loggedUser;
 
     @FXML
@@ -64,11 +68,11 @@ public class HomeGC {
             WorkplaceBean fullWp = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(fullWp);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
-        }catch(UserNotMemberException e) {
+        }catch(UserNotMemberException _) {
             showJoinConfirmation(workplaceName);
-        }catch(MembershipPendingException e){
+        }catch(MembershipPendingException _){
             SceneManager.getInstance().showInfoAlert("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
-        }catch (EntityNotFoundException | DAOException e){
+        }catch (EntityNotFoundException | DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
         }
     }
@@ -85,9 +89,9 @@ public class HomeGC {
                     ManageMembersAC ac = new ManageMembersAC();
                     ac.requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
-                }catch(EntityNotFoundException e){
+                }catch(EntityNotFoundException _){
                     SceneManager.getInstance().showErrorAlert("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
-                }catch(DAOException e){
+                }catch(DAOException _){
                     SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile inviare la richiesta");
                 }
 
@@ -98,17 +102,16 @@ public class HomeGC {
 
     public void handleWorkplaceSelection(String workplaceName) {
         try{
-            //AccessWorkplaceAC ac = new AccessWorkplaceAC();
             WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         }catch (Exception e){
             if(e.getMessage().equals("Non sei membro di questo workplace")){
-                System.out.println("vuoi inviare richiesta?");
+                LOGGER.info("vuoi inviare richiesta?");
             }else if(e.getMessage().equals("Non sei ancora stato accettato da questo workplace")){
-                System.out.println("richiesta già inviata");
+                LOGGER.info("richiesta già inviata");
             }else{
-                System.out.println("ERRORE: "+e.getMessage());
+                LOGGER.info("ERRORE: "+e.getMessage());
             }
         }
     }
@@ -127,7 +130,7 @@ public class HomeGC {
             for (WorkplaceBean wp : result) {
                 workplaceListView.getItems().add(wp.getWorkplaceName());
             }
-        }catch(DAOException e){
+        }catch(DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile eseguire la ricerca");
             workplaceListView.getItems().clear();
         }
@@ -142,25 +145,23 @@ public class HomeGC {
 
     private void refreshWorkplaceList() {
         if (this.loggedUser == null) {
-            System.out.println("DEBUG HOME: Impossibile fare refresh, loggedUser è NULL");
+            LOGGER.info("DEBUG HOME: Impossibile fare refresh, loggedUser è NULL");
             return;
         }
         try{
             SearchWorkplacesAC searchAC = new SearchWorkplacesAC();
             List<WorkplaceBean> allWorkplaces = searchAC.getAllWorkplaces();
-            //System.out.println("DEBUG HOME: Trovati "+myWorkplaces.size()+" workplace per "+this.loggedUser.getEmail());
 
             workplaceListView.getItems().clear();
             for (WorkplaceBean wp : allWorkplaces) {
                 workplaceListView.getItems().add(wp.getWorkplaceName());
             }
-            GetOwnedWorkplaceAC ac = new GetOwnedWorkplaceAC();
-            List<WorkplaceBean> myWorkplaces = ac.getForUser(this.loggedUser);
+            List<WorkplaceBean> myWorkplaces = GetOwnedWorkplaceAC.getForUser(this.loggedUser);
             ownedWorkplaceList.getItems().clear();
             for (WorkplaceBean wp : myWorkplaces) {
                 ownedWorkplaceList.getItems().add(wp.getWorkplaceName());
             }
-        }catch(DAOException e){
+        }catch(DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore Workplace 3","Impossibile recuperare i workplace del loggedUser");
         }
     }
@@ -168,7 +169,7 @@ public class HomeGC {
     public void newWpClicked(ActionEvent event) {
 
         if (this.loggedUser == null) {
-            System.err.println("ERRORE: Impossibile aprire il popup, loggedUser è null!");
+            LOGGER.warning("ERRORE: Impossibile aprire il popup, loggedUser è null!");
             return;
         }
 
@@ -179,13 +180,13 @@ public class HomeGC {
         // 2. Passiamo l'utente loggato al controller del popup
         if (popupController != null) {
             popupController.setLoggedUser(this.loggedUser);
-            System.out.println("utente passato al popup: " + this.loggedUser.getEmail());
+            LOGGER.info("utente passato al popup: " + this.loggedUser.getEmail());
             popupController.getNameField().getScene().getWindow().setOnHiding(e -> {
-                System.out.println("DEBUG HOME: Popup in chiusura, eseguo il refresh...");
+                LOGGER.info("DEBUG HOME: Popup in chiusura, eseguo il refresh...");
                 refreshWorkplaceList();
             });
         } else {
-            System.err.println("Errore nel caricamento del popup");
+            LOGGER.info("Errore nel caricamento del popup");
         }
 
         refreshWorkplaceList();
@@ -195,7 +196,7 @@ public class HomeGC {
     public void onLogoutClicked(ActionEvent event) {
         this.loggedUser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        System.out.println("Logout effettuato");
+        LOGGER.info("Logout effettuato");
     }
 
     public void onShiftsclicked(ActionEvent actionEvent) {
@@ -203,7 +204,7 @@ public class HomeGC {
         if (wp != null) {
             handleWorkplaceSelection(wp.getWorkplaceName());
         } else {
-            System.out.println("Seleziona un workplace dai tuoi per vedere i turni");
+            LOGGER.info("Seleziona un workplace dai tuoi per vedere i turni");
         }
     }
 
