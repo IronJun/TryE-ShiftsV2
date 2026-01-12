@@ -12,9 +12,9 @@ public class WorkplaceBean {
 
     public WorkplaceBean(){}
 
-    public WorkplaceBean(String Workplacename, String Address,List<String> selectedDays,List<String> shifts,String ownerEmail){
-        this.workplaceName = Workplacename;
-        this.address = Address;
+    public WorkplaceBean(String workplacename, String address,List<String> selectedDays,List<String> shifts,String ownerEmail){
+        this.workplaceName = workplacename;
+        this.address = address;
         this.selectedDaysBean = selectedDays;
         this.shiftsBean = shifts;
         this.ownerEmail = ownerEmail;

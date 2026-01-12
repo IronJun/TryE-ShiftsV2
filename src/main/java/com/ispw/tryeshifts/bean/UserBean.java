@@ -8,7 +8,7 @@ public class UserBean {
     private String name;
     private String surname;
     private Membership membership;
-    private String Role;
+    private String role;
     private String pwdRepeat;
 
     public UserBean(String text, String passwordFieldText){
@@ -66,8 +66,8 @@ public class UserBean {
     public void setSurname(String surname) {
         this.surname = surname;
     }
-    public void setRole(String role){this.Role = role;}
-    public String getRole(){return this.Role;}
+    public void setRole(String role){this.role = role;}
+    public String getRole(){return this.role;}
     public String getPwdRep(){return pwdRepeat;}
 
 }

@@ -5,15 +5,15 @@ public class AvailabilityBean {
     private String workplaceName;
     private String day;
     private String shift;
-    private String StartShift;
-    private String EndShift;
+    private String startShift;
+    private String endShifts;
 
-    public AvailabilityBean(String userEmail, String workplaceName, String day,String StartShift,String EndShift) {
+    public AvailabilityBean(String userEmail, String workplaceName, String day,String startShift,String endShifts) {
         this.userEmail = userEmail;
         this.workplaceName = workplaceName;
         this.day = day;
-        this.StartShift = StartShift;
-        this.EndShift = EndShift;
+        this.startShift = startShift;
+        this.endShifts = endShifts;
     }
 
     public String getUserEmail() {
@@ -28,6 +28,6 @@ public class AvailabilityBean {
     public String getShift() {
         return shift;
     }
-    public String getStartShift() {return StartShift;}
-    public String getEndShift() {return EndShift;}
+    public String getStartShift() {return startShift;}
+    public String getEndShifts() {return endShifts;}
 }

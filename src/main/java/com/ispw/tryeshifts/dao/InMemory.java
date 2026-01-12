@@ -20,11 +20,15 @@ public class InMemory implements Repository {
 
 
     public void save(UserInfo user) throws DAOException{
-        usersDbDemo.put(user.getEmail(),user);
+        if(user != null){
+            usersDbDemo.put(user.getEmail(),user);
+
+        }else{
+            throw new DAOException("No user passed");
+        }
     }
 
-
-    public UserInfo findByEmail(String email) throws EntityNotFoundException,DAOException{
+    public UserInfo findByEmail(String email) throws EntityNotFoundException{
         UserInfo user = usersDbDemo.get(email);
         if(user == null){
             throw new EntityNotFoundException("User with email: " + email + " not found");
@@ -32,36 +36,43 @@ public class InMemory implements Repository {
         return user;
     }
 
-    public List<Membership> getMemberships(String email) throws DAOException{
-        return membershipsDbDemo.stream().filter(m -> m.getUser().getEmail().equals(email)).toList();
-    }
-
     public void saveWorkplace(Workplace wp) throws DAOException{
-        workplacesDbDemo.put(wp.getName(),wp);
+        if(wp != null) {
+            workplacesDbDemo.put(wp.getName(), wp);
+        }else{
+            throw new DAOException("No workplace passed");
+        }
     }
 
     public void saveMembership(Membership m)throws DAOException{
-        membershipsDbDemo.add(m);
+        if(m != null) {
+            membershipsDbDemo.add(m);
+        }else{
+            throw new DAOException("No membership passed");
+        }
     }
 
     public boolean existsWorkplaceByName(String name) throws DAOException{
-        // Essendo una mappa con il nome come chiave, il controllo è istantaneo
-        return workplacesDbDemo.containsKey(name);
+        if(name != null) {
+            return workplacesDbDemo.containsKey(name);
+        }else{
+            throw new DAOException("No workplace name passed");
+        }
     }
 
     public List<Workplace> findWorkplacesbyEmail(String email) throws DAOException{
         try{
             return membershipsDbDemo.stream().filter(m -> m.getUser().getEmail().equals(email)).map(Membership::getWorkplace).toList();
-        }catch(Exception e){
+        }catch(Exception _){
             throw new DAOException("Cannot resolve the Workplaces for this User");
         }
     }
 
-    public List<Workplace> findAllWorkplaces()throws DAOException{
+    public List<Workplace> findAllWorkplaces(){
         return new ArrayList<>(workplacesDbDemo.values());
     }
 
-    public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException,DAOException{
+    public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException{
         if(name == null || name.isEmpty()){throw new EntityNotFoundException("Workplace name cannot be empty");}
         List<Workplace> result = new ArrayList<>();
         String lowerCaseQuery = name.toLowerCase();
@@ -74,6 +85,7 @@ public class InMemory implements Repository {
     }
 
     public boolean isUserMemberOf(String email,String workplaceName)throws DAOException{
+        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
         for(Membership m : membershipsDbDemo){
             if(m.getUser().getEmail().equals(email) && m.getWorkplace().getName().equals(workplaceName)){
                 return true;
@@ -83,12 +95,14 @@ public class InMemory implements Repository {
     }
 
     public Workplace findWorkplaceByName(String name) throws EntityNotFoundException,DAOException{
+        if(name == null || name.isEmpty()){throw new DAOException("Workplace name cannot be empty");}
         Workplace wp = workplacesDbDemo.get(name);
         if(wp == null){throw new EntityNotFoundException("Workplace with name: " + name + " not found");}
         return wp;
     }
 
     public Membership findMembership(String email,String workplaceName)throws DAOException{
+        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
         for(Membership m : membershipsDbDemo){
             if(m.getUser().getEmail().equals(email) && m.getWorkplace().getName().equals(workplaceName)){
                 return m;
@@ -98,6 +112,7 @@ public class InMemory implements Repository {
     }
 
     public List<Membership> getMembershipByUser(String email)throws DAOException{
+        if(email == null || email.isEmpty()){throw new DAOException("Invalid parameters");}
         return membershipsDbDemo.stream().filter(m -> m.getUser().getEmail().equals(email)).toList();
     }
 
@@ -133,6 +148,7 @@ public class InMemory implements Repository {
     }
 
     private boolean isOwnerOfWorkplace(String email, String workplaceName) throws DAOException{
+        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
         for (Membership m : this.membershipsDbDemo) {
             if (m.getWorkplace().getName().equals(workplaceName) &&
                     m.getUser().getEmail().equals(email) &&
@@ -144,12 +160,13 @@ public class InMemory implements Repository {
     }
 
     public void removeMembership(Membership membership)throws DAOException{
+        if(membership == null){throw new DAOException("Invalid parameters");}
         this.membershipsDbDemo.remove(membership);
     }
 
     public List<Membership> getMembershipsByWorkplace(String workplaceName)throws DAOException {
         List<Membership> filteredList = new ArrayList<>();
-
+        if(workplaceName == null || workplaceName.isEmpty()){throw new DAOException("Invalid parameters");}
         // Accedi alla tua lista globale (es. membershipsList)
         for (Membership m : this.membershipsDbDemo) {
             // Confrontiamo il nome del workplace
@@ -163,11 +180,13 @@ public class InMemory implements Repository {
 
     // 1. Salva una nuova disponibilità
     public void saveAvailability(Availability availability)throws DAOException {
+        if(availability == null){throw new DAOException("Invalid parameters");}
         this.availabilities.add(availability);
     }
 
     // 2. Recupera tutte le disponibilità per un determinato Workplace (per il Boss)
     public List<Availability> getAvailabilitiesByWorkplace(String workplaceName) throws DAOException {
+        if(workplaceName == null || workplaceName.isEmpty()){throw new DAOException("Invalid parameters");}
         List<Availability> result = new ArrayList<>();
         for (Availability a : availabilities) {
             if (a.getWorkplaceName().equals(workplaceName)) {
@@ -179,6 +198,7 @@ public class InMemory implements Repository {
 
     // 3. Recupera le disponibilità di un singolo utente in un workplace (per il Worker)
     public List<Availability> getAvailabilitiesByUser(String email, String workplaceName) throws DAOException{
+        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
         List<Availability> result = new ArrayList<>();
         for (Availability a : availabilities) {
             if (a.getUserEmail().equals(email) && a.getWorkplaceName().equals(workplaceName)) {
@@ -190,7 +210,7 @@ public class InMemory implements Repository {
 
     // 4. Elimina le vecchie disponibilità di un utente (per la pulizia prima del salvataggio)
     public void deleteAvailabilitiesByUser(String email, String workplaceName) throws DAOException {
-        // Usiamo removeIf che è molto più pulito e veloce
+        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
         this.availabilities.removeIf(a ->
                 a.getUserEmail().equals(email) && a.getWorkplaceName().equals(workplaceName)
         );
@@ -215,7 +235,7 @@ public class InMemory implements Repository {
         System.out.println("Repository: Aggiornato workplace [" + newName + "] con successo.");
     }
 
-    public void updateUser(UserInfo updatedUser) throws EntityNotFoundException,DAOException{
+    public void updateUser(UserInfo updatedUser) throws EntityNotFoundException{
         if(!usersDbDemo.containsKey(updatedUser.getEmail())){throw new EntityNotFoundException("User not found");}
         usersDbDemo.put(updatedUser.getEmail(),updatedUser);
         System.out.println("Repository: Aggiornato utente [" + updatedUser.getEmail() + "] con successo.");

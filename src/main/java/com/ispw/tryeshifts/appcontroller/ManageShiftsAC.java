@@ -75,7 +75,7 @@ public class ManageShiftsAC {
                         bean.getWorkplaceName(),
                         bean.getDay(),
                         bean.getStartShift(),
-                        bean.getEndShift()// Assicurati che nel Bean si chiami shift o timeSlot come nella Entity
+                        bean.getEndShifts()// Assicurati che nel Bean si chiami shift o timeSlot come nella Entity
                 );
                 repo.saveAvailability(entity);
             }
