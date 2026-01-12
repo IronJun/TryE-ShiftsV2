@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller;
 
+import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.bean.UserBean;
@@ -16,9 +17,11 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 public class NewWorkplaceGC {
+    private static final Logger LOGGER = Logger.getLogger(NewWorkplaceGC.class.getName());
 
     @FXML
     private TextField nameField;
@@ -40,13 +43,17 @@ public class NewWorkplaceGC {
     private CheckBox checkSun;
     @FXML
     private ListView<String> shiftsListView;
-    @FXML private
-    ComboBox<String> startHourCombo, startMinuteCombo, endHourCombo, endMinuteCombo;
-    @FXML private
-    ComboBox<String> minuteComboBox;
+    @FXML
+    private ComboBox<String> startHourCombo;
+    @FXML
+    private ComboBox<String> startMinuteCombo;
+    @FXML
+    private ComboBox<String> endHourCombo;
+    @FXML
+    private ComboBox<String> endMinuteCombo;
+
     @FXML private Label errorLabel;
 
-    //private List<String> selectedShifts = new ArrayList<>();
     private UserBean loggedUser;
 
     public void initialize() {
@@ -56,13 +63,11 @@ public class NewWorkplaceGC {
             String h = String.format("%02d",i);
             startHourCombo.getItems().add(h);
             endHourCombo.getItems().add(h);
-            //hourComboBox.getItems().add(String.format("%02d",i));
         }
         for(int i=0;i<60;i+=5){
             String m = String.format("%02d",i);
             startMinuteCombo.getItems().add(m);
             endMinuteCombo.getItems().add(m);
-            //minuteComboBox.getItems().add(String.format("%02d",i));
         }
         startHourCombo.getSelectionModel().selectFirst();
         startMinuteCombo.getSelectionModel().selectFirst();
@@ -82,14 +87,14 @@ public class NewWorkplaceGC {
 
 
         if (loggedUser == null) {
-            System.err.println("ERRORE: Il popup non ha ricevuto l'utente loggato!");
+            LOGGER.warning("ERRORE: Il popup non ha ricevuto l'utente loggato!");
             return;
         }
 
         String email = loggedUser.getEmail();
         // 1. Validazione base
         if (nameField.getText().isEmpty() || addressField.getText().isEmpty()) {
-            System.err.println("Compila tutti i campi!");
+            LOGGER.warning("Compila tutti i campi!");
             return;
         }
         List<String> days = getSelectedDays();

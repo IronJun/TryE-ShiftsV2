@@ -22,7 +22,7 @@ public class SecurityUtils{
                 hexString.append(hex);
             }
             return hexString.toString();
-        } catch (Exception e) {
+        } catch (Exception _) {
             throw new FetchDataException("Errore critico durante l'hashing");
         }
     }

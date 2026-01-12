@@ -1,6 +1,5 @@
 package com.ispw.tryeshifts.graphcontroller;
 
-import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.AccessWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
@@ -13,7 +12,6 @@ import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.MembershipPendingException;
 import com.ispw.tryeshifts.excpetion.UserNotMemberException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -136,12 +134,6 @@ public class HomeGC {
         }
     }
 
-    public void setLoggedUser(UserBean user) {
-        this.loggedUser = user;
-        if (ownedWorkplaceList != null) {
-            refreshWorkplaceList();
-        }
-    }
 
     private void refreshWorkplaceList() {
         if (this.loggedUser == null) {
@@ -166,8 +158,7 @@ public class HomeGC {
         }
     }
 
-    public void newWpClicked(ActionEvent event) {
-
+    public void newWpClicked() {
         if (this.loggedUser == null) {
             LOGGER.warning("ERRORE: Impossibile aprire il popup, loggedUser è null!");
             return;
@@ -193,13 +184,13 @@ public class HomeGC {
 
     }
 
-    public void onLogoutClicked(ActionEvent event) {
+    public void onLogoutClicked() {
         this.loggedUser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         LOGGER.info("Logout effettuato");
     }
 
-    public void onShiftsclicked(ActionEvent actionEvent) {
+    public void onShiftsclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if (wp != null) {
             handleWorkplaceSelection(wp.getWorkplaceName());
@@ -208,7 +199,7 @@ public class HomeGC {
         }
     }
 
-    public void onWorkersclicked(ActionEvent actionEvent) {
+    public void onWorkersclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
@@ -216,7 +207,7 @@ public class HomeGC {
             SceneManager.getInstance().showInfoAlert("Seleziona un workplace", "Per vedere i membri devi prima selezionare un workplace");
         }
     }
-    public void onSettingsclicked(ActionEvent actionEvent) {
+    public void onSettingsclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
