@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class ShiftsGC {
-    private UserBean loggeduser;
+    private UserBean loggedUser;
     private WorkplaceBean selectedWorkplace;
     private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
 
@@ -48,13 +48,13 @@ public class ShiftsGC {
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     public void initialize(){
-        this.loggeduser = SessionContext.getInstance().getLoggeduser();
+        this.loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         if (info != null) {
             setSelectedWorkplace(info);
         }
         ShiftsUIStrat strat;
-        if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
+        if(loggedUser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
             strat = new BossShiftsStrat();
         }else{
             strat = new WorkerShiftsStrat();
@@ -245,7 +245,7 @@ public class ShiftsGC {
 
 
     public void onLogoutClicked(ActionEvent actionEvent) {
-        this.loggeduser = null;
+        this.loggedUser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         LOGGER.info("Logout effettuato");
     }

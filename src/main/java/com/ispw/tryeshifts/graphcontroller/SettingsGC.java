@@ -19,7 +19,8 @@ import java.util.List;
 
 
 public class SettingsGC {
-    @FXML private TextField nameField,addressField;
+    @FXML private TextField nameField;
+    @FXML private TextField addressField;
     @FXML private FlowPane daysContainer;
     @FXML private ListView<String> shiftsListView;
     @FXML private ComboBox<String> startHourCombo;
