@@ -15,10 +15,8 @@ public class ShiftCellHandling extends ListCell<String> {
     private final Pane spacer = new Pane();
     public ShiftCellHandling(){
         // Configuriamo il layout una volta sola nel costruttore
-        //HBox.setHgrow(spacer, Priority.ALWAYS);
         container.setSpacing(10);
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        //container.getChildren().addAll(timeLabel,spacer,btnDelete);
         btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-cursor: hand;");
         container.setAlignment(Pos.CENTER_RIGHT);
 

@@ -7,7 +7,6 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -23,15 +22,21 @@ public class SettingsGC {
     @FXML private TextField nameField,addressField;
     @FXML private FlowPane daysContainer;
     @FXML private ListView<String> shiftsListView;
-    @FXML private ComboBox<String> startHourCombo, startMinuteCombo, endHourCombo, endMinuteCombo;
+    @FXML private ComboBox<String> startHourCombo;
+    @FXML private ComboBox<String> startMinuteCombo;
+    @FXML private ComboBox<String> endHourCombo;
+    @FXML private ComboBox<String> endMinuteCombo;
     @FXML private Label errorlabel;
     @FXML private VBox leftPane;
     @FXML private VBox rightPane;
     @FXML private HBox mainHBox;
-    @FXML private TextField firstNameField,lastNameField, emailField;
-    @FXML private PasswordField newPasswordField,confirmPasswordField;
+    @FXML private TextField firstNameField;
+    @FXML private TextField lastNameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
 
-    private List<CheckBox> dayCheckBoxes = new ArrayList<>();
+    private final List<CheckBox> dayCheckBoxes = new ArrayList<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     @FXML
@@ -115,11 +120,11 @@ public class SettingsGC {
 
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 
-        }catch(Exception e){
+        }catch(Exception _){
             SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
         }
     }
-    public void onShiftsClicked(ActionEvent actionEvent) {
+    public void onShiftsClicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Shifts.fxml", "Gestione Membri", 900, 600);
@@ -128,7 +133,7 @@ public class SettingsGC {
         }
     }
 
-    public void onWorkersclicked(ActionEvent actionEvent) {
+    public void onWorkersclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
@@ -137,17 +142,17 @@ public class SettingsGC {
         }
     }
 
-    public void onLogoutClicked(ActionEvent actionEvent) {
+    public void onLogoutClicked() {
         SessionContext.getInstance().setLoggeduser(null);
         SessionContext.getInstance().setLoggedWorkplace(null);
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
     }
 
-    public void onHomeclicked(ActionEvent actionEvent) {
+    public void onHomeclicked() {
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
     }
 
-    public void saveProfileChanges(ActionEvent actionEvent) {
+    public void saveProfileChanges() {
         try{
             String newPwd = newPasswordField.getText();
             String confirmPwd = confirmPasswordField.getText();
@@ -180,7 +185,7 @@ public class SettingsGC {
 
             newPasswordField.clear();
             confirmPasswordField.clear();
-        }catch(Exception e){
+        }catch(Exception _){
             SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2","Impossibile aggiornare il profilo");
         }
     }

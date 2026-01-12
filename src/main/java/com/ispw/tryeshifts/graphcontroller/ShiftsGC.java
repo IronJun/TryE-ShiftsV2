@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ShiftsGC {
-    private UserBean loggedUser;
+    private UserBean loggeduser;
     private WorkplaceBean selectedWorkplace;
+    private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
+
     @FXML
     private GridPane shiftsGrid;
     @FXML
@@ -45,13 +48,13 @@ public class ShiftsGC {
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     public void initialize(){
-        this.loggedUser = SessionContext.getInstance().getLoggeduser();
+        this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         if (info != null) {
             setSelectedWorkplace(info);
         }
         ShiftsUIStrat strat;
-        if(loggedUser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
+        if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
             strat = new BossShiftsStrat();
         }else{
             strat = new WorkerShiftsStrat();
@@ -65,7 +68,7 @@ public class ShiftsGC {
         this.workplaceTitleLabel.setText(wp.getWorkplaceName());
         // Qui potrai caricare i turni specifici di questo workplace
         buildDynamicTable();
-        System.out.println("Benvenuto nei turni di: " + wp.getWorkplaceName());
+        LOGGER.info("Benvenuto nei turni di: " + wp.getWorkplaceName());
     }
 
 
@@ -130,14 +133,14 @@ public class ShiftsGC {
                     String currentDay = days[c - 1];
                     String timeKey =timeSlots.get(r).replace("","");
                     String cellKey = currentDay + "_" + timeKey;
-                    System.out.println("DEBUG UI: Cerco in mappa la chiave: [" + cellKey + "]");
+                    LOGGER.info("DEBUG UI: Cerco in mappa la chiave: [" + cellKey + "]");
                     boolean isDayActive = activeDays.contains(currentDay);
                     List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
                     if (!isOwner && cellContent.contains("SELECTED")) {
                         selectedCellsMap.put(cellKey, true);
                     }
                     if (!cellContent.isEmpty()) {
-                        System.out.println("DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent);
+                        LOGGER.info("DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent);
                     }
                     // DELEGA ALLA FACTORY: Non c'è più IF/ELSE qui!
                     VBox cell = cellProvider.createCell(cellKey, cellContent, isDayActive);
@@ -145,7 +148,7 @@ public class ShiftsGC {
                     shiftsGrid.add(cell, c, r + 1);
                 }
             }
-        }catch(DAOException | EntityNotFoundException e){
+        }catch(DAOException | EntityNotFoundException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i turni");
         }
     }
@@ -155,13 +158,13 @@ public class ShiftsGC {
         // 1. Recuperiamo i dati contestuali
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        System.out.println("DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size());
+        LOGGER.info("DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size());
         // 2. Creiamo una lista di AvailabilityBean
         List<AvailabilityBean> availabilityBeans = new ArrayList<>();
 
         // Scorriamo la mappa delle celle selezionate
         for (Map.Entry<String, Boolean> entry : selectedCellsMap.entrySet()) {
-            System.out.println("DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue());
+            LOGGER.info("DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue());
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
                 String[] parts = key.split("_", 2);
@@ -179,7 +182,7 @@ public class ShiftsGC {
                         String end = timeParts[1].trim();
 
                         // LOG DI CONTROLLO FINALE
-                        System.out.println("DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end);
+                        LOGGER.info("DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end);
 
                         AvailabilityBean bean = new AvailabilityBean(
                                 loggedUser.getEmail(),
@@ -191,12 +194,12 @@ public class ShiftsGC {
                         availabilityBeans.add(bean);
                     } else {
                         // Se finisci qui, stampa esattamente cosa c'è dentro per capire
-                        System.out.println("DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]");
+                        LOGGER.info("DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]");
                     }
                 }
 
             }
-            System.out.println("DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size());
+            LOGGER.info("DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size());
 
             // 3. Chiamiamo il Controller Applicativo
             try {
@@ -206,7 +209,7 @@ public class ShiftsGC {
                 // Messaggio di successo
                 SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
 
-            } catch (Exception e) {
+            } catch (Exception _) {
                 SceneManager.getInstance().showErrorAlert("Errore", "Impossibile salvare le disponibilità.");
             }
         }
@@ -222,7 +225,7 @@ public class ShiftsGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
         }else{
-            System.out.println("Seleziona un workplace");
+           LOGGER.info("Seleziona un workplace");
         }
     }
     public void goToHome(ActionEvent actionEvent) {
@@ -236,14 +239,14 @@ public class ShiftsGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
         }else{
-            System.out.println("Seleziona un workplace");
+            LOGGER.info("Seleziona un workplace");
         }
     }
 
 
     public void onLogoutClicked(ActionEvent actionEvent) {
-        this.loggedUser = null;
+        this.loggeduser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        System.out.println("Logout effettuato");
+        LOGGER.info("Logout effettuato");
     }
 }
