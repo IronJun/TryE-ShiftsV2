@@ -225,7 +225,7 @@ public class ShiftsGC {
     }
 
 
-    public void onPublic(ActionEvent actionEvent) {
+    public void onPublic() {
         SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
 
@@ -237,13 +237,13 @@ public class ShiftsGC {
            LOGGER.info("Seleziona un workplace");
         }
     }
-    public void goToHome(ActionEvent actionEvent) {
+    public void goToHome() {
 
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
 
     }
 
-    public void onSettingsclicked(ActionEvent actionEvent) {
+    public void onSettingsclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
@@ -255,7 +255,7 @@ public class ShiftsGC {
     }
 
 
-    public void onLogoutClicked(ActionEvent actionEvent) {
+    public void onLogoutClicked() {
         this.loggeduser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         msg = "Logout effettuato";
