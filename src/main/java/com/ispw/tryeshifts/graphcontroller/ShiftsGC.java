@@ -30,6 +30,7 @@ public class ShiftsGC {
     private UserBean loggeduser;
     private WorkplaceBean selectedWorkplace;
     private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
+    private String msg;
 
     @FXML
     private GridPane shiftsGrid;
@@ -69,7 +70,8 @@ public class ShiftsGC {
         this.workplaceTitleLabel.setText(wp.getWorkplaceName());
         // Qui potrai caricare i turni specifici di questo workplace
         buildDynamicTable();
-        LOGGER.info("Benvenuto nei turni di: " + wp.getWorkplaceName());
+        msg = "DEBUG UI: Workplace selezionato: " + wp.getWorkplaceName();
+        LOGGER.log(Level.FINE,msg);
     }
 
 
@@ -134,14 +136,17 @@ public class ShiftsGC {
                     String currentDay = days[c - 1];
                     String timeKey =timeSlots.get(r).replace("","");
                     String cellKey = currentDay + "_" + timeKey;
-                    LOGGER.log(Level.FINE, "DEBUG UI: Cerco in mappa la chiave: [{}]", cellKey);
+
+                    msg = "DEBUG UI: Cerco in mappa la chiave: " +cellKey;
+                    LOGGER.log(Level.FINE, msg);
                     boolean isDayActive = activeDays.contains(currentDay);
                     List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
                     if (!isOwner && cellContent.contains("SELECTED")) {
                         selectedCellsMap.put(cellKey, true);
                     }
                     if (!cellContent.isEmpty()) {
-                        LOGGER.info("DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent);
+                        msg = "DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent;
+                        LOGGER.log(Level.FINE ,msg);
                     }
                     // DELEGA ALLA FACTORY: Non c'è più IF/ELSE qui!
                     VBox cell = cellProvider.createCell(cellKey, cellContent, isDayActive);
@@ -159,13 +164,15 @@ public class ShiftsGC {
         // 1. Recuperiamo i dati contestuali
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        LOGGER.info("DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size());
+        msg = "DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size();
+        LOGGER.log(Level.FINE, msg);
         // 2. Creiamo una lista di AvailabilityBean
         List<AvailabilityBean> availabilityBeans = new ArrayList<>();
 
         // Scorriamo la mappa delle celle selezionate
         for (Map.Entry<String, Boolean> entry : selectedCellsMap.entrySet()) {
-            LOGGER.info("DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue());
+            msg = "DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue();
+            LOGGER.log(Level.FINE, msg);
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
                 String[] parts = key.split("_", 2);
@@ -183,8 +190,8 @@ public class ShiftsGC {
                         String end = timeParts[1].trim();
 
                         // LOG DI CONTROLLO FINALE
-                        LOGGER.info("DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end);
-
+                        msg ="DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
+                        LOGGER.log(Level.FINE, msg);
                         AvailabilityBean bean = new AvailabilityBean(
                                 loggedUser.getEmail(),
                                 wp.getWorkplaceName(),
@@ -194,13 +201,14 @@ public class ShiftsGC {
                         );
                         availabilityBeans.add(bean);
                     } else {
-                        // Se finisci qui, stampa esattamente cosa c'è dentro per capire
-                        LOGGER.info("DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]");
+                        msg ="DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
+                        LOGGER.log(Level.FINE, msg);
                     }
                 }
 
             }
-            LOGGER.info("DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size());
+            msg ="DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size();
+            LOGGER.log(Level.FINE, msg);
 
             // 3. Chiamiamo il Controller Applicativo
             try {
@@ -240,7 +248,9 @@ public class ShiftsGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
         }else{
-            LOGGER.info("Seleziona un workplace");
+
+            msg = "Seleziona un workplace";
+            LOGGER.log(Level.FINE, msg);
         }
     }
 
@@ -248,6 +258,7 @@ public class ShiftsGC {
     public void onLogoutClicked(ActionEvent actionEvent) {
         this.loggeduser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        LOGGER.info("Logout effettuato");
+        msg = "Logout effettuato";
+        LOGGER.log(Level.FINE, msg);
     }
 }
