@@ -7,7 +7,6 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -19,13 +18,9 @@ import javafx.scene.layout.HBox;
 import java.util.List;
 
 public class WorkersGC {
-    @FXML
-    private ListView<UserBean> activeWorkersList;
-    @FXML
-    private ListView<UserBean> pendingWorkersList;
-    @FXML
-    private Label titleLabel;
-
+    @FXML private ListView<UserBean> activeWorkersList;
+    @FXML private ListView<UserBean> pendingWorkersList;
+    @FXML private Label titleLabel;
     private WorkplaceBean currentWorkplace;
 
     public void initialize(){
@@ -49,9 +44,9 @@ public class WorkersGC {
             pendingWorkersList.getItems().setAll(pending);
 
             setupCells();
-        }catch(EntityNotFoundException e){
+        }catch(EntityNotFoundException _){
             SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace");
-        }catch(DAOException e){
+        }catch(DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i membri");
         }catch(Exception e){
             e.printStackTrace();
@@ -109,24 +104,19 @@ public class WorkersGC {
             ac.acceptWorker(userEmail, currentWp, accept);
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
-        }catch(EntityNotFoundException e){
+        }catch(EntityNotFoundException _){
             SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace");
-        }catch(DAOException e){
+        }catch(DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile aggiornare il DB");
         }
-//        ManageMembersAC ac = new ManageMembersAC();
-//        // Chiamiamo l'applicativo per aggiornare il DB
-//        ac.acceptWorker(userEmail, currentWorkplace.getWorkplaceName(), accept);
-//
-//        // Ricarichiamo le liste: la persona sparirà da destra e apparirà a sinistra
-//        loadLists();
+
     }
 
-    public void goToHome(ActionEvent actionEvent) {
+    public void goToHome() {
     SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
     }
 
-    public void onLogoutClicked(ActionEvent actionEvent) {
+    public void onLogoutClicked() {
         SessionContext.getInstance().setLoggeduser(null);
         SessionContext.getInstance().setLoggedWorkplace(null);
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 400, 500);
@@ -135,7 +125,7 @@ public class WorkersGC {
         SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
     }
 
-    public void onSettingclicked(ActionEvent actionEvent) {
+    public void onSettingclicked() {
         SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
     }
 }

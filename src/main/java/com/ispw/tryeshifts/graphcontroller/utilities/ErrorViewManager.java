@@ -6,6 +6,9 @@ import javafx.scene.control.TextInputControl;
 
 public class ErrorViewManager {
 
+    private ErrorViewManager() {
+        throw new IllegalStateException("Utility class");
+    }
     public static void showError(Label errorLabel, String message) {
         if (errorLabel != null) {
             errorLabel.setText(message);

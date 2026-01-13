@@ -18,7 +18,6 @@ public class WorkerCellFactory implements ShiftCellProvider{
     public VBox createCell(String cellKey, List<String> content, boolean isDayActive){
         VBox cell = new VBox(3);
         cell.setAlignment(Pos.TOP_CENTER);
-        //cell.setCursor(Cursor.HAND);
 
         if (!isDayActive) {
             cell.setStyle("-fx-border-color: #D1CFE2; -fx-padding: 5; -fx-background-color: #f2f2f2;");
@@ -42,7 +41,6 @@ public class WorkerCellFactory implements ShiftCellProvider{
         cell.setOnMouseClicked(e -> {
             boolean newState = !selectionMap.getOrDefault(cellKey,false);
             selectionMap.put(cellKey,newState);
-            System.out.println("DEBUG FACTORY: Cliccata cella [" + cellKey + "] -> Stato: " + newState);
             applyStyle(cell,status,newState);
         });
 
