@@ -9,7 +9,6 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.utilities.*;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -134,7 +133,7 @@ public class ShiftsGC {
 
                 for (int c = 1; c <= 7; c++) {
                     String currentDay = days[c - 1];
-                    String timeKey =timeSlots.get(r).replace("","");
+                    String timeKey =timeSlots.get(r).replace(" ","");
                     String cellKey = currentDay + "_" + timeKey;
 
                     msg = "DEBUG UI: Cerco in mappa la chiave: " +cellKey;
@@ -229,7 +228,7 @@ public class ShiftsGC {
         SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
 
-    public void onWorkersclicked(ActionEvent actionEvent) {
+    public void onWorkersclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
