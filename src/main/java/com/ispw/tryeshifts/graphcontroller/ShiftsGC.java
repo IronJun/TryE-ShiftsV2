@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ShiftsGC {
-    private UserBean loggedUser;
+    private UserBean loggeduser;
     private WorkplaceBean selectedWorkplace;
     private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
 
@@ -43,18 +44,18 @@ public class ShiftsGC {
 
     @FXML private Label instructionLabel;
 
-    private Map<String, Boolean> selectedCellsMap = new HashMap<>();
+    private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
 
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     public void initialize(){
-        this.loggedUser = SessionContext.getInstance().getLoggeduser();
+        this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         if (info != null) {
             setSelectedWorkplace(info);
         }
         ShiftsUIStrat strat;
-        if(loggedUser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
+        if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
             strat = new BossShiftsStrat();
         }else{
             strat = new WorkerShiftsStrat();
@@ -133,7 +134,7 @@ public class ShiftsGC {
                     String currentDay = days[c - 1];
                     String timeKey =timeSlots.get(r).replace("","");
                     String cellKey = currentDay + "_" + timeKey;
-                    LOGGER.info("DEBUG UI: Cerco in mappa la chiave: [" + cellKey + "]");
+                    LOGGER.log(Level.FINE, "DEBUG UI: Cerco in mappa la chiave: [{}]", cellKey);
                     boolean isDayActive = activeDays.contains(currentDay);
                     List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
                     if (!isOwner && cellContent.contains("SELECTED")) {
@@ -245,7 +246,7 @@ public class ShiftsGC {
 
 
     public void onLogoutClicked(ActionEvent actionEvent) {
-        this.loggedUser = null;
+        this.loggeduser = null;
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         LOGGER.info("Logout effettuato");
     }
