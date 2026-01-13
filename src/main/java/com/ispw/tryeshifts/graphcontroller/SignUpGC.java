@@ -45,7 +45,7 @@ public class SignUpGC {
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         } catch (InvalidDataException | UserAlreadyExistsException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
-        } catch (DAOException e) {
+        } catch (DAOException _) {
             SceneManager.getInstance().showErrorAlert("Errore tecnico", "Impossibile registrare l'utente");
         }
 

@@ -49,7 +49,6 @@ public class OwnerCellFactory implements ShiftCellProvider{
                 cell.getChildren().add(nameTag);
             }
         }
-        System.out.println("DEBUG BOSS: Sto processando cella " + cellKey + " - Candidati: " + candidates.size());
         return cell;
 
     }
