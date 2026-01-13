@@ -130,6 +130,17 @@
                 </graphic>
             </Button>
         </HBox>
+
+        <Button text="Sign-in if you already have an account"
+                onAction="#goTologin"
+                style="-fx-background-color: transparent; -fx-text-fill: black; -fx-cursor: hand; -fx-underline: true;">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+        </Button>
     </VBox>
 
     <!-- Colonna destra: area bianca con logo completo E-Shifts -->

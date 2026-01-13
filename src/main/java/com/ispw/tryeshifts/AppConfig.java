@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class AppConfig {
     private static Repository repository = null;
-    public static final boolean IS_DEMO_MODE = true;
+    public static final boolean IS_DEMO_MODE = false;
     private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
 

@@ -17,10 +17,12 @@ import java.util.logging.Logger;
 
 public class JDBC implements Repository{
     private static final Logger LOGGER = Logger.getLogger(JDBC.class.getName());
+    private String msg;
+
 
     public UserInfo findByEmail(String email) {
         // Selezioniamo solo i campi che servono al tuo costruttore
-        String query = "SELECT email, nome, cognome FROM users WHERE email = ?";
+        String query = "SELECT email, nome, cognome, password FROM users WHERE email = ?";
 
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -30,11 +32,13 @@ public class JDBC implements Repository{
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     // Usiamo il TUO costruttore: email, nome, cognome
-                    return new UserInfo(
+                    UserInfo user = new UserInfo(
                             rs.getString("email"),
                             rs.getString("nome"),
                             rs.getString("cognome")
                     );
+                    user.setPasswordHash(rs.getString("password"));
+                    return user;
                 }
             }
         } catch (SQLException e) {
@@ -44,8 +48,27 @@ public class JDBC implements Repository{
         return null;
     }
     public void save(UserInfo user) throws DAOException{
-        throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
-    };
+        String query = "INSERT INTO users (email, nome, cognome,password) VALUES (?,?,?,?)";
+        try(Connection conn = DBconnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+
+
+            pstmt.setString(1,user.getEmail());
+            pstmt.setString(2, user.getName());
+            pstmt.setString(3, user.getSurname());
+            pstmt.setString(4, user.getPasswordHash());
+
+            pstmt.executeUpdate();
+            msg = user.getEmail()+ " registrato con successo nel database! ";
+            LOGGER.log(Level.FINE,msg);
+        }catch (SQLException e){
+            if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
+                LOGGER.log(Level.WARNING, "Errore: l'email {0} è già registrata.", user.getEmail());
+            } else {
+                LOGGER.log(Level.SEVERE, "Errore durante il salvataggio JDBC", e);
+            }
+        }
+    }
     public void updateUser(UserInfo updateUser) throws EntityNotFoundException,DAOException{
         throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
     };

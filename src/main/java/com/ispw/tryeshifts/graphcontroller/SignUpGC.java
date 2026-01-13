@@ -51,4 +51,8 @@ public class SignUpGC {
 
     }
 
+    public void goTologin(){
+        SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
+    }
+
 }
