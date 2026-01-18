@@ -23,6 +23,12 @@ public class Availability {
     public String getDay() {
         return day;
     }
+    public String getEndShift() {
+        return endShift;
+    }
+    public String getStartShift() {
+        return startShift;
+    }
     public String getFullShift() {
         return startShift + "-" + endShift;
     }
