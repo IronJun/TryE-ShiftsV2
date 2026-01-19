@@ -16,6 +16,16 @@ import java.util.logging.Logger;
 public class JDBC implements Repository{
     private static final Logger LOGGER = Logger.getLogger(JDBC.class.getName());
     private String msg;
+    private String userEmail = "user_email";
+    private String nameUser = "name";
+    private String addressUser = "address";
+    private String ownerEmail = "owner_email";
+    private String dayName = "day_name";
+    private String isAccepted = "is_accepted";
+    private String workplaceStrName = "workplace_name";
+    private String startShift = "start_shift";
+    private String endShift = "end_shift";
+
 
     public UserInfo findByEmail(String email) {
         // Selezioniamo solo i campi che servono al tuo costruttore
@@ -160,10 +170,10 @@ public class JDBC implements Repository{
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Workplace wp = new Workplace(
-                            rs.getString("name"),
-                            rs.getString("address"),
+                            rs.getString(nameUser),
+                            rs.getString(addressUser),
                             null, null,
-                            rs.getString("owner_email")
+                            rs.getString(ownerEmail)
                     );
                     wp.setId(String.valueOf(rs.getInt("id")));
 
@@ -199,10 +209,10 @@ public class JDBC implements Repository{
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Workplace wp = new Workplace(
-                            rs.getString("name"),
-                            rs.getString("address"),
+                            rs.getString(nameUser),
+                            rs.getString(addressUser),
                             null, null,
-                            rs.getString("owner_email")
+                            rs.getString(userEmail)
                     );
                     wp.setId(String.valueOf(rs.getInt("id")));
 
@@ -225,7 +235,7 @@ public class JDBC implements Repository{
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                Workplace wp = new Workplace(rs.getString("name"), rs.getString("address"), null, null, rs.getString("owner_email"));
+                Workplace wp = new Workplace(rs.getString(nameUser), rs.getString(addressUser), null, null, rs.getString(ownerEmail));
                 wp.setId(String.valueOf(rs.getInt("id")));
                 fillWorkplaceDetails(wp, conn);
                 list.add(wp);
@@ -242,7 +252,7 @@ public class JDBC implements Repository{
             pstmt.setString(1, "%" + name + "%");
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Workplace wp = new Workplace(rs.getString("name"), rs.getString("address"), null, null, rs.getString("owner_email"));
+                    Workplace wp = new Workplace(rs.getString(nameUser), rs.getString(addressUser), null, null, rs.getString(ownerEmail));
                     wp.setId(String.valueOf(rs.getInt("id")));
                     fillWorkplaceDetails(wp, conn);
                     list.add(wp);
@@ -261,7 +271,7 @@ public class JDBC implements Repository{
             pstmt.setInt(1, Integer.parseInt(wp.getId()));
             try (ResultSet rs = pstmt.executeQuery()) {
                 List<String> days = new ArrayList<>();
-                while (rs.next()) days.add(rs.getString("day_name"));
+                while (rs.next()) days.add(rs.getString(dayName));
                 wp.setSelectedDays(days);
             }
         }
@@ -323,7 +333,7 @@ public class JDBC implements Repository{
                     UserInfo ui = new UserInfo(email, null, null); // Nome e cognome non necessari qui
                     Workplace wp = new Workplace();
                     wp.setName(workplaceName);
-                    return new Membership(ui, wp, rs.getString("role"), rs.getBoolean("is_accepted"));
+                    return new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted));
                 }
             }
         } catch (SQLException e) {
@@ -339,9 +349,9 @@ public class JDBC implements Repository{
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Workplace wp = new Workplace();
-                    wp.setName(rs.getString("workplace_name"));
+                    wp.setName(rs.getString(workplaceStrName));
                     UserInfo ui = new UserInfo(email, null, null);
-                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean("is_accepted")));
+                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted)));
                 }
             }
         } catch (SQLException e) {
@@ -360,9 +370,9 @@ public class JDBC implements Repository{
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Workplace wp = new Workplace();
-                    wp.setName(rs.getString("workplace_name"));
-                    UserInfo ui = new UserInfo(rs.getString("user_email"), null, null);
-                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean("is_accepted")));
+                    wp.setName(rs.getString(workplaceStrName));
+                    UserInfo ui = new UserInfo(rs.getString(userEmail), null, null);
+                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted)));
                 }
             }
         } catch (SQLException e) {
@@ -377,10 +387,10 @@ public class JDBC implements Repository{
             pstmt.setString(1, workplaceName);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    UserInfo ui = new UserInfo(rs.getString("user_email"), null, null);
+                    UserInfo ui = new UserInfo(rs.getString(userEmail), null, null);
                     Workplace wp = new Workplace();
                     wp.setName(workplaceName);
-                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean("is_accepted")));
+                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted)));
                 }
             }
         } catch (SQLException e) {
@@ -458,11 +468,11 @@ public class JDBC implements Repository{
                 while (rs.next()) {
                     // Ricostruiamo l'oggetto Availability
                     list.add(new Availability(
-                            rs.getString("user_email"),
+                            rs.getString(userEmail),
                             workplaceName,
-                            rs.getString("day_name"),
-                            rs.getString("start_shift"),
-                            rs.getString("end_shift")
+                            rs.getString(dayName),
+                            rs.getString(startShift),
+                            rs.getString(endShift)
                     ));
                 }
             }
@@ -482,10 +492,10 @@ public class JDBC implements Repository{
                 while (rs.next()) {
                     list.add(new Availability(
                             email,
-                            rs.getString("workplace_name"),
-                            rs.getString("day_name"),
-                            rs.getString("start_shift"),
-                            rs.getString("end_shift")
+                            rs.getString(workplaceStrName),
+                            rs.getString(dayName),
+                            rs.getString(startShift),
+                            rs.getString(startShift)
                     ));
                 }
             }
