@@ -16,15 +16,15 @@ import java.util.logging.Logger;
 public class JDBC implements Repository{
     private static final Logger LOGGER = Logger.getLogger(JDBC.class.getName());
     private String msg;
-    private String userEmail = "user_email";
-    private String nameUser = "name";
-    private String addressUser = "address";
-    private String ownerEmail = "owner_email";
-    private String dayName = "day_name";
-    private String isAccepted = "is_accepted";
-    private String workplaceStrName = "workplace_name";
-    private String startShift = "start_shift";
-    private String endShift = "end_shift";
+    private final String userEmail = "user_email";
+    private final String nameUser = "name";
+    private final String addressUser = "address";
+    private final String ownerEmail = "owner_email";
+    private final String dayName = "day_name";
+    private final String isAccepted = "is_accepted";
+    private final String workplaceStrName = "workplace_name";
+    private final String startShift = "start_shift";
+    private final String endShift = "end_shift";
 
 
     public UserInfo findByEmail(String email) {
@@ -212,7 +212,7 @@ public class JDBC implements Repository{
                             rs.getString(nameUser),
                             rs.getString(addressUser),
                             null, null,
-                            rs.getString(userEmail)
+                            rs.getString(ownerEmail)
                     );
                     wp.setId(String.valueOf(rs.getInt("id")));
 

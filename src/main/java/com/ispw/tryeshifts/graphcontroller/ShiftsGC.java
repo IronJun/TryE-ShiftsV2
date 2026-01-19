@@ -30,23 +30,14 @@ public class ShiftsGC {
     private WorkplaceBean selectedWorkplace;
     private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
     private String msg;
-
-    @FXML
-    private GridPane shiftsGrid;
-    @FXML
-
-    private Label workplaceTitleLabel;
-    @FXML
-    private Button saveShiftsBtn;
-
-    @FXML
-    private Button publicShiftsBtn;
-
+    @FXML private GridPane shiftsGrid;
+    @FXML private Label workplaceTitleLabel;
+    @FXML private Button saveShiftsBtn;
+    @FXML private Button publicShiftsBtn;
     @FXML private Label instructionLabel;
-
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
-
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+
 
     public void initialize(){
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
@@ -63,7 +54,6 @@ public class ShiftsGC {
         strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn);
     }
 
-
     public void setSelectedWorkplace(WorkplaceBean wp) {
         this.selectedWorkplace = wp;
         this.workplaceTitleLabel.setText(wp.getWorkplaceName());
@@ -72,8 +62,6 @@ public class ShiftsGC {
         msg = "DEBUG UI: Workplace selezionato: " + wp.getWorkplaceName();
         LOGGER.log(Level.FINE,msg);
     }
-
-
 
     private void buildDynamicTable() {
 
@@ -223,7 +211,6 @@ public class ShiftsGC {
         }
     }
 
-
     public void onPublic() {
         SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
@@ -236,6 +223,7 @@ public class ShiftsGC {
            LOGGER.info("Seleziona un workplace");
         }
     }
+
     public void goToHome() {
 
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
@@ -252,7 +240,6 @@ public class ShiftsGC {
             LOGGER.log(Level.FINE, msg);
         }
     }
-
 
     public void onLogoutClicked() {
         this.loggeduser = null;

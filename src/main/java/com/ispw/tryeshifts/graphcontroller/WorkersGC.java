@@ -21,10 +21,20 @@ public class WorkersGC {
     @FXML private ListView<UserBean> activeWorkersList;
     @FXML private ListView<UserBean> pendingWorkersList;
     @FXML private Label titleLabel;
+    @FXML private Label titlePending;
     private WorkplaceBean currentWorkplace;
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
+        String emailUser = SessionContext.getInstance().getLoggeduser().getEmail();
+
+        boolean isOwner = currentWorkplace.getOwnerEmail().equals(emailUser);
+        titlePending.setVisible(isOwner);
+        titlePending.setManaged(isOwner);
+        pendingWorkersList.setVisible(isOwner);
+        pendingWorkersList.setManaged(isOwner);
+        activeWorkersList.setVisible(true);
+
         if(currentWorkplace != null){
             titleLabel.setText("Lavoratori: "+ currentWorkplace.getWorkplaceName());
             loadLists();
