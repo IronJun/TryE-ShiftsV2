@@ -30,6 +30,8 @@ public class DBconnection {
         throw new IllegalStateException("Utility class");
     }
     public static Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(props.getProperty("db.url"),props.getProperty("db.user"),props.getProperty("db.password"));
+        String password = System.getenv("DB_password");
+        if(password == null){LOGGER.warning("ERRORE CRITICO: La variabile d'ambiente DB_PASSWORD non è impostata!");}
+        return DriverManager.getConnection(props.getProperty("db.url"),props.getProperty("db.user"),password);
     }
 }

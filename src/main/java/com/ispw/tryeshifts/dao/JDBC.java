@@ -60,15 +60,15 @@ public class JDBC implements Repository{
             LOGGER.log(Level.FINE,msg);
         }catch (SQLException e){
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
-                LOGGER.log(Level.WARNING, "Errore: l'email {0} è già registrata.", user.getEmail());
+                throw new DAOException("Impossibile salvare, esiste già un utente con questo indirizzo email: " + e.getMessage());
             } else {
-                LOGGER.log(Level.SEVERE, "Errore durante il salvataggio JDBC", e);
+                throw new DAOException("Errore durante il salvataggio dell'utente: " + e.getMessage());
             }
         }
     }
     public void updateUser(UserInfo updateUser) throws EntityNotFoundException,DAOException{
         throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
-    };
+    }
 
     //gestione workplace
     public void saveWorkplace(Workplace wp) throws DAOException {
@@ -134,11 +134,9 @@ public class JDBC implements Repository{
             }
         }
     }
-
     public void updateWorkplace(Workplace updateWp,String oldName) throws DAOException, EntityNotFoundException{
         throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
-    };
-
+    }
     public boolean existsWorkplaceByName(String name) throws DAOException{
         String query = "SELECT COUNT(*) FROM workplaces WHERE name = ?";
         try(Connection conn = DBconnection.getConnection();
@@ -149,12 +147,10 @@ public class JDBC implements Repository{
                 return rs.getInt(1) > 0;
             }
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE,"Errore durante la ricerca del Workplace",e);
-            return false;
+            throw new DAOException("Errore durante la ricerca del workplace: " + e.getMessage());
         }
-    };
-
-    public Workplace findWorkplaceByName(String name)throws EntityNotFoundException,DAOException{
+    }
+    public Workplace findWorkplaceByName(String name)throws DAOException{
         String query = "SELECT id, name, address, owner_email FROM workplaces WHERE name = ?";
 
         try (Connection conn = DBconnection.getConnection();
@@ -178,11 +174,10 @@ public class JDBC implements Repository{
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore findWorkplaceByName", e);
+            throw new DAOException("Errore nel recupero della lista workplace: " + e.getMessage());
         }
         return null;
-    };
-
+    }
     public List<Workplace> findWorkplacesbyEmail(String email) throws DAOException{
         List<Workplace> list = new ArrayList<>();
 
@@ -221,8 +216,7 @@ public class JDBC implements Repository{
             throw new DAOException("Errore nel recupero della lista workplace: " + e.getMessage());
         }
         return list;
-    };
-
+    }
     public List<Workplace> findAllWorkplaces() throws DAOException{
         List<Workplace> list = new ArrayList<>();
         String query = "SELECT id, name, address, owner_email FROM workplaces";
@@ -237,8 +231,7 @@ public class JDBC implements Repository{
                 list.add(wp);
             }
         } catch (SQLException e) { throw new DAOException("Errore recupero totale workplace: " + e.getMessage()); }
-        return list;    };
-
+        return list;    }
     public List<Workplace> findWorkplacesByName(String name)throws EntityNotFoundException,DAOException{
         List<Workplace> list = new ArrayList<>();
         // Usiamo LIKE per permettere ricerche parziali (es. "Off" trova "Officina")
@@ -258,7 +251,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) { throw new DAOException("Errore ricerca per nome: " + e.getMessage()); }
 
         if (list.isEmpty()) throw new EntityNotFoundException("Nessun workplace trovato con nome: " + name);
-        return list;    };
+        return list;    }
 
     //classe di supporto caricamento liste:
     private void fillWorkplaceDetails(Workplace wp, Connection conn) throws SQLException {
@@ -296,7 +289,7 @@ public class JDBC implements Repository{
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Errore salvataggio membership: " + e.getMessage());
-        }    };
+        }    }
     public void updateMembership(Membership updateMembership)throws DAOException{
         String query = "UPDATE memberships SET role = ?, is_accepted = ? WHERE user_email = ? AND workplace_name = ?";
         try (Connection conn = DBconnection.getConnection();
@@ -308,7 +301,7 @@ public class JDBC implements Repository{
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Errore aggiornamento membership: " + e.getMessage());
-        }    };
+        }    }
     public void removeMembership(Membership membership)throws DAOException{
         String query = "DELETE FROM memberships WHERE user_email = ? AND workplace_name = ?";
         try (Connection conn = DBconnection.getConnection();
@@ -318,7 +311,7 @@ public class JDBC implements Repository{
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Errore rimozione membership: " + e.getMessage());
-        }    };
+        }    }
     public Membership findMembership(String email,String workplaceName)throws DAOException{
         String query = "SELECT role, is_accepted FROM memberships WHERE user_email = ? AND workplace_name = ?";
         try (Connection conn = DBconnection.getConnection();
@@ -336,7 +329,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore findMembership: " + e.getMessage());
         }
-        return null;    };
+        return null;    }
     public List<Membership> getMembershipByUser(String email)throws DAOException{
         List<Membership> list = new ArrayList<>();
         String query = "SELECT workplace_name, role, is_accepted FROM memberships WHERE user_email = ?";
@@ -354,7 +347,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore getMembershipByUser: " + e.getMessage());
         }
-        return list;    };
+        return list;    }
     public List<Membership> getPendingRequestsForOwner(String ownerEmail)throws DAOException{
         List<Membership> list = new ArrayList<>();
         // Questa query unisce memberships e workplaces per trovare le richieste di quei posti che appartengono all'owner
@@ -375,7 +368,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore getPendingRequestsForOwner: " + e.getMessage());
         }
-        return list;    };
+        return list;    }
     public List<Membership> getMembershipsByWorkplace(String workplaceName)throws DAOException{
         List<Membership> list = new ArrayList<>();
         String query = "SELECT user_email, role, is_accepted FROM memberships WHERE workplace_name = ?";
@@ -393,7 +386,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore getMembershipsByWorkplace: " + e.getMessage());
         }
-        return list;    };
+        return list;    }
     public boolean isUserMemberOf(String email,String workplaceName)throws DAOException{
         // Controlliamo se l'utente è il PROPRIETARIO (nella tabella workplaces)
         // OPPURE se è un MEMBRO ACCETTATO (nella tabella memberships)
@@ -414,7 +407,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore nel controllo permessi: " + e.getMessage());
         }
-    };
+    }
 
     //Gestione availability
     public void saveAvailability(Availability availability)throws DAOException{
@@ -436,7 +429,7 @@ public class JDBC implements Repository{
 
         } catch (SQLException e) {
             throw new DAOException("Errore nel salvataggio della disponibilità: " + e.getMessage());
-        }    };
+        }    }
     public void deleteAvailabilitiesByUser(String email,String workplaceName)throws DAOException{
         String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ?";
 
@@ -445,13 +438,13 @@ public class JDBC implements Repository{
 
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
-
             int rowsAffected = pstmt.executeUpdate();
-            LOGGER.info("Eliminate " + rowsAffected + " disponibilità per l'utente: " + email);
+            msg="Eliminate " + rowsAffected + " disponibilità per l'utente: " + email;
+            LOGGER.info(msg);
 
         } catch (SQLException e) {
             throw new DAOException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
-        }    };
+        }    }
     public List<Availability> getAvailabilitiesByWorkplace(String workplaceName)throws DAOException{
         List<Availability> list = new ArrayList<>();
         String query = "SELECT user_email, day_name, start_shift, end_shift FROM availabilities WHERE workplace_name = ?";
@@ -476,7 +469,7 @@ public class JDBC implements Repository{
         } catch (SQLException e) {
             throw new DAOException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": " + e.getMessage());
         }
-        return list;    };
+        return list;    }
     public List<Availability> getAvailabilitiesByUser(String email,String workplaceName)throws DAOException{
         List<Availability> list = new ArrayList<>();
         String query = "SELECT workplace_name, day_name, start_shift, end_shift FROM availabilities WHERE user_email = ?";
@@ -500,6 +493,6 @@ public class JDBC implements Repository{
             throw new DAOException("Errore nel recupero disponibilità: " + e.getMessage());
         }
         return list;
-    };
+    }
 
 }
