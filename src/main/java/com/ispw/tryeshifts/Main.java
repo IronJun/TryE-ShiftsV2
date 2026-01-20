@@ -1,6 +1,6 @@
 package com.ispw.tryeshifts;
 
-import com.ispw.tryeshifts.dao.JDBC;
+//import com.ispw.tryeshifts.dao.JDBC;
 import com.ispw.tryeshifts.entity.UserInfo;
 import javafx.application.Application;
 import javafx.stage.Stage;

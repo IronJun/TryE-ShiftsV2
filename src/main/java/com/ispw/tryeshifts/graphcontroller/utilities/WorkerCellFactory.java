@@ -10,8 +10,10 @@ import java.util.Map;
 
 public class WorkerCellFactory implements ShiftCellProvider{
     private final Map<String,Boolean> selectionMap;
+    private final boolean isLocked;
 
-    public WorkerCellFactory(Map<String,Boolean> selectionMap){
+    public WorkerCellFactory(Map<String,Boolean> selectionMap, boolean locked){
+        this.isLocked = locked;
         this.selectionMap = selectionMap;
     }
 
@@ -38,13 +40,27 @@ public class WorkerCellFactory implements ShiftCellProvider{
         Label status = new Label(isSelected ? "Selezionato" : "Libero");
         applyStyle(cell,status,isSelected);
 
-        cell.setOnMouseClicked(e -> {
-            boolean newState = !selectionMap.getOrDefault(cellKey,false);
-            selectionMap.put(cellKey,newState);
-            applyStyle(cell,status,newState);
-        });
+        if (this.isLocked) {
+            // Se la settimana è bloccata, mostriamo lo stato ma impediamo modifiche
+            cell.setCursor(Cursor.DEFAULT);
+            cell.setOpacity(0.8); // Feedback visivo: la cella è "congelata"
 
-        cell.getChildren().add(status);
+            // Se è bloccata, non aggiungiamo il listener setOnMouseClicked
+            // Opzionalmente aggiungiamo un tooltip o un piccolo testo
+            Label lockText = new Label("Sola Lettura");
+            lockText.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
+            cell.getChildren().addAll(status, lockText);
+        } else {
+            // 4. LOGICA DI INTERAZIONE (OPEN)
+            cell.setCursor(Cursor.HAND);
+            cell.setOnMouseClicked(e -> {
+                boolean newState = !selectionMap.getOrDefault(cellKey, false);
+                selectionMap.put(cellKey, newState);
+                status.setText(newState ? "Selezionato" : "Libero");
+                applyStyle(cell, status, newState);
+            });
+            cell.getChildren().add(status);
+        }
 
         return cell;
     }

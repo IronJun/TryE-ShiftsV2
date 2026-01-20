@@ -5,6 +5,7 @@ import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
+import com.ispw.tryeshifts.dao.Repository;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
@@ -18,8 +19,9 @@ import java.util.logging.Logger;
 
 public class ManageShiftsAC {
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
+    Repository repository = AppConfig.getRepository();
 
-    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace) throws DAOException, EntityNotFoundException {
+    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace,String weekId ) throws DAOException, EntityNotFoundException {
         if(workplace == null||user == null){throw new DAOException("Workplace or User not found");}
         var repo = AppConfig.getRepository();
         Map<String, List<String>> viewMap = new HashMap<>();
@@ -45,7 +47,7 @@ public class ManageShiftsAC {
                 viewMap.computeIfAbsent(key, k -> new ArrayList<>()).add("SELECTED");
             }
         }
-        return viewMap;
+        return repo.getAvailabilitiesByWeek(workplace.getWorkplaceName(),weekId);
     }
 
     public void saveAvailabilities(List<AvailabilityBean> beans) throws ShiftPersistenceException {
@@ -75,12 +77,25 @@ public class ManageShiftsAC {
                         bean.getWorkplaceName(),
                         bean.getDay(),
                         bean.getStartShift(),
-                        bean.getEndShifts()// Assicurati che nel Bean si chiami shift o timeSlot come nella Entity
+                        bean.getEndShifts(),
+                        bean.getWeekId()// Assicurati che nel Bean si chiami shift o timeSlot come nella Entity
                 );
                 repo.saveAvailability(entity);
             }
         }catch(DAOException _){
             throw new ShiftPersistenceException("Errire tecnico durante salvataggio disponibilità");
         }
+    }
+
+    public String getWeekStatusShifts(String workplaceName, String weekId) {
+        // Chiamata al repository (sia esso in memoria o DB)
+        String status = repository.getWeekStatus(workplaceName, weekId);
+
+        // Logica di fallback: se il repository restituisce null, la settimana è nuova/aperta
+        return (status != null) ? status : "OPEN";
+    }
+
+    public void updateWeekStatusShifts(String workplaceName,String weekId, String status){
+        repository.updateWeekStatus(workplaceName,weekId,status);
     }
 }

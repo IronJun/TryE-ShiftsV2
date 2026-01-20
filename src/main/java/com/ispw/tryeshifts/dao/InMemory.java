@@ -11,12 +11,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InMemory implements Repository {
     private static final Map<String, UserInfo> usersDbDemo = new HashMap<>();
     private static final Map<String, Workplace> workplacesDbDemo = new HashMap<>();
     private static final List<Membership> membershipsDbDemo = new ArrayList<>();
     private static final List<Availability> availabilities = new ArrayList<>();
+
+    private static final Map<String, String> weekStatusDbDemo = new HashMap<>();
+
+    // 2. Turni Pubblicati: "2026_04_Lunedì_09:00" -> Email del lavoratore scelto
+    private static final Map<String, String> publishedShiftsDbDemo = new HashMap<>();
+
+
 
 
     public void save(UserInfo user) throws DAOException{
@@ -234,6 +242,51 @@ public class InMemory implements Repository {
     public void updateUser(UserInfo updatedUser) throws EntityNotFoundException{
         if(!usersDbDemo.containsKey(updatedUser.getEmail())){throw new EntityNotFoundException("User not found");}
         usersDbDemo.put(updatedUser.getEmail(),updatedUser);
+    }
+
+    public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) {
+        Map<String, List<String>> weekMap = new HashMap<>();
+        for(Availability a : availabilities){
+            if(a.getWorkplaceName().equals(workplaceName) && a.getWeekId().equals(weekId)){
+                String cellKey = a.getDay() + "_" + a.getFullShift();
+                weekMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(a.getUserEmail());
+            }
+        }
+        return weekMap;
+    }
+
+    public String getWeekStatus(String WorkplaceName, String weekId){
+        return weekStatusDbDemo.get(WorkplaceName + "_" + weekId);
+    }
+
+    public void updateWeekStatus(String workplaceName, String weekId, String newStatus) {
+        // Usiamo la stessa chiave usata per il recupero
+        weekStatusDbDemo.put(workplaceName + "_" + weekId, newStatus);
+    }
+
+    public void savePublishedShifts(String workplace, String weekId, Map<String, String> assignments) {
+        assignments.forEach((cellKey, email) -> {
+            publishedShiftsDbDemo.put(workplace + "_" + weekId + "_" + cellKey, email);
+        });
+    }
+    @Override
+    public Map<String, String> getPublishedShiftsByWeek(String workplaceName, String weekId) {
+        Map<String, String> filteredAssignments = new HashMap<>();
+
+        // Il prefisso che identifica univocamente la settimana per quel posto di lavoro
+        String prefix = workplaceName + "_" + weekId + "_";
+
+        for (Map.Entry<String, String> entry : publishedShiftsDbDemo.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith(prefix)) {
+                // Rimuoviamo il prefisso per restituire alla UI solo la "CellKey"
+                // (es. "Mon_08:00-09:00") così la Factory la trova subito
+                String cellKey = key.substring(prefix.length());
+                filteredAssignments.put(cellKey, entry.getValue());
+            }
+        }
+
+        return filteredAssignments;
     }
 }
 

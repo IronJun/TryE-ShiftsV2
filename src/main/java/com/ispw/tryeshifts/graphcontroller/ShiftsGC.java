@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
+import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
@@ -15,10 +16,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,12 +29,16 @@ public class ShiftsGC {
     private WorkplaceBean selectedWorkplace;
     private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
     private String msg;
+    private int weekOffset = 0;
+    private String currentWeekId;
     @FXML private GridPane shiftsGrid;
     @FXML private Label workplaceTitleLabel;
     @FXML private Button saveShiftsBtn;
     @FXML private Button publicShiftsBtn;
     @FXML private Label instructionLabel;
     @FXML private Label lblMode;
+    @FXML private Label lblWeekDisplay;
+    @FXML private Label errorlbl;
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
@@ -40,11 +46,20 @@ public class ShiftsGC {
 
 
     public void initialize(){
+        ErrorViewManager.setupAutoHide(errorlbl);
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         if (info != null) {
             setSelectedWorkplace(info);
         }
+        this.weekOffset = 0;
+        this.currentWeekId = calculateWeekId(weekOffset);
+
+        if(lblWeekDisplay!=null){
+            lblWeekDisplay.setText("Settimana: "+getWeekRangeString(weekOffset));
+        }
+
+
         ShiftsUIStrat strat;
         if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
             strat = new BossShiftsStrat();
@@ -53,6 +68,7 @@ public class ShiftsGC {
         }
         strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn);
         lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
+        buildDynamicTable();
     }
 
     public void setSelectedWorkplace(WorkplaceBean wp) {
@@ -104,19 +120,26 @@ public class ShiftsGC {
 
             // 2. Recupero Dati e Scelta della Factory (Logica GoF)
             ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
+            PublishShiftsAC publishAC = new PublishShiftsAC();
             UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
             WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp);
+            Map<String, String> assignments = publishAC.getAssignmentsForWeek(wp, this.currentWeekId);
+            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp,this.currentWeekId);
             List<String> activeDays = wp.getSelectedDays();
+            String status =manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
             boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
 
+            configureUIByStatus(status, isOwner);
             // Qui applichiamo l'Abstract Factory
-            ShiftCellProvider cellProvider;
-            if (isOwner) {
+            ShiftCellProvider cellProvider = null;
+            if (status.equals("PUBLISHED")) {
+                cellProvider = new PublishedCellFactory(assignments); // Mostra solo i nomi assegnati
+            } else if (isOwner) {
                 cellProvider = new OwnerCellFactory();
             } else {
-                // Passiamo la mappa delle celle selezionate alla factory del worker
-                cellProvider = new WorkerCellFactory(selectedCellsMap);
+                // Se è LOCKED, passiamo un flag alla factory per disabilitare i click
+                boolean isLocked = status.equals("LOCKED");
+                cellProvider = new WorkerCellFactory(selectedCellsMap, isLocked);
             }
 
             // 3. Costruzione dinamica della griglia..
@@ -146,14 +169,19 @@ public class ShiftsGC {
                 for (int c = 1; c <= 7; c++) {
                     String currentDay = days[c - 1];
                     String timeKey =timeSlots.get(r).replace(" ","");
-                    String cellKey = currentDay + "_" + timeKey;
+                    String cellKey = currentWeekId+"_"+ currentDay + "_" + timeKey;
 
                     msg = "DEBUG UI: Cerco in mappa la chiave: " +cellKey;
                     LOGGER.log(Level.FINE, msg);
                     boolean isDayActive = activeDays.contains(currentDay);
                     List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
-                    if (!isOwner && cellContent.contains("SELECTED")) {
+                    if (!isOwner && cellContent.contains(loggedUser.getEmail())) {
                         selectedCellsMap.put(cellKey, true);
+                        msg = "DEBUG UI: Trovata corrispondenza! Attivo " + cellKey;
+                        LOGGER.log(Level.FINE, msg);
+                    } else {
+                        // Importante: se non c'è nel DB, assicurati che sia false nella mappa locale
+                        selectedCellsMap.put(cellKey, false);
                     }
                     if (!cellContent.isEmpty()) {
                         msg = "DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent;
@@ -170,6 +198,13 @@ public class ShiftsGC {
         }
     }
 
+    private String calculateWeekId(int weekOffset) {
+        LocalDate targetDate = LocalDate.now().plusWeeks(weekOffset);
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
+        int year = targetDate.get(weekFields.weekBasedYear());
+        return year + "_" + String.format("%02d", weekNum);
+    }
     @FXML
     public void onSaveAvailability() {
         // 1. Recuperiamo i dati contestuali
@@ -208,7 +243,8 @@ public class ShiftsGC {
                                 wp.getWorkplaceName(),
                                 day,
                                 start,
-                                end
+                                end,
+                                this.currentWeekId
                         );
                         availabilityBeans.add(bean);
                     } else {
@@ -222,21 +258,41 @@ public class ShiftsGC {
             LOGGER.log(Level.FINE, msg);
 
             // 3. Chiamiamo il Controller Applicativo
-            try {
-                ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
-                manageShiftsAC.saveAvailabilities(availabilityBeans);
 
-                // Messaggio di successo
-                SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
+        }
+        try {
+            ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
+            manageShiftsAC.saveAvailabilities(availabilityBeans);
 
-            } catch (Exception _) {
-                SceneManager.getInstance().showErrorAlert("Errore", "Impossibile salvare le disponibilità.");
-            }
+            // Messaggio di successo
+            SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
+
+        } catch (Exception _) {
+            SceneManager.getInstance().showErrorAlert("Errore", "Impossibile salvare le disponibilità.");
         }
     }
 
     public void onPublic() {
-        SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
+        ManageShiftsAC managShiftsAC = new ManageShiftsAC();
+        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+
+        String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
+
+        try{
+            if("OPEN".equals(currentStatus)){
+                managShiftsAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,"LOCKED");
+                SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
+            }
+            else if("LOCKED".equals(currentStatus)){
+                PublishShiftsAC publishAC = new PublishShiftsAC();
+                publishAC.publish(wp, this.currentWeekId);
+                SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
+            }
+            buildDynamicTable();
+        }catch(Exception _){
+            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile aggiornare lo stato dei turni.");
+        }
+        //SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
 
     public void onWorkersclicked() {
@@ -270,5 +326,65 @@ public class ShiftsGC {
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         msg = "Logout effettuato";
         LOGGER.log(Level.FINE, msg);
+    }
+    @FXML
+    private void handleNextWeek() {
+        if(weekOffset<1){
+            weekOffset++;
+            updateView();
+        }else{
+            ErrorViewManager.showError(errorlbl,"puoi dare disponibilità solo per la settimana successiva");
+        }
+    }
+
+    @FXML
+    private void handlePrevWeek() {
+        if(weekOffset>0){
+            weekOffset--;
+            updateView();
+        }
+    }
+
+    private void updateView() {
+        this.currentWeekId = calculateWeekId(weekOffset);
+        // Aggiorna la label per far capire all'utente dove si trova
+        selectedCellsMap.clear();
+        lblWeekDisplay.setText("Settimana: "+ getWeekRangeString(weekOffset));
+        // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
+        buildDynamicTable();
+    }
+
+
+    private String getWeekRangeString(int offset) {
+        LocalDate start = LocalDate.now().plusWeeks(offset).with(DayOfWeek.MONDAY);
+        LocalDate end = start.plusDays(6);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
+        return start.format(formatter) + " - " + end.format(formatter);
+    }
+
+    private void configureUIByStatus(String status,boolean isOwner) {
+        if (isOwner) {
+            // Il capo vede il pulsante, ma il testo cambia
+            publicShiftsBtn.setVisible(true);
+            if (status.equals("OPEN")) {
+                publicShiftsBtn.setText("Lock Availability");
+            } else if (status.equals("LOCKED")) {
+                publicShiftsBtn.setText("Publish Shifts");
+            } else {
+                publicShiftsBtn.setVisible(false); // Nascondi se già pubblicato
+            }
+        } else {
+            // Il lavoratore non può salvare se non è OPEN
+            boolean canSave = status.equals("OPEN");
+            saveShiftsBtn.setDisable(!canSave);
+
+            if (status.equals("LOCKED")) {
+                instructionLabel.setText("Inserimento chiuso: il Boss sta elaborando i turni.");
+            } else if (status.equals("PUBLISHED")) {
+                instructionLabel.setText("Turni ufficiali pubblicati.");
+            } else {
+                instructionLabel.setText("Seleziona le tue disponibilità per la settimana.");
+            }
+        }
     }
 }

@@ -6,14 +6,17 @@ public class Availability {
     private final String day;
     private final String startShift;
     private final String endShift;
+    private final String weekId;
 
-    public Availability(String userEmail, String workplaceName, String day, String startShift, String endShift) {
+    public Availability(String userEmail, String workplaceName, String day, String startShift, String endShift,String weekId) {
         this.userEmail = userEmail;
         this.workplaceName = workplaceName;
         this.day = day;
         this.startShift = startShift;
         this.endShift = endShift;
+        this.weekId = weekId;
     }
+    public String getWeekId() { return weekId; }
     public String getUserEmail() {
         return userEmail;
     }

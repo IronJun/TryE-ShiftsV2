@@ -9,6 +9,7 @@ import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface Repository {
 
@@ -25,6 +26,10 @@ public interface Repository {
     List<Workplace> findWorkplacesbyEmail(String email) throws DAOException;
     List<Workplace> findAllWorkplaces() throws DAOException;
     List<Workplace> findWorkplacesByName(String name)throws EntityNotFoundException,DAOException;
+    String getWeekStatus(String WorkplaceName, String weekId);
+    void updateWeekStatus(String workplaceName, String weekId, String newStatus);
+    void savePublishedShifts(String workplace, String weekId, Map<String, String> assignments);
+    Map<String, String> getPublishedShiftsByWeek(String workplaceName, String weekId);
 
     //gestione membership
     void saveMembership(Membership m) throws DAOException;
@@ -41,6 +46,7 @@ public interface Repository {
     void deleteAvailabilitiesByUser(String email,String workplaceName)throws DAOException;
     List<Availability> getAvailabilitiesByWorkplace(String workplaceName)throws DAOException;
     List<Availability> getAvailabilitiesByUser(String email,String workplaceName)throws DAOException;
+    Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId);
 
 
 }
