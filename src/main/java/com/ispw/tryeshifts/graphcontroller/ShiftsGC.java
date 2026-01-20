@@ -13,10 +13,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +32,11 @@ public class ShiftsGC {
     @FXML private Button saveShiftsBtn;
     @FXML private Button publicShiftsBtn;
     @FXML private Label instructionLabel;
+    @FXML private Label lblMode;
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+    private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    private String shiftsMode= "Randomica" ;
 
 
     public void initialize(){
@@ -52,6 +52,7 @@ public class ShiftsGC {
             strat = new WorkerShiftsStrat();
         }
         strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn);
+        lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
     }
 
     public void setSelectedWorkplace(WorkplaceBean wp) {
@@ -67,6 +68,8 @@ public class ShiftsGC {
 
         // 1. Reset e Setup Iniziale (come prima)
         try {
+            shiftsGrid.setGridLinesVisible(false); // Reset
+            shiftsGrid.setGridLinesVisible(true);
 
             shiftsGrid.getChildren().clear();
             shiftsGrid.getColumnConstraints().clear();
@@ -78,11 +81,26 @@ public class ShiftsGC {
                 shiftsGrid.getColumnConstraints().add(col);
             }
 
-            for (int i = 0; i < days.length; i++) {
-                Label lbl = new Label(days[i]);
-                lbl.setStyle("-fx-font-weight: bold; -fx-padding: 10;");
+            RowConstraints headerRow = new RowConstraints();
+            headerRow.setMinHeight(40);
+            headerRow.setPrefHeight(40);
+            headerRow.setVgrow(Priority.NEVER); // Impedisce che la riga si ridimensioni male
+            shiftsGrid.getRowConstraints().add(headerRow);
+
+            for (int i = 0; i < daysShown.length; i++) {
+                Label lbl = new Label(daysShown[i].toUpperCase());
+                lbl.setStyle("-fx-font-weight: bold; " +
+                        "-fx-text-fill: #4B4488; " +
+                        "-fx-background-color: #E8E6F3; " + // Stesso colore degli orari
+                        "-fx-padding: 10; " +
+                        "-fx-border-color: #8379B5; " +    // Bordo viola chiaro
+                        "-fx-border-width: 0 0 1 0;");
+                lbl.setMaxWidth(Double.MAX_VALUE);
                 shiftsGrid.add(lbl, i + 1, 0);
             }
+            Label timeHeader = new Label("ORA");
+            timeHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
+            shiftsGrid.add(timeHeader, 0, 0);
 
             // 2. Recupero Dati e Scelta della Factory (Logica GoF)
             ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
@@ -108,11 +126,17 @@ public class ShiftsGC {
                 RowConstraints rowConstraint = new RowConstraints();
                 rowConstraint.setMinHeight(80);
                 rowConstraint.setPrefHeight(80);
+                rowConstraint.setVgrow(Priority.ALWAYS); // Aiuta a mantenere la riga visibile
                 shiftsGrid.getRowConstraints().add(rowConstraint);
 
                 // Label Orario (Colonna 0)
                 Label timeLbl = new Label(timeSlots.get(r));
-                timeLbl.setStyle("-fx-font-weight: bold; -fx-padding: 10; -fx-background-color: #E8E6F3;");
+                timeLbl.setStyle("-fx-font-weight: bold; " +
+                        "-fx-text-fill: #4B4488; " +
+                        "-fx-background-color: #E8E6F3; " +
+                        "-fx-padding: 10; " +
+                        "-fx-border-color: #8379B5; " +
+                        "-fx-border-width: 0 1 1 0;");
                 timeLbl.setMaxWidth(Double.MAX_VALUE);
                 timeLbl.setMaxHeight(Double.MAX_VALUE);
                 timeLbl.setAlignment(Pos.CENTER);
