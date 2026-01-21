@@ -7,19 +7,17 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.Repository;
 import com.ispw.tryeshifts.entity.Availability;
+import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.ShiftPersistenceException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
-    Repository repository = AppConfig.getRepository();
+    static Repository repository = AppConfig.getRepository();
 
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace,String weekId ) throws DAOException, EntityNotFoundException {
         if(workplace == null||user == null){throw new DAOException("Workplace or User not found");}
@@ -98,4 +96,41 @@ public class ManageShiftsAC {
     public void updateWeekStatusShifts(String workplaceName,String weekId, String status){
         repository.updateWeekStatus(workplaceName,weekId,status);
     }
+
+    public static Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws DAOException {
+        Map<String, String> assignments = new HashMap<>();
+        TreeSet<String> timeSlots = new TreeSet<>();
+
+        List<Workplace> myWorkplaces = repository.findWorkplacesbyEmail(userEmail);
+
+        for (Workplace wp : myWorkplaces) {
+            // Recuperiamo i turni pubblicati per questo locale
+            Map<String, List<String>> shifts = repository.getPublishedShiftsByWeek(wp.getName(), weekId);
+
+            for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
+                if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
+                    // Esempio entry.getKey(): "Mon_08:00-09:00"
+                    String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
+                    String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
+                    assignments.put(cleanKey, wp.getName());
+
+                    // Aggiungiamo l'orario al set per le righe della tabella
+                    String timePart = cleanKey.split("_")[1];
+                    timeSlots.add(timePart);
+                }
+            }
+        }
+
+        // Impacchettiamo tutto in una mappa generica
+        Map<String, Object> result = new HashMap<>();
+        result.put("assignments", assignments);
+        result.put("slots", timeSlots);
+        return result;
+    }
+
+
+    public static List<Workplace> getUserWorkplaces(String email) throws DAOException {
+        return repository.findWorkplacesbyEmail(email);
+    }
+
 }

@@ -358,7 +358,6 @@ public class JDBC implements Repository {
         return shifts;
     }
 
-
     //classe di supporto caricamento liste:
     private void fillWorkplaceDetails(Workplace wp, Connection conn) throws SQLException {
         // Caricamento Giorni
@@ -549,7 +548,6 @@ public class JDBC implements Repository {
             LOGGER.info("Disponibilità salvata per l'utente: " + availability.getUserEmail());
 
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new DAOException("Errore nel salvataggio della disponibilità: " + e.getMessage());
         }
     }
