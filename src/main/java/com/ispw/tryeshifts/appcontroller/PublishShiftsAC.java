@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,11 @@ public class PublishShiftsAC {
 
 
         Map<String, List<String>> availabilities = repo.getAvailabilitiesByWeek(wp.getWorkplaceName(),weekId);
-        ShiftDistributor distributor = new ShiftDistributor();
-        Map<String, String> finalAssignments = distributor.distribute(availabilities);
+        //ShiftDistributor distributor = new ShiftDistributor();
+        //Map<String, String> finalAssignments = distributor.distribute(availabilities);
 
         // 4. Salviamo i turni pubblicati nel repository
-        repo.savePublishedShifts(wp.getWorkplaceName(), weekId, finalAssignments);
+        repo.savePublishedShifts(wp.getWorkplaceName(), weekId, availabilities);
 
         // 5. Aggiorniamo lo stato della settimana
         repo.updateWeekStatus(wp.getWorkplaceName(), weekId, "PUBLISHED");
@@ -48,19 +49,25 @@ public class PublishShiftsAC {
     }
 
 
-    public Map<String, String> getAssignmentsForWeek(WorkplaceBean wp, String weekId) throws DAOException, EntityNotFoundException {
+    public Map<String, List<String>> getAssignmentsForWeek(WorkplaceBean wp, String weekId) throws DAOException, EntityNotFoundException {
         Repository repo = AppConfig.getRepository();
         // Chiediamo al repo tutti i turni pubblicati per quel contesto
-        Map<String, String> rawData = repo.getPublishedShiftsByWeek(wp.getWorkplaceName(), weekId);
+        Map<String, List<String>> rawData = repo.getPublishedShiftsByWeek(wp.getWorkplaceName(), weekId);
 
         // Possiamo convertire le email in nomi reali qui
-        Map<String, String> formattedData = new HashMap<>();
-        for (Map.Entry<String, String> entry : rawData.entrySet()) {
-            String workerEmail = entry.getValue();
-            UserInfo user = repo.findByEmail(workerEmail);
-            String displayName = (user != null) ? user.getName() + " " + user.getSurname() : workerEmail;
+        Map<String, List<String>> formattedData = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : rawData.entrySet()) {
+            List<String> emails = entry.getValue();
+            List<String> names = new ArrayList<>();
 
-            formattedData.put(entry.getKey(), displayName);
+            for (String email : emails) {
+                // Convertiamo ogni email nel nome reale
+                UserInfo user = repo.findByEmail(email);
+                String displayName = (user != null) ? user.getName() + " " + user.getSurname() : email;
+                names.add(displayName);
+            }
+
+            formattedData.put(entry.getKey(), names);
         }
         return formattedData;
     }

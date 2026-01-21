@@ -123,7 +123,7 @@ public class ShiftsGC {
             PublishShiftsAC publishAC = new PublishShiftsAC();
             UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
             WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-            Map<String, String> assignments = publishAC.getAssignmentsForWeek(wp, this.currentWeekId);
+            Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, this.currentWeekId);
             Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp,this.currentWeekId);
             List<String> activeDays = wp.getSelectedDays();
             String status =manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);

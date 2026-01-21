@@ -28,8 +28,8 @@ public interface Repository {
     List<Workplace> findWorkplacesByName(String name)throws EntityNotFoundException,DAOException;
     String getWeekStatus(String WorkplaceName, String weekId);
     void updateWeekStatus(String workplaceName, String weekId, String newStatus);
-    void savePublishedShifts(String workplace, String weekId, Map<String, String> assignments);
-    Map<String, String> getPublishedShiftsByWeek(String workplaceName, String weekId);
+    void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments);
+    Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId);
 
     //gestione membership
     void saveMembership(Membership m) throws DAOException;

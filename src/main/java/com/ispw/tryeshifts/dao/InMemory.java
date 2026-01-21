@@ -22,7 +22,7 @@ public class InMemory implements Repository {
     private static final Map<String, String> weekStatusDbDemo = new HashMap<>();
 
     // 2. Turni Pubblicati: "2026_04_Lunedì_09:00" -> Email del lavoratore scelto
-    private static final Map<String, String> publishedShiftsDbDemo = new HashMap<>();
+    private static final Map<String, List<String>> publishedShiftsDbDemo = new HashMap<>();
 
 
 
@@ -264,25 +264,26 @@ public class InMemory implements Repository {
         weekStatusDbDemo.put(workplaceName + "_" + weekId, newStatus);
     }
 
-    public void savePublishedShifts(String workplace, String weekId, Map<String, String> assignments) {
+    public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) {
         assignments.forEach((cellKey, email) -> {
-            publishedShiftsDbDemo.put(workplace + "_" + weekId + "_" + cellKey, email);
+            String fullKey = workplace + "_" + weekId + "_" + cellKey;
+            publishedShiftsDbDemo.put(fullKey, new ArrayList<>(email));
         });
     }
     @Override
-    public Map<String, String> getPublishedShiftsByWeek(String workplaceName, String weekId) {
-        Map<String, String> filteredAssignments = new HashMap<>();
+    public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) {
+        Map<String, List<String>> filteredAssignments = new HashMap<>();
 
         // Il prefisso che identifica univocamente la settimana per quel posto di lavoro
         String prefix = workplaceName + "_" + weekId + "_";
 
-        for (Map.Entry<String, String> entry : publishedShiftsDbDemo.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : publishedShiftsDbDemo.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith(prefix)) {
                 // Rimuoviamo il prefisso per restituire alla UI solo la "CellKey"
                 // (es. "Mon_08:00-09:00") così la Factory la trova subito
                 String cellKey = key.substring(prefix.length());
-                filteredAssignments.put(cellKey, entry.getValue());
+                filteredAssignments.put(cellKey, new ArrayList<>(entry.getValue()));
             }
         }
 
