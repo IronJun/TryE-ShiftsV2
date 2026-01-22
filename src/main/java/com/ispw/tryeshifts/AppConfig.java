@@ -12,7 +12,6 @@ public class AppConfig {
     public static final boolean IS_DEMO_MODE = false;
     private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
-
     private AppConfig(){
         throw new IllegalStateException("Utility class");
     }
@@ -41,7 +40,6 @@ public class AppConfig {
         }
         return workplaceRepo;
     }
-
     public static AvailabilityDAO getAvailabilityRepository(){
         if(availabilityRepo == null){
             if(IS_DEMO_MODE){
@@ -54,7 +52,6 @@ public class AppConfig {
         }
         return availabilityRepo;
     }
-
     public static MembershipDAO getMembershipRepository(){
         if(membershipRepo == null){
             if(IS_DEMO_MODE){

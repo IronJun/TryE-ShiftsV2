@@ -89,7 +89,27 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         }
     }
     public void updateWorkplace(Workplace updateWp, String oldName) throws DAOException, EntityNotFoundException {
-        throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
+        String sql = "UPDATE workplace SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, updateWp.getName());
+            pstmt.setString(2, updateWp.getAddress());
+            pstmt.setString(3, oldName);
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DAOException("Aggiornamento fallito: Workplace '" + oldName + "' non trovato.");
+            }
+
+        } catch (SQLException e) {
+            // Gestione errore duplicato (se il nuovo nome esiste già)
+            if (e.getErrorCode() == 1062) { // Codice errore MySQL per Duplicate Entry
+                throw new DAOException("Un workplace con il nome '" + updateWp.getName() + "' esiste già.");
+            }
+            throw new EntityNotFoundException("Errore database: " + e.getMessage());
+        }
     }
     public boolean existsWorkplaceByName(String name) throws DAOException {
         String query = "SELECT COUNT(*) FROM workplaces WHERE name = ?";
