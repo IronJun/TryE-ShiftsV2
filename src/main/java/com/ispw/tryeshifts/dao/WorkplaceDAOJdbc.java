@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WorkplaceDAOJdbc implements WorkplaceDAO {
-    private static final Logger LOGGER = Logger.getLogger(JDBC.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WorkplaceDAOJdbc.class.getName());
     private String msg;
     private final String nameUser = "name";
     private final String addressUser = "address";
