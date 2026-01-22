@@ -9,7 +9,6 @@ public class AppConfig {
     private static WorkplaceDAO workplaceRepo = null;
     private static MembershipDAO membershipRepo = null;
     private static AvailabilityDAO availabilityRepo = null;
-    private static Repository repository = null;
     public static final boolean IS_DEMO_MODE = false;
     private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
