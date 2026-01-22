@@ -2,7 +2,7 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.dao.Repository;
+import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.SecurityUtils;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.excpetion.*;
@@ -17,11 +17,11 @@ public class LoginAC {
     }
     public static UserBean loginUser(UserBean userBean) throws UserNotFoundException, InvalidCredentialException, DAOException {
 
-        Repository repository = AppConfig.getRepository();
+        UserDAO userRepo = AppConfig.getUserRepository();
 
         UserInfo savedUser;
         try{
-            savedUser=repository.findByEmail(userBean.getEmail());
+            savedUser=userRepo.findByEmail(userBean.getEmail());
         }catch(EntityNotFoundException _){
             throw new UserNotFoundException("Errore di recupero utente");
         }

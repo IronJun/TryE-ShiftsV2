@@ -2,6 +2,10 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
+import com.ispw.tryeshifts.dao.UserDAO;
+import com.ispw.tryeshifts.dao.WorkplaceDAO;
+import com.ispw.tryeshifts.dao.AvailabilityDAO;
+import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
@@ -12,14 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageMembersAC {
-    public List<UserBean> getActiveMembers(String wpName) throws EntityNotFoundException, DAOException{
-        var repo = AppConfig.getRepository();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private static final UserDAO userRepo = AppConfig.getUserRepository();
+    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
 
-        if(repo.findWorkplaceByName(wpName) == null){
+    public List<UserBean> getActiveMembers(String wpName) throws EntityNotFoundException, DAOException{
+
+        if(workplaceRepo.findWorkplaceByName(wpName) == null){
             throw new EntityNotFoundException("Workplace: "+wpName+" not found");
         }
 
-        List<Membership> memberships = repo.getMembershipsByWorkplace(wpName);
+        List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);
         List<UserBean> active = new ArrayList<>();
 
         for (Membership m : memberships) {
@@ -33,45 +40,41 @@ public class ManageMembersAC {
         return active;
     }
 
-
     public void acceptWorker(String userEmail,String workplaceName,boolean accept)throws DAOException, EntityNotFoundException{
-        var repo = AppConfig.getRepository();
-        Membership m = repo.findMembership(userEmail,workplaceName);
+        Membership m = membershipRepo.findMembership(userEmail,workplaceName);
 
         if(m == null){
-            throw new EntityNotFoundException("Join request not found for user: "+userEmail+" in workplace: "+workplaceName+"");
+            throw new EntityNotFoundException("Join request not found for user: "+userEmail+" in workplace: "+workplaceName);
         }
             if (accept) {
                 m.setAccepted(true);
-                repo.updateMembership(m);
+                membershipRepo.updateMembership(m);
             } else {
                 // Se rifiuta, eliminiamo semplicemente la richiesta/membership
-                repo.removeMembership(m);
+                membershipRepo.removeMembership(m);
             }
     }
 
     public void requestJoin(UserBean userBean, String workplaceName) throws DAOException, EntityNotFoundException {
-        var repo = AppConfig.getRepository();
-        UserInfo user = repo.findByEmail(userBean.getEmail());
-        Workplace wp = repo.findWorkplaceByName(workplaceName);
+        UserInfo user = userRepo.findByEmail(userBean.getEmail());
+        Workplace wp = workplaceRepo.findWorkplaceByName(workplaceName);
 
-        if(repo.isUserMemberOf(userBean.getEmail(),workplaceName)){
+        if(membershipRepo.isUserMemberOf(userBean.getEmail(),workplaceName)){
             throw new DAOException("You already have a pendant request");
         }
 
         Membership request = new Membership(user,wp,"Worker",false);
-        repo.saveMembership(request);
+        membershipRepo.saveMembership(request);
 
     }
 
     public List<UserBean> getPendingRequests(String workplaceName) throws DAOException,EntityNotFoundException{
-        var repo = AppConfig.getRepository();
 
-        if(repo.findWorkplaceByName(workplaceName) == null){
+        if(workplaceRepo.findWorkplaceByName(workplaceName) == null){
             throw new EntityNotFoundException("Workplace: "+workplaceName+" not found");
         }
 
-        List<Membership> allMembers = repo.getMembershipsByWorkplace(workplaceName);
+        List<Membership> allMembers = membershipRepo.getMembershipsByWorkplace(workplaceName);
         List<UserBean> beans = new ArrayList<>();
 
         for (Membership m : allMembers) {

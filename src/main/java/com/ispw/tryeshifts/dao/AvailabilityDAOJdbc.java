@@ -1,0 +1,154 @@
+package com.ispw.tryeshifts.dao;
+
+import com.ispw.tryeshifts.entity.Availability;
+import com.ispw.tryeshifts.excpetion.DAOException;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+public class AvailabilityDAOJdbc implements AvailabilityDAO{
+    private String msg;
+    private final String userEmail = "user_email";
+    private final String dayName = "day_name";
+    private final String workplaceStrName = "workplace_name";
+    private final String startShift = "start_shift";
+    private final String endShift = "end_shift";
+    private final String week_id = "week_id";
+    private static final Logger LOGGER = Logger.getLogger(AvailabilityDAOJdbc.class.getName());
+
+    public void saveAvailability(Availability availability) throws DAOException {
+        String query = "INSERT INTO availabilities (user_email, workplace_name,week_id, day_name, start_shift, end_shift) VALUES (?, ?, ?, ?, ?,?)";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, availability.getUserEmail());
+            pstmt.setString(2, availability.getWorkplaceName());
+            pstmt.setString(4, availability.getDay());
+
+            // Supponendo che startShift ed endShift siano stringhe "HH:mm"
+            pstmt.setString(5, availability.getStartShift());
+            pstmt.setString(6, availability.getEndShift());
+            pstmt.setString(3, availability.getWeekId());
+
+            pstmt.executeUpdate();
+            LOGGER.info("Disponibilità salvata per l'utente: " + availability.getUserEmail());
+
+        } catch (SQLException e) {
+            throw new DAOException("Errore nel salvataggio della disponibilità: " + e.getMessage());
+        }
+    }
+    public void deleteAvailabilitiesByUser(String email, String workplaceName) throws DAOException {
+        String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ?";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, email);
+            pstmt.setString(2, workplaceName);
+            int rowsAffected = pstmt.executeUpdate();
+            msg = "Eliminate " + rowsAffected + " disponibilità per l'utente: " + email;
+            LOGGER.info(msg);
+
+        } catch (SQLException e) {
+            throw new DAOException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
+        }
+    }
+    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName) throws DAOException {
+        List<Availability> list = new ArrayList<>();
+        String query = "SELECT user_email, day_name, start_shift, end_shift, week_id FROM availabilities WHERE workplace_name = ?";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, workplaceName);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Ricostruiamo l'oggetto Availability
+                    list.add(new Availability(
+                            rs.getString(userEmail),
+                            workplaceName,
+                            rs.getString(dayName),
+                            rs.getString(startShift),
+                            rs.getString(endShift),
+                            rs.getString(week_id)
+
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": " + e.getMessage());
+        }
+        return list;
+    }
+    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName) throws DAOException {
+        List<Availability> list = new ArrayList<>();
+        String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift FROM availabilities WHERE user_email = ? AND workplace_name = ?";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, email);
+            pstmt.setString(2, workplaceName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Availability(
+                            email,
+                            rs.getString(workplaceStrName),
+                            rs.getString(dayName),
+                            rs.getString(startShift),
+                            rs.getString(startShift),
+                            rs.getString(week_id)
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Errore nel recupero disponibilità: " + e.getMessage());
+        }
+        return list;
+    }
+    @Override
+    public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) {
+        Map<String, List<String>> availabilitiesMap = new HashMap<>();
+
+        // Query che seleziona l'email e compone la chiave della cella
+        String query = "SELECT user_email, day_name, start_shift, end_shift " +
+                "FROM availabilities " +
+                "WHERE workplace_name = ? AND week_id = ?";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, workplaceName);
+            pstmt.setString(2, weekId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // 1. Ricostruiamo la cellKey per farla corrispondere a quella della UI
+                    String day = rs.getString("day_name");
+                    String start = rs.getString("start_shift");
+                    String end = rs.getString("end_shift");
+                    String cellKey = day + "_" + start + "-" + end;
+
+                    // 2. Recuperiamo l'email del lavoratore
+                    String email = rs.getString("user_email");
+
+                    // 3. Aggiungiamo l'email alla lista corrispondente a quella cella
+                    // Se la chiave non esiste, crea una nuova ArrayList
+                    availabilitiesMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(email);
+                }
+            }
+        } catch (SQLException e) {
+        }
+
+        return availabilitiesMap;
+    }
+}

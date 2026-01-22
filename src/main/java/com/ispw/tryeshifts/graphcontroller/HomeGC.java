@@ -30,14 +30,11 @@ import java.util.logging.Logger;
 
 public class HomeGC {
     private static final Logger LOGGER = Logger.getLogger(HomeGC.class.getName());
-
     private UserBean loggedUser;
-
     @FXML private ListView<String> workplaceListView;
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
     @FXML private VBox vboxWorkplaceLegend;
     @FXML private TextField searchField;
-
     @FXML private ListView<String> ownedWorkplaceList;
     private final Map<String, String> workplaceColors = new HashMap<>();
 
@@ -45,17 +42,10 @@ public class HomeGC {
 
         this.loggedUser = SessionContext.getInstance().getLoggeduser();
 
-
-
         // Aggiungiamo un listener: ogni volta che il testo cambia, cerchiamo
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleSearch(newValue);
         });
-//        ownedWorkplaceList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            if (newValue != null) {
-//                handleWorkplaceSelectionSpec(newValue);
-//            }
-//        });
 
         workplaceListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
@@ -114,38 +104,17 @@ public class HomeGC {
         });
     }
 
-
-    private void handleWorkplaceSelection(Workplace wp) {
-        if (wp != null) {
-            handleWorkplaceSelectionSpec(wp.getName()); // Chiama il metodo originale
-        }
-    }
-
-    public void handleWorkplaceSelectionSpec(String workplaceName) {
+    public void handleWorkplaceSelection(String workplaceName) {
         try {
             WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         } catch (Exception e) {
-            // ... la tua gestione degli errori (LOGGER, ecc.)
             if(e.getMessage().equals("Non sei membro di questo workplace")){
                 LOGGER.info("vuoi inviare richiesta?");
             } // ecc...
         }
 
-//        try{
-//            WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
-//            SessionContext.getInstance().setLoggedWorkplace(wpBean);
-//            SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
-//        }catch (Exception e){
-//            if(e.getMessage().equals("Non sei membro di questo workplace")){
-//                LOGGER.info("vuoi inviare richiesta?");
-//            }else if(e.getMessage().equals("Non sei ancora stato accettato da questo workplace")){
-//                LOGGER.info("richiesta già inviata");
-//            }else{
-//                LOGGER.info("ERRORE: "+e.getMessage());
-//            }
-//        }
     }
 
     public void handleSearch(String query) {
@@ -241,7 +210,7 @@ public class HomeGC {
                 row.setOnMouseExited(e -> row.setStyle("-fx-background-color: transparent;"));
 
                 // Azione al click (sostituisce il vecchio listener della ListView)
-                row.setOnMouseClicked(e -> handleWorkplaceSelectionSpec(wp.getName()));
+                row.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getName()));
 
                 // Quadratino colorato
                 Rectangle rect = new Rectangle(15, 15);
@@ -256,26 +225,7 @@ public class HomeGC {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if (this.loggedUser == null) {
-//            LOGGER.info("DEBUG HOME: Impossibile fare refresh, loggedUser è NULL");
-//            return;
-//        }
-//        try{
-//            SearchWorkplacesAC searchAC = new SearchWorkplacesAC();
-//            List<WorkplaceBean> allWorkplaces = searchAC.getAllWorkplaces();
-//
-//            workplaceListView.getItems().clear();
-//            for (WorkplaceBean wp : allWorkplaces) {
-//                workplaceListView.getItems().add(wp.getWorkplaceName());
-//            }
-//            List<WorkplaceBean> myWorkplaces = GetOwnedWorkplaceAC.getForUser(this.loggedUser);
-//            ownedWorkplaceList.getItems().clear();
-//            for (WorkplaceBean wp : myWorkplaces) {
-//                ownedWorkplaceList.getItems().add(wp.getWorkplaceName());
-//            }
-//        }catch(DAOException _){
-//            SceneManager.getInstance().showErrorAlert("Errore Workplace 3","Impossibile recuperare i workplace del loggedUser");
-//        }
+
     }
 
     public void newWpClicked() throws DAOException {
@@ -313,7 +263,7 @@ public class HomeGC {
     public void onShiftsclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if (wp != null) {
-            handleWorkplaceSelectionSpec(wp.getWorkplaceName());
+            handleWorkplaceSelection(wp.getWorkplaceName());
         } else {
             LOGGER.info("Seleziona un workplace dai tuoi per vedere i turni");
         }

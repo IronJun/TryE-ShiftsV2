@@ -1,12 +1,14 @@
 package com.ispw.tryeshifts;
 
-import com.ispw.tryeshifts.dao.InMemory;
-import com.ispw.tryeshifts.dao.JDBC;
-import com.ispw.tryeshifts.dao.Repository;
+import com.ispw.tryeshifts.dao.*;
 
 import java.util.logging.Logger;
 
 public class AppConfig {
+    private static UserDAO UserRepo = null;
+    private static WorkplaceDAO workplaceRepo = null;
+    private static MembershipDAO membershipRepo = null;
+    private static AvailabilityDAO availabilityRepo = null;
     private static Repository repository = null;
     public static final boolean IS_DEMO_MODE = false;
     private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
@@ -16,16 +18,54 @@ public class AppConfig {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Repository getRepository(){
-        if(repository == null){
+    public static UserDAO getUserRepository(){
+        if(UserRepo  == null){
             if(IS_DEMO_MODE){
-                repository = new InMemory();
+                UserRepo = new UserDAODemo();
                 LOGGER.info("Sistema: craeto un nuovo repository in memoria");
             }else{
-                repository = new JDBC();
+                UserRepo = new UserDAOJdbc();
                 LOGGER.info("Sistema in Modalità persistenza");
             }
         }
-        return repository;
+        return UserRepo;
+    }
+    public static WorkplaceDAO getWorkplaceRepository(){
+        if(workplaceRepo == null){
+            if(IS_DEMO_MODE){
+                workplaceRepo = new WorkplaceDAODemo();
+                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
+            }else{
+                workplaceRepo = new WorkplaceDAOJdbc();
+                LOGGER.info("Sistema in Modalità persistenza");
+            }
+        }
+        return workplaceRepo;
+    }
+
+    public static AvailabilityDAO getAvailabilityRepository(){
+        if(availabilityRepo == null){
+            if(IS_DEMO_MODE){
+                availabilityRepo = new AvailabilityDAODemo();
+                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
+            }else{
+                availabilityRepo = new AvailabilityDAOJdbc();
+                LOGGER.info("Sistema in Modalità persistenza");
+            }
+        }
+        return availabilityRepo;
+    }
+
+    public static MembershipDAO getMembershipRepository(){
+        if(membershipRepo == null){
+            if(IS_DEMO_MODE){
+                membershipRepo = new MembershipDAODemo();
+                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
+            }else{
+                membershipRepo = new MembershipDAOJdbc();
+                LOGGER.info("Sistema in Modalità persistenza");
+            }
+        }
+        return membershipRepo;
     }
 }
