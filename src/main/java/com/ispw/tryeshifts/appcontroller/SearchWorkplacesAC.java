@@ -2,9 +2,6 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
-import com.ispw.tryeshifts.dao.MembershipDAO;
-import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.DAOException;
@@ -14,9 +11,6 @@ import java.util.List;
 
 public class SearchWorkplacesAC {
     private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
-    private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
     public List<WorkplaceBean> getAllWorkplaces() throws DAOException {
         try {

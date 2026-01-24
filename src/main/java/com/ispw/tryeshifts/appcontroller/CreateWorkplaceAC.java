@@ -20,10 +20,6 @@ public class CreateWorkplaceAC {
     public static void createWorkplace(WorkplaceBean wp) throws InvalidDataException, DuplicateEntityException, UserNotFoundException ,DAOException{
         if(wp.getWorkplaceName().isEmpty()){throw new InvalidDataException("Workplace name cannot be empty");}
 
-//        WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-//        UserDAO userRepo = AppConfig.getUserRepository();
-//        MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
-
         if(workplaceRepo.existsWorkplaceByName(wp.getWorkplaceName())){throw new DuplicateEntityException("This Workplace name is taken");}
 
         UserInfo owner;

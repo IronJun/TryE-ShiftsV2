@@ -9,6 +9,7 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -28,6 +29,7 @@ public class SettingsGC {
     @FXML private ComboBox<String> endHourCombo;
     @FXML private ComboBox<String> endMinuteCombo;
     @FXML private Label errorlabel;
+    @FXML private Label errorlbl2;
     @FXML private VBox leftPane;
     @FXML private VBox rightPane;
     @FXML private HBox mainHBox;
@@ -36,21 +38,36 @@ public class SettingsGC {
     @FXML private TextField emailField;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private VBox overlayPane;
+    @FXML private Label overlayMessage;
 
     private final List<CheckBox> dayCheckBoxes = new ArrayList<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     @FXML
     public void initialize(){
+        ErrorViewManager.setupAutoHide(errorlbl2);
         ErrorViewManager.setupAutoHide(errorlabel);
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-        boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
-
-        if(!isOwner){
-            mainHBox.getChildren().remove(leftPane);
-        }else {
+        if (wp==null) {
+            // Stato 1: Nessun workplace selezionato
+            overlayPane.setVisible(true);
+            overlayPane.setManaged(true); // Se hai aggiunto managed
+            ErrorViewManager.showError(overlayMessage,"Nessun workplace selezionato");
+            applyBlur(true);
+        } else if (loggedUser.getEmail().equals(wp.getOwnerEmail()) == false) {
+            // Stato 2: Selezionato ma non sei l'owner
+            overlayPane.setVisible(true);
+            overlayPane.setManaged(true);
+            ErrorViewManager.showError(overlayMessage,"Non sei l'owner del workplace");
+            applyBlur(true);
+        } else {
+            overlayPane.setVisible(false);
+            overlayPane.setManaged(false);
+            ErrorViewManager.hideError(overlayMessage);
+            applyBlur(false);
             initworkplaceSettings(wp);
             initTimeCombos();
         }
@@ -92,7 +109,6 @@ public class SettingsGC {
         endHourCombo.getSelectionModel().selectFirst();
         endMinuteCombo.getSelectionModel().selectFirst();
     }
-
     @FXML
     private void addShift(){
         String start = startHourCombo.getValue() + ":" + startMinuteCombo.getValue();
@@ -106,7 +122,6 @@ public class SettingsGC {
             ErrorViewManager.showError(errorlabel,"turno già esistente");
         }
     }
-
     @FXML
     private void saveWorkplaceChanges(){
         try{
@@ -121,7 +136,7 @@ public class SettingsGC {
 
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 
-        }catch(Exception _){
+        }catch(Exception e){
             SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
         }
     }
@@ -130,35 +145,29 @@ public class SettingsGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Shifts.fxml", "Gestione Membri", 900, 600);
         }else{
-            SceneManager.getInstance().showInfoAlert("Seleziona un workplace", "Per vedere i membri devi prima selezionare un workplace");
+            ErrorViewManager.showError(errorlbl2,"Per vedere i turni torna alla home e seleziona un workpalce");
         }
     }
-
     public void onWorkersclicked() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
         }else{
-            SceneManager.getInstance().showInfoAlert("Seleziona un workplace", "Per vedere i membri devi prima selezionare un workplace");
+            ErrorViewManager.showError(errorlbl2,"Torna alla Home e seleziona un workplace per vederne i dipendenti");
         }
     }
-
     public void onLogoutClicked() {
         SessionContext.getInstance().setLoggeduser(null);
         SessionContext.getInstance().setLoggedWorkplace(null);
         SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
     }
-
     public void onHomeclicked() {
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
     }
-
     public void saveProfileChanges() {
         try{
             String newPwd = newPasswordField.getText();
             String confirmPwd = confirmPasswordField.getText();
-
-
 
             if (!newPwd.isEmpty()) {
                 if (!newPwd.equals(confirmPwd)) {
@@ -188,6 +197,20 @@ public class SettingsGC {
             confirmPasswordField.clear();
         }catch(Exception _){
             SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2","Impossibile aggiornare il profilo");
+        }
+    }
+    private void applyBlur(boolean blur) {
+        if (blur) {
+            BoxBlur boxBlur = new BoxBlur(10, 10, 3);
+            leftPane.setEffect(boxBlur);
+            leftPane.setDisable(true); // Impedisce anche l'uso del tab per navigare i campi
+            overlayPane.setVisible(true);
+            overlayPane.setMouseTransparent(false); // Impedisce i click sotto
+        } else {
+            leftPane.setEffect(null);
+            leftPane.setDisable(false);
+            overlayPane.setVisible(false);
+            overlayPane.setMouseTransparent(true); // Permette di cliccare di nuovo il form
         }
     }
 }

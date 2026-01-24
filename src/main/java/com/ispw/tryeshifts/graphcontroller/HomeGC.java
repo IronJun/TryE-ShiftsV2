@@ -10,14 +10,14 @@ import com.ispw.tryeshifts.excpetion.DAOException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.MembershipPendingException;
 import com.ispw.tryeshifts.excpetion.UserNotMemberException;
+import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -35,11 +35,11 @@ public class HomeGC {
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
     @FXML private VBox vboxWorkplaceLegend;
     @FXML private TextField searchField;
-    @FXML private ListView<String> ownedWorkplaceList;
+    @FXML private Label errorlbl;
     private final Map<String, String> workplaceColors = new HashMap<>();
 
     public void initialize() throws DAOException {
-
+        ErrorViewManager.setupAutoHide(errorlbl);
         this.loggedUser = SessionContext.getInstance().getLoggeduser();
 
         // Aggiungiamo un listener: ogni volta che il testo cambia, cerchiamo
@@ -143,38 +143,66 @@ public class HomeGC {
 
     public void buildHomeTable(GridPane grid, String userEmail, String weekId) throws DAOException {
         grid.getChildren().clear();
-        Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(userEmail, weekId);
+        grid.getColumnConstraints().clear();
+        grid.getRowConstraints().clear();
 
+        Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(userEmail, weekId);
         Map<String, String> assignments = (Map<String, String>) data.get("assignments");
         TreeSet<String> slots = (TreeSet<String>) data.get("slots");
 
         String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-        System.out.println("DEBUG - Assignments caricati: " + assignments.keySet());
+
+        ColumnConstraints timeCol = new ColumnConstraints();
+        timeCol.setHgrow(Priority.NEVER);
+        timeCol.setPrefWidth(100);
+        grid.getColumnConstraints().add(timeCol);
+        for (int i = 0; i < days.length; i++) {
+            ColumnConstraints dayCol = new ColumnConstraints();
+            dayCol.setHgrow(Priority.ALWAYS); // Questa riga permette l'espansione
+            dayCol.setPercentWidth(100.0 / (days.length + 1)); // Distribuzione uniforme
+            dayCol.setHalignment(HPos.CENTER);
+            grid.getColumnConstraints().add(dayCol);
+        }
+
         for (int i = 0; i < days.length; i++) {
             Label lblDay = new Label(days[i]);
             lblDay.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
             lblDay.setMaxWidth(Double.MAX_VALUE);
+            lblDay.setMaxHeight(Double.MAX_VALUE); // Aggiungi questo
             lblDay.setAlignment(Pos.CENTER);
 
-            // Aggiunge alla colonna i+1, riga 0
             grid.add(lblDay, i + 1, 0);
+            // Forza l'allineamento della cella nella griglia
+            GridPane.setValignment(lblDay, VPos.CENTER);
         }
         int rowIndex = 1;
         for(String slot : slots){
-            grid.add(new Label(slot),0 , rowIndex);
+            // Configurazione riga: permette l'espansione verticale se vuoi
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            grid.getRowConstraints().add(row);
+
+            Label lblSlot = new Label(slot);
+            lblSlot.setAlignment(Pos.CENTER);
+            grid.add(lblSlot, 0, rowIndex);
+
             for (int col = 0; col < days.length; col++) {
                 String cellKey = days[col] + "_" + slot;
-                System.out.println("TROVATO: " + cellKey);
                 StackPane cell = new StackPane();
-                cell.setPrefSize(80, 40);
 
+                // RIMOSSO prefSize fisso: ora usiamo maxWidth/Height per farla crescere
+                cell.setMaxWidth(Double.MAX_VALUE);
+                cell.setMaxHeight(Double.MAX_VALUE);
+                GridPane.setMargin(cell, new Insets(2, 2, 2, 2));
                 if (assignments.containsKey(cellKey)) {
                     String wpName = assignments.get(cellKey);
-                    cell.setStyle("-fx-background-color: " + getColorForWorkplace(wpName) + ";");
+                    cell.setStyle("-fx-background-color: " + getColorForWorkplace(wpName) + "; -fx-background-radius: 5;");
                 } else {
-                    cell.setStyle("-fx-border-color: #eeeeee;");
+                    cell.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0.5;");
                 }
                 grid.add(cell, col + 1, rowIndex);
+                GridPane.setHgrow(cell, Priority.ALWAYS);
+                GridPane.setVgrow(cell, Priority.ALWAYS);
             }
             rowIndex++;
         }
@@ -265,7 +293,7 @@ public class HomeGC {
         if (wp != null) {
             handleWorkplaceSelection(wp.getWorkplaceName());
         } else {
-            LOGGER.info("Seleziona un workplace dai tuoi per vedere i turni");
+            ErrorViewManager.showError(errorlbl,"Select a workplace to see its shifts, or create a new one");
         }
     }
 
@@ -274,17 +302,12 @@ public class HomeGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
         }else{
-            SceneManager.getInstance().showInfoAlert("Seleziona un workplace", "Per vedere i membri devi prima selezionare un workplace");
+            ErrorViewManager.showError(errorlbl,"Select a workplace to see its workers");
         }
     }
 
     public void onSettingsclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
-        }else{
-            SceneManager.getInstance().showInfoAlert("Seleziona un workplace", "Per vedere i membri devi prima selezionare un workplace");
-        }
+        SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
     }
 
     public void refreshAllData() throws DAOException {

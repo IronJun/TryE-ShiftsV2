@@ -13,10 +13,7 @@ import java.util.logging.Logger;
 
 public class SettingsAC {
     private static final Logger LOGGER = Logger.getLogger(SettingsAC.class.getName());
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
     private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
-    private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
     public void updateUserProfile(UserBean user) throws DAOException, EntityNotFoundException {
         UserInfo existingUser = userRepo.findByEmail(user.getEmail());

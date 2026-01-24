@@ -42,7 +42,6 @@ public class UserDAOJdbc implements UserDAO{
         }
         return null;
     }
-
     public void save(UserInfo user) throws DAOException {
         String query = "INSERT INTO users (email, nome, cognome,password) VALUES (?,?,?,?)";
         try (Connection conn = DBconnection.getConnection();
@@ -65,8 +64,23 @@ public class UserDAOJdbc implements UserDAO{
             }
         }
     }
-
     public void updateUser(UserInfo updateUser) throws EntityNotFoundException, DAOException {
-        throw new UnsupportedOperationException("Metodo JDBC non ancora implementato");
+// Nota: Uso 'users' al plurale come abbiamo fatto per 'workplaces'
+        // Usiamo l'email presente nell'oggetto user sia per i nuovi dati che per il WHERE
+        String sql = "UPDATE users SET nome = ?, cognome = ?, password = ? WHERE email = ?";
+
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, updateUser.getName());
+            pstmt.setString(2, updateUser.getSurname());
+            pstmt.setString(3, updateUser.getPasswordHash());
+            pstmt.setString(4, updateUser.getEmail()); // L'email identifica chi aggiornare
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DAOException("Errore update: " + e.getMessage());
+        }
     }
 }

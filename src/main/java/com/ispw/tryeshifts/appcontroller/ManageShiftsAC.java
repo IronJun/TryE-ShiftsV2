@@ -5,10 +5,8 @@ import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
-import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.DAOException;
@@ -20,8 +18,6 @@ import java.util.logging.Logger;
 
 public class ManageShiftsAC {
     private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
     private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());

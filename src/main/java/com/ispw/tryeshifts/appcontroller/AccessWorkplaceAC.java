@@ -19,7 +19,6 @@ import com.ispw.tryeshifts.excpetion.UserNotMemberException;
 import java.util.logging.Logger;
 
 public class AccessWorkplaceAC {
-    private static final Logger LOGGER = Logger.getLogger(AccessWorkplaceAC.class.getName());
 
     private AccessWorkplaceAC(){
         throw new IllegalStateException("Utility class");

@@ -22,38 +22,21 @@ import java.util.logging.Logger;
 
 public class NewWorkplaceGC {
     private static final Logger LOGGER = Logger.getLogger(NewWorkplaceGC.class.getName());
-
-    @FXML
-    private TextField nameField;
-    @FXML
-    private TextField addressField;
-    @FXML
-    private CheckBox checkMon;
-    @FXML
-    private CheckBox checkTue;
-    @FXML
-    private CheckBox checkWed;
-    @FXML
-    private CheckBox checkThu;
-    @FXML
-    private CheckBox checkFri;
-    @FXML
-    private CheckBox checkSat;
-    @FXML
-    private CheckBox checkSun;
-    @FXML
-    private ListView<String> shiftsListView;
-    @FXML
-    private ComboBox<String> startHourCombo;
-    @FXML
-    private ComboBox<String> startMinuteCombo;
-    @FXML
-    private ComboBox<String> endHourCombo;
-    @FXML
-    private ComboBox<String> endMinuteCombo;
-
+    @FXML private TextField nameField;
+    @FXML private TextField addressField;
+    @FXML private CheckBox checkMon;
+    @FXML private CheckBox checkTue;
+    @FXML private CheckBox checkWed;
+    @FXML private CheckBox checkThu;
+    @FXML private CheckBox checkFri;
+    @FXML private CheckBox checkSat;
+    @FXML private CheckBox checkSun;
+    @FXML private ListView<String> shiftsListView;
+    @FXML private ComboBox<String> startHourCombo;
+    @FXML private ComboBox<String> startMinuteCombo;
+    @FXML private ComboBox<String> endHourCombo;
+    @FXML private ComboBox<String> endMinuteCombo;
     @FXML private Label errorLabel;
-
     private UserBean loggedUser;
 
     public void initialize() {
@@ -76,16 +59,11 @@ public class NewWorkplaceGC {
 
         shiftsListView.setCellFactory(listView -> new ShiftCellHandling());
     }
-
-    // Metodo chiamato da HomeGC per passare l'utente corrente
     public void setLoggedUser(UserBean user) {
         this.loggedUser = user;
     }
-
     @FXML
     public void onSave() throws Exception {
-
-
         if (loggedUser == null) {
             LOGGER.warning("ERRORE: Il popup non ha ricevuto l'utente loggato!");
             return;
@@ -94,11 +72,19 @@ public class NewWorkplaceGC {
         String email = loggedUser.getEmail();
         // 1. Validazione base
         if (nameField.getText().isEmpty() || addressField.getText().isEmpty()) {
-            LOGGER.warning("Compila tutti i campi!");
+            ErrorViewManager.showError(errorLabel,"Name and address are mandatory!");
             return;
         }
         List<String> days = getSelectedDays();
+        if (days.isEmpty()) {
+            ErrorViewManager.showError(errorLabel,"You have to select at least one day of the week!");
+            return;
+        }
         List<String> shifts = new ArrayList<>(shiftsListView.getItems());
+        if(shifts.isEmpty()){
+            ErrorViewManager.showError(errorLabel,"you have to add at least one shift!");
+            return;
+        }
         // 2. Creazione del Bean (trasporto dati verso la logica applicativa)
         try {
             WorkplaceBean wpBean = new WorkplaceBean(nameField.getText(), addressField.getText(), days, shifts, email);
@@ -114,19 +100,16 @@ public class NewWorkplaceGC {
         }
 
     }
-
     @FXML
     public void onCancel() {
         closeWindow();
     }
-
     private void closeWindow() {
         // Recupera lo Stage (finestra) corrente tramite un nodo qualsiasi e lo chiude
         Stage stage = (Stage) nameField.getScene().getWindow();
         stage.close();
 
     }
-
     private List<String> getSelectedDays() {
         List<String> days = new ArrayList<>();
 
@@ -141,7 +124,6 @@ public class NewWorkplaceGC {
 
         return days;
     }
-
     public void addShiftToList() {
         String startH = startHourCombo.getValue();
         String startM = startMinuteCombo.getValue();
@@ -165,7 +147,6 @@ public class NewWorkplaceGC {
 
 
     }
-
     public TextField getNameField() {
         return nameField; // Ritorna il campo del nome per permettere alla Home di trovare la finestra
     }

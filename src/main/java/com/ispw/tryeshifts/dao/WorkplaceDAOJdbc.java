@@ -89,7 +89,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         }
     }
     public void updateWorkplace(Workplace updateWp, String oldName) throws DAOException, EntityNotFoundException {
-        String sql = "UPDATE workplace SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
+        String sql = "UPDATE workplaces SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
