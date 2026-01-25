@@ -7,19 +7,12 @@ public class UserBean {
     private String password;
     private String name;
     private String surname;
-    private Membership membership;
     private String role;
     private String pwdRepeat;
 
     public UserBean(String text, String passwordFieldText){
         this.email = text;
         this.password = passwordFieldText;
-    }
-    public UserBean(String email, String password, String name, String surname){
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.surname = surname;
     }
 
     public UserBean(String email, String password, String name, String surname,String pwd2){
@@ -30,13 +23,6 @@ public class UserBean {
         this.pwdRepeat = pwd2;
     }
 
-    public UserBean(String email, String password, String name, String surname,Membership membership){
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.surname = surname;
-        this.membership = membership;
-    }
 
     public UserBean() {
 

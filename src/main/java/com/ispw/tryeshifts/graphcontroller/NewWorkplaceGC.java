@@ -1,6 +1,5 @@
 package com.ispw.tryeshifts.graphcontroller;
 
-import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.bean.UserBean;

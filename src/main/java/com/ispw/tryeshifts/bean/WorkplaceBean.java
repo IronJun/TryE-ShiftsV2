@@ -4,7 +4,6 @@ import java.util.List;
 
 public class WorkplaceBean {
     private String workplaceName;
-    private String userRole;
     private String ownerEmail;
     private String address;
     private List<String> selectedDaysBean;
@@ -21,17 +20,12 @@ public class WorkplaceBean {
     }
 
     public List<String> getSelectedDays() {return selectedDaysBean;}
-    public void setSelectedDays(List<String> selectedDays) {this.selectedDaysBean = selectedDays;}
     public List<String> getShiftsBean() {return shiftsBean;}
-    public void setShiftsBean(List<String> shiftsBean) {this.shiftsBean = shiftsBean;}
     public String getWorkplaceName(){
         return this.workplaceName;
     }
-    public String getUserRole(){return this.userRole;}
     public String getOwnerEmail(){return this.ownerEmail;}
-    public void setOwnerEmail(String email){this.ownerEmail = email;}
     public void setWorkplaceName(String name){this.workplaceName = name;}
-    public void setUserRole(String role){this.userRole = role;}
     public String getAddress(){return this.address;}
     public void setAddress(String address){this.address = address;}
 }

@@ -58,8 +58,6 @@ public class WorkersGC {
             SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace");
         }catch(DAOException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i membri");
-        }catch(Exception e){
-            e.printStackTrace();
         }
     }
 
