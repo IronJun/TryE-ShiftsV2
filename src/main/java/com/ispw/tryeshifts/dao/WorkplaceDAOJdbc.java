@@ -1,7 +1,8 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
+import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.sql.*;
@@ -21,7 +22,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     private final String dayName = "day_name";
 
 
-    public void saveWorkplace(Workplace wp) throws DAOException {
+    public void saveWorkplace(Workplace wp) throws DataFetchException,DuplicateEntityException {
         String insertWorkplace = "INSERT INTO workplaces (name, address, owner_email) VALUES (?, ?, ?)";
         String insertDay = "INSERT INTO workplace_days (workplace_id, day_name) VALUES (?, ?)";
         String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
@@ -43,7 +44,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                         workplaceId = rs.getInt(1);
                         wp.setId(String.valueOf(workplaceId)); // Aggiorniamo l'oggetto Java
                     } else {
-                        throw new SQLException("Errore: ID non generato.");
+                        throw new DataFetchException("Errore: ID non generato.");
                     }
                 }
             }
@@ -73,22 +74,25 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.SEVERE, "Rollback fallito", ex);
+                    LOGGER.severe("Rollback fallito!");
                 }
             }
-            throw new DAOException("Errore durante il salvataggio del workplace: " + e.getMessage());
+            if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
+                throw new DuplicateEntityException("Workplace", wp.getName());
+            }
+            throw new DataFetchException("Errore tecnico nel salvataggio del workplace");
         } finally {
             if (conn != null) {
                 try {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    LOGGER.log(Level.SEVERE, "Errore durante la chiusura della connessione JDBC", e);
+                    LOGGER.warning("Errore durante la chiusura della connessione: ");
                 }
             }
         }
     }
-    public void updateWorkplace(Workplace updateWp, String oldName) throws DAOException, EntityNotFoundException {
+    public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException,EntityNotFoundException {
         String sql = "UPDATE workplaces SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -100,18 +104,17 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             int affectedRows = pstmt.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new DAOException("Aggiornamento fallito: Workplace '" + oldName + "' non trovato.");
+                throw new EntityNotFoundException("Workplace", oldName);
             }
-
         } catch (SQLException e) {
             // Gestione errore duplicato (se il nuovo nome esiste già)
-            if (e.getErrorCode() == 1062) { // Codice errore MySQL per Duplicate Entry
-                throw new DAOException("Un workplace con il nome '" + updateWp.getName() + "' esiste già.");
+            if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
+                throw new DuplicateEntityException("Workplace", updateWp.getName());
             }
-            throw new EntityNotFoundException("Errore database: " + e.getMessage());
+            throw new DataFetchException("Errore database: " + e.getMessage());
         }
     }
-    public boolean existsWorkplaceByName(String name) throws DAOException {
+    public boolean existsWorkplaceByName(String name) throws DataFetchException {
         String query = "SELECT COUNT(*) FROM workplaces WHERE name = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -121,10 +124,10 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore durante la ricerca del workplace: " + e.getMessage());
+            throw new DataFetchException("Errore durante la ricerca del workplace: " + e.getMessage());
         }
     }
-    public Workplace findWorkplaceByName(String name) throws DAOException {
+    public Workplace findWorkplaceByName(String name) throws DataFetchException {
         String query = "SELECT id, name, address, owner_email FROM workplaces WHERE name = ?";
 
         try (Connection conn = DBconnection.getConnection();
@@ -148,11 +151,11 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore nel recupero della lista workplace: " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero della lista workplace: " + e.getMessage());
         }
         return null;
     }
-    public List<Workplace> findWorkplacesbyEmail(String email) throws DAOException {
+    public List<Workplace> findWorkplacesbyEmail(String email) throws DataFetchException {
         List<Workplace> list = new ArrayList<>();
 
         // Questa query prende:
@@ -187,11 +190,11 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore nel recupero della lista workplace: " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero della lista workplace: " + e.getMessage());
         }
         return list;
     }
-    public List<Workplace> findAllWorkplaces() throws DAOException {
+    public List<Workplace> findAllWorkplaces() throws DataFetchException {
         List<Workplace> list = new ArrayList<>();
         String query = "SELECT id, name, address, owner_email FROM workplaces";
 
@@ -205,11 +208,11 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 list.add(wp);
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore recupero totale workplace: " + e.getMessage());
+            throw new DataFetchException("Errore recupero totale workplace: " + e.getMessage());
         }
         return list;
     }
-    public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException, DAOException {
+    public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException, DataFetchException {
         List<Workplace> list = new ArrayList<>();
         // Usiamo LIKE per permettere ricerche parziali (es. "Off" trova "Officina")
         String query = "SELECT id, name, address, owner_email FROM workplaces WHERE name LIKE ?";
@@ -226,13 +229,13 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore ricerca per nome: " + e.getMessage());
+            throw new DataFetchException("Errore ricerca per nome: " + e.getMessage());
         }
 
-        if (list.isEmpty()) throw new EntityNotFoundException("Nessun workplace trovato con nome: " + name);
+        if (list.isEmpty()) throw new EntityNotFoundException("Workplace", name);
         return list;
     }
-    public String getWeekStatus(String workplaceName, String weekId) {
+    public String getWeekStatus(String workplaceName, String weekId) throws DataFetchException{
         String query = "SELECT status_name FROM week_status WHERE workplace_name = ? AND week_id = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -241,11 +244,11 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) return rs.getString("status_name");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataFetchException("Impossibile recuperare lo stato della settimana:");
         }
         return "OPEN";
     }
-    public void updateWeekStatus(String workplaceName, String weekId, String newStatus) {
+    public void updateWeekStatus(String workplaceName, String weekId, String newStatus)throws DataFetchException {
         // ON DUPLICATE KEY UPDATE permette di inserire o aggiornare se esiste già
         String query = "INSERT INTO week_status (workplace_name, week_id, status_name) VALUES (?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE status_name = ?";
@@ -257,10 +260,10 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(4, newStatus);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataFetchException("Impossibile aggiornare lo stato della settimana:");
         }
     }
-    public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) {
+    public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) throws DataFetchException{
         String query = "INSERT INTO published_shifts (workplace_name, week_id, cell_key, worker_email) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection()) {
             conn.setAutoCommit(false); // Transazione per sicurezza
@@ -281,10 +284,10 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 throw e;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataFetchException("Errore DB: impossibile salvare le assegnazioni");
         }
     }
-    public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) {
+    public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) throws DataFetchException {
         Map<String, List<String>> shifts = new HashMap<>();
         String query = "SELECT cell_key, worker_email FROM published_shifts WHERE workplace_name = ? AND week_id = ?";
         try (Connection conn = DBconnection.getConnection();
@@ -298,7 +301,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 shifts.computeIfAbsent(key, k -> new ArrayList<>()).add(email);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataFetchException("Errore DB: impossibile recuperare le assegnazioni");
         }
         return shifts;
     }

@@ -7,7 +7,8 @@ import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.utilities.*;
 import javafx.fxml.FXML;
@@ -49,15 +50,18 @@ public class ShiftsGC {
         ErrorViewManager.setupAutoHide(errorlbl);
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
-        if (info != null) {
-            setSelectedWorkplace(info);
-        }
         this.weekOffset = 0;
         this.currentWeekId = calculateWeekId(weekOffset);
-
         if(lblWeekDisplay!=null){
             lblWeekDisplay.setText("Settimana: "+getWeekRangeString(weekOffset));
         }
+
+        if (info != null) {
+            this.selectedWorkplace = info;
+            setSelectedWorkplace(info);
+        }
+
+
 
 
         ShiftsUIStrat strat;
@@ -193,8 +197,12 @@ public class ShiftsGC {
                     shiftsGrid.add(cell, c, r + 1);
                 }
             }
-        }catch(DAOException | EntityNotFoundException _){
+        }catch(DataFetchException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i turni");
+        }catch(EntityNotFoundException _){
+            ErrorViewManager.ScreenError("availability not found","Impossibile recuperare i turni");
+        }catch(BaseException _){
+            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i turni");
         }
     }
 
@@ -276,9 +284,10 @@ public class ShiftsGC {
         ManageShiftsAC managShiftsAC = new ManageShiftsAC();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-        String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
 
         try{
+            String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
+
             if("OPEN".equals(currentStatus)){
                 managShiftsAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,"LOCKED");
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
@@ -289,7 +298,7 @@ public class ShiftsGC {
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();
-        }catch(Exception _){
+        }catch(BaseException _){
             SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile aggiornare lo stato dei turni.");
         }
         //SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");

@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.utilities;
 
+import com.ispw.tryeshifts.SceneManager;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputControl;
@@ -16,8 +17,6 @@ public class ErrorViewManager {
             errorLabel.setManaged(true);
         }
     }
-
-    // Metodo per nascondere l'errore
     public static void hideError(Label errorLabel) {
         if (errorLabel != null) {
             errorLabel.setVisible(false);
@@ -25,7 +24,6 @@ public class ErrorViewManager {
             errorLabel.setText("");
         }
     }
-
     public static void setupAutoHide(Label errorLabel, TextInputControl... fields){
         for(TextInputControl field : fields){
             field.textProperty().addListener((observable, oldValue, newValue) -> hideError(errorLabel));
@@ -35,5 +33,8 @@ public class ErrorViewManager {
         for(ComboBox<?> combo : combos){
             combo.valueProperty().addListener((observable, oldValue, newValue) -> hideError(errorLabel));
         }
+    }
+    public static void ScreenError(String title, String message){
+        SceneManager.getInstance().showErrorAlert(title, message);
     }
 }

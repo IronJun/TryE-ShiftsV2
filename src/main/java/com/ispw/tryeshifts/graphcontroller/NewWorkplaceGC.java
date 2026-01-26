@@ -4,10 +4,7 @@ import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
-import com.ispw.tryeshifts.excpetion.InvalidDataException;
-import com.ispw.tryeshifts.excpetion.UserNotFoundException;
+import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -90,14 +87,13 @@ public class NewWorkplaceGC {
             CreateWorkplaceAC.createWorkplace(wpBean);
             SceneManager.getInstance().showInfoAlert("Successo", "Workplace creato con successo!");
             closeWindow();
-        }catch(InvalidDataException | DuplicateEntityException | UserNotFoundException e){
+        }catch(DuplicateEntityException e){
             SceneManager.getInstance().showErrorAlert("Errore Creazione del Workplace",e.getMessage());
-        }catch(DAOException e){
+        }catch(EntityNotFoundException e){
+            SceneManager.getInstance().showErrorAlert("Errore Creazione del Workplace",e.getMessage());
+        }catch(BaseException e) {
             SceneManager.getInstance().showErrorAlert("Errore tecnico salvataggio dati", e.getMessage());
-        }catch (Exception e){
-            e.printStackTrace();
         }
-
     }
     @FXML
     public void onCancel() {

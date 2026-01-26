@@ -1,9 +1,9 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.excpetion.*;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +15,7 @@ public class UserDAOJdbc implements UserDAO{
     private static final Logger LOGGER = Logger.getLogger(UserDAOJdbc.class.getName());
     private String msg;
 
-    public UserInfo findByEmail(String email) {
+    public UserInfo findByEmail(String email) throws DataFetchException {
         // Selezioniamo solo i campi che servono al tuo costruttore
         String query = "SELECT email, nome, cognome, password FROM users WHERE email = ?";
 
@@ -34,15 +34,16 @@ public class UserDAOJdbc implements UserDAO{
                     );
                     user.setPasswordHash(rs.getString("password"));
                     return user;
+                }else {
+                    return null;
                 }
             }
         } catch (SQLException e) {
-            // Usa il logger che abbiamo sistemato prima per non avere smells!
-            LOGGER.log(Level.SEVERE, "Errore durante la ricerca dell'utente", e);
+            // Incapsuliamo l'errore tecnico
+            throw new DataFetchException("Errore durante la ricerca dell'utente: " + email);
         }
-        return null;
     }
-    public void save(UserInfo user) throws DAOException {
+    public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
         String query = "INSERT INTO users (email, nome, cognome,password) VALUES (?,?,?,?)";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -58,13 +59,13 @@ public class UserDAOJdbc implements UserDAO{
             LOGGER.log(Level.FINE, msg);
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
-                throw new DAOException("Impossibile salvare, esiste già un utente con questo indirizzo email: " + e.getMessage());
+                throw new DuplicateEntityException("User",user.getEmail());
             } else {
-                throw new DAOException("Errore durante il salvataggio dell'utente: " + e.getMessage());
+                throw new DataFetchException("Errore durante il salvataggio dell'utente: " + e.getMessage());
             }
         }
     }
-    public void updateUser(UserInfo updateUser) throws EntityNotFoundException, DAOException {
+    public void updateUser(UserInfo updateUser) throws  DataFetchException {
 // Nota: Uso 'users' al plurale come abbiamo fatto per 'workplaces'
         // Usiamo l'email presente nell'oggetto user sia per i nuovi dati che per il WHERE
         String sql = "UPDATE users SET nome = ?, cognome = ?, password = ? WHERE email = ?";
@@ -79,8 +80,7 @@ public class UserDAOJdbc implements UserDAO{
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DAOException("Errore update: " + e.getMessage());
+            throw new DataFetchException("Errore update: " + e.getMessage());
         }
     }
 }

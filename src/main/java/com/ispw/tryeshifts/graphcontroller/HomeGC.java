@@ -6,10 +6,7 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.excpetion.MembershipPendingException;
-import com.ispw.tryeshifts.excpetion.UserNotMemberException;
+import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -25,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -38,7 +36,7 @@ public class HomeGC {
     @FXML private Label errorlbl;
     private final Map<String, String> workplaceColors = new HashMap<>();
 
-    public void initialize() throws DAOException {
+    public void initialize() {
         ErrorViewManager.setupAutoHide(errorlbl);
         this.loggedUser = SessionContext.getInstance().getLoggeduser();
 
@@ -76,9 +74,11 @@ public class HomeGC {
         }catch(UserNotMemberException _) {
             showJoinConfirmation(workplaceName);
         }catch(MembershipPendingException _){
-            SceneManager.getInstance().showInfoAlert("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
-        }catch (EntityNotFoundException | DAOException _){
-            SceneManager.getInstance().showErrorAlert("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
+            ErrorViewManager.ScreenError("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
+        }catch (EntityNotFoundException _){
+            ErrorViewManager.ScreenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
+        }catch (BaseException _){
+            ErrorViewManager.ScreenError("unkown error","ask the programmer");
         }
     }
 
@@ -95,9 +95,9 @@ public class HomeGC {
                     ac.requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
-                    SceneManager.getInstance().showErrorAlert("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
-                }catch(DAOException _){
-                    SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile inviare la richiesta");
+                    ErrorViewManager.ScreenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
+                }catch(BaseException _){
+                    ErrorViewManager.ScreenError("Errore tecnico","Impossibile inviare la richiesta");
                 }
 
             }
@@ -109,12 +109,16 @@ public class HomeGC {
             WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
-        } catch (Exception e) {
-            if(e.getMessage().equals("Non sei membro di questo workplace")){
-                LOGGER.info("vuoi inviare richiesta?");
-            } // ecc...
+        }catch (UserNotMemberException _) {
+            LOGGER.info("L'utente non è membro. Mostro popup di iscrizione per: " + workplaceName);
+            showJoinConfirmation(workplaceName);
+        }catch (MembershipPendingException e){
+            ErrorViewManager.ScreenError("Richiesta Pendente", e.getMessage());
+        }catch(EntityNotFoundException _){
+            ErrorViewManager.ScreenError("Errore Workplace", "il workpalce selezionato non esiste");
+        }catch(BaseException e){
+            ErrorViewManager.ScreenError("Errore tecnico", e.getMessage());
         }
-
     }
 
     public void handleSearch(String query) {
@@ -134,79 +138,89 @@ public class HomeGC {
                 System.out.println("Aggiungo: " + wp.getWorkplaceName()); // DEBUG
                 workplaceListView.getItems().add(wp.getWorkplaceName());
             }
-        }catch(DAOException e){
-            e.printStackTrace(); // Molto meglio per il debug rispetto a _
-            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile eseguire la ricerca");
+        }catch(DataFetchException e){
+            LOGGER.log(Level.SEVERE, "Errore durante la ricerca", e);
+            ErrorViewManager.ScreenError("Errore di Connessione",
+                    "Non è stato possibile recuperare i dati. Riprova più tardi.");
+            workplaceListView.getItems().clear();
+        }catch(BaseException e){
+            ErrorViewManager.ScreenError("Errore tecnico", e.getMessage());
             workplaceListView.getItems().clear();
         }
     }
 
-    public void buildHomeTable(GridPane grid, String userEmail, String weekId) throws DAOException {
+    public void buildHomeTable(GridPane grid, String userEmail, String weekId){
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
         grid.getRowConstraints().clear();
+        try {
+            Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(userEmail, weekId);
+            Map<String, String> assignments = (Map<String, String>) data.get("assignments");
+            TreeSet<String> slots = (TreeSet<String>) data.get("slots");
 
-        Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(userEmail, weekId);
-        Map<String, String> assignments = (Map<String, String>) data.get("assignments");
-        TreeSet<String> slots = (TreeSet<String>) data.get("slots");
+            String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-
-        ColumnConstraints timeCol = new ColumnConstraints();
-        timeCol.setHgrow(Priority.NEVER);
-        timeCol.setPrefWidth(100);
-        grid.getColumnConstraints().add(timeCol);
-        for (int i = 0; i < days.length; i++) {
-            ColumnConstraints dayCol = new ColumnConstraints();
-            dayCol.setHgrow(Priority.ALWAYS); // Questa riga permette l'espansione
-            dayCol.setPercentWidth(100.0 / (days.length + 1)); // Distribuzione uniforme
-            dayCol.setHalignment(HPos.CENTER);
-            grid.getColumnConstraints().add(dayCol);
-        }
-
-        for (int i = 0; i < days.length; i++) {
-            Label lblDay = new Label(days[i]);
-            lblDay.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
-            lblDay.setMaxWidth(Double.MAX_VALUE);
-            lblDay.setMaxHeight(Double.MAX_VALUE); // Aggiungi questo
-            lblDay.setAlignment(Pos.CENTER);
-
-            grid.add(lblDay, i + 1, 0);
-            // Forza l'allineamento della cella nella griglia
-            GridPane.setValignment(lblDay, VPos.CENTER);
-        }
-        int rowIndex = 1;
-        for(String slot : slots){
-            // Configurazione riga: permette l'espansione verticale se vuoi
-            RowConstraints row = new RowConstraints();
-            row.setVgrow(Priority.ALWAYS);
-            grid.getRowConstraints().add(row);
-
-            Label lblSlot = new Label(slot);
-            lblSlot.setAlignment(Pos.CENTER);
-            grid.add(lblSlot, 0, rowIndex);
-
-            for (int col = 0; col < days.length; col++) {
-                String cellKey = days[col] + "_" + slot;
-                StackPane cell = new StackPane();
-
-                // RIMOSSO prefSize fisso: ora usiamo maxWidth/Height per farla crescere
-                cell.setMaxWidth(Double.MAX_VALUE);
-                cell.setMaxHeight(Double.MAX_VALUE);
-                GridPane.setMargin(cell, new Insets(2, 2, 2, 2));
-                if (assignments.containsKey(cellKey)) {
-                    String wpName = assignments.get(cellKey);
-                    cell.setStyle("-fx-background-color: " + getColorForWorkplace(wpName) + "; -fx-background-radius: 5;");
-                } else {
-                    cell.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0.5;");
-                }
-                grid.add(cell, col + 1, rowIndex);
-                GridPane.setHgrow(cell, Priority.ALWAYS);
-                GridPane.setVgrow(cell, Priority.ALWAYS);
+            ColumnConstraints timeCol = new ColumnConstraints();
+            timeCol.setHgrow(Priority.NEVER);
+            timeCol.setPrefWidth(100);
+            grid.getColumnConstraints().add(timeCol);
+            for (int i = 0; i < days.length; i++) {
+                ColumnConstraints dayCol = new ColumnConstraints();
+                dayCol.setHgrow(Priority.ALWAYS); // Questa riga permette l'espansione
+                dayCol.setPercentWidth(100.0 / (days.length + 1)); // Distribuzione uniforme
+                dayCol.setHalignment(HPos.CENTER);
+                grid.getColumnConstraints().add(dayCol);
             }
-            rowIndex++;
-        }
 
+            for (int i = 0; i < days.length; i++) {
+                Label lblDay = new Label(days[i]);
+                lblDay.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
+                lblDay.setMaxWidth(Double.MAX_VALUE);
+                lblDay.setMaxHeight(Double.MAX_VALUE); // Aggiungi questo
+                lblDay.setAlignment(Pos.CENTER);
+
+                grid.add(lblDay, i + 1, 0);
+                // Forza l'allineamento della cella nella griglia
+                GridPane.setValignment(lblDay, VPos.CENTER);
+            }
+            int rowIndex = 1;
+            for (String slot : slots) {
+                // Configurazione riga: permette l'espansione verticale se vuoi
+                RowConstraints row = new RowConstraints();
+                row.setVgrow(Priority.ALWAYS);
+                grid.getRowConstraints().add(row);
+
+                Label lblSlot = new Label(slot);
+                lblSlot.setAlignment(Pos.CENTER);
+                grid.add(lblSlot, 0, rowIndex);
+
+                for (int col = 0; col < days.length; col++) {
+                    String cellKey = days[col] + "_" + slot;
+                    StackPane cell = new StackPane();
+
+                    // RIMOSSO prefSize fisso: ora usiamo maxWidth/Height per farla crescere
+                    cell.setMaxWidth(Double.MAX_VALUE);
+                    cell.setMaxHeight(Double.MAX_VALUE);
+                    GridPane.setMargin(cell, new Insets(2, 2, 2, 2));
+                    if (assignments.containsKey(cellKey)) {
+                        String wpName = assignments.get(cellKey);
+                        cell.setStyle("-fx-background-color: " + getColorForWorkplace(wpName) + "; -fx-background-radius: 5;");
+                    } else {
+                        cell.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0.5;");
+                    }
+                    grid.add(cell, col + 1, rowIndex);
+                    GridPane.setHgrow(cell, Priority.ALWAYS);
+                    GridPane.setVgrow(cell, Priority.ALWAYS);
+                }
+                rowIndex++;
+            }
+        }catch(BaseException e){
+            LOGGER.log(Level.SEVERE, "Errore durante la generazione della tabella Home", e);
+
+            Label errorLabel = new Label("Impossibile caricare i turni: " + e.getMessage());
+            errorLabel.setStyle("-fx-text-fill: red; -fx-font-style: italic;");
+            grid.add(errorLabel, 0, 0, 8, 1);
+        }
     }
 
     public String getColorForWorkplace(String wpName) {
@@ -250,13 +264,13 @@ public class HomeGC {
                 row.getChildren().addAll(rect, name);
                 vboxWorkplaceLegend.getChildren().add(row);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (BaseException e) {
+            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i workplace");
         }
 
     }
 
-    public void newWpClicked() throws DAOException {
+    public void newWpClicked(){
         if (this.loggedUser == null) {
             LOGGER.warning("ERRORE: Impossibile aprire il popup, loggedUser è null!");
             return;
@@ -310,7 +324,7 @@ public class HomeGC {
         SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
     }
 
-    public void refreshAllData() throws DAOException {
+    public void refreshAllData() {
         if (this.loggedUser != null) {
             // Aggiorna i tuoi workplace (quelli con i colori)
             refreshWorkplaceList();

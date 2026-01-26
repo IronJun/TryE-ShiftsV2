@@ -1,7 +1,8 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Membership;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
+import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,19 @@ import java.util.List;
 public class MembershipDAODemo implements MembershipDAO{
     private final InMemory db = InMemory.getInstance();
 
-    public void saveMembership(Membership m)throws DAOException {
-        if(m != null) {
-            db.getMemberships().add(m);
+    public void saveMembership(Membership m)throws DuplicateEntityException {
+        if(m == null) {
+            throw new NullPointerException("Invalid parameters");
         }else{
-            throw new DAOException("No membership passed");
+            for(Membership mem : db.getMemberships()){
+                if(mem.getUser().getEmail().equals(m.getUser().getEmail()) && mem.getWorkplace().getName().equals(m.getWorkplace().getName())){
+                    throw new DuplicateEntityException("Membership", m.getUser().getEmail()+ "in" + m.getWorkplace().getName());
+                }
+            }
+            db.getMemberships().add(m);
         }
     }
-    public void updateMembership(Membership membership) throws DAOException {
+    public void updateMembership(Membership membership) throws EntityNotFoundException {
         boolean found = false;
         for(int i = 0; i< db.getMemberships().size(); i++){
             Membership m = db.getMemberships().get(i);
@@ -26,14 +32,19 @@ public class MembershipDAODemo implements MembershipDAO{
                 break;
             }
         }
-        if(!found){throw new DAOException("Not able to update: Membership not found");}
+        if(!found){throw new EntityNotFoundException("Membership", membership.getUser().getEmail());}
     }
-    public void removeMembership(Membership membership)throws DAOException{
-        if(membership == null){throw new DAOException("Invalid parameters");}
-        db.getMemberships().remove(membership);
+    public void removeMembership(Membership membership)throws EntityNotFoundException{
+        if(membership == null){throw new NullPointerException("Invalid parameters");}
+        boolean removed = db.getMemberships().removeIf(m ->
+                m.getUser().getEmail().equals(membership.getUser().getEmail()) && m.getWorkplace().getName().equals(membership.getWorkplace().getName())
+        );
+        if (!removed) {
+            throw new EntityNotFoundException("Membership", membership.getUser().getEmail());
+        }
     }
-    public Membership findMembership(String email,String workplaceName)throws DAOException{
-        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
+    public Membership findMembership(String email,String workplaceName){
+        if(email == null || workplaceName == null){throw new NullPointerException("Invalid parameters");}
         for(Membership m : db.getMemberships()){
             if(m.getUser().getEmail().equals(email) && m.getWorkplace().getName().equals(workplaceName)){
                 return m;
@@ -41,9 +52,9 @@ public class MembershipDAODemo implements MembershipDAO{
         }
         return null;
     }
-    public List<Membership> getMembershipsByWorkplace(String workplaceName)throws DAOException {
+    public List<Membership> getMembershipsByWorkplace(String workplaceName) {
         List<Membership> filteredList = new ArrayList<>();
-        if(workplaceName == null || workplaceName.isEmpty()){throw new DAOException("Invalid parameters");}
+        if(workplaceName == null || workplaceName.isEmpty()){throw new NullPointerException("Invalid parameters");}
         // Accedi alla tua lista globale (es. membershipsList)
         for (Membership m : db.getMemberships()) {
             // Confrontiamo il nome del workplace
@@ -54,27 +65,8 @@ public class MembershipDAODemo implements MembershipDAO{
 
         return filteredList;
     }
-    public List<Membership> getPendingRequestsForOwner(String ownerEmail)throws DAOException{
-        List<Membership> pendingRequests = new ArrayList<>();
-        for (Membership m : db.getMemberships()) {
-
-            // Criterio 1: La richiesta deve essere ancora da accettare
-
-            // Criterio 2: Dobbiamo verificare se il workplace di questa richiesta
-            // appartiene effettivamente all'owner che sta guardando
-            // (Nota: qui assumiamo che tu possa risalire all'owner del workplace)
-            if (!m.isAccepted() && isOwnerOfWorkplace(ownerEmail, m.getWorkplace().getName())) {
-                pendingRequests.add(m);
-            }
-        }
-        return pendingRequests;
-    }
-    public List<Membership> getMembershipByUser(String email)throws DAOException{
-        if(email == null || email.isEmpty()){throw new DAOException("Invalid parameters");}
-        return db.getMemberships().stream().filter(m -> m.getUser().getEmail().equals(email)).toList();
-    }
-    public boolean isUserMemberOf(String email,String workplaceName)throws DAOException{
-        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
+    public boolean isUserMemberOf(String email,String workplaceName){
+        if(email == null || workplaceName == null){throw new NullPointerException("Invalid parameters");}
         for(Membership m : db.getMemberships()){
             if(m.getUser().getEmail().equals(email) && m.getWorkplace().getName().equals(workplaceName)){
                 return true;
@@ -82,17 +74,4 @@ public class MembershipDAODemo implements MembershipDAO{
         }
         return false;
     }
-
-    private boolean isOwnerOfWorkplace(String email, String workplaceName) throws DAOException{
-        if(email == null || workplaceName == null){throw new DAOException("Invalid parameters");}
-        for (Membership m : db.getMemberships()) {
-            if (m.getWorkplace().getName().equals(workplaceName) &&
-                    m.getUser().getEmail().equals(email) &&
-                    m.getRole().equals("MANAGER")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

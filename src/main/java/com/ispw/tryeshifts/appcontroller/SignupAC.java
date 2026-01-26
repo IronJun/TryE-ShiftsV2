@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
+import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.entity.UserInfo;
@@ -16,34 +17,34 @@ public class SignupAC {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void registerUser(UserBean userbean) throws InvalidDataException, UserAlreadyExistsException, DAOException {
+    public static void registerUser(UserBean userbean) throws BaseException {
 
         UserDAO userRepo = AppConfig.getUserRepository();
 
         if (isDataInvalid(userbean)) {
-            throw new InvalidDataException("Dati non validi");
-        } else if (pwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
-            throw new InvalidDataException("Le password non corrispondono");
+            throw new IncompleteDataException("Tutti i campi sono obbligatori");
+        }
+        if (pwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
+            throw new ValidationException("Le password non corrispondono","PwdRep");
         }
 
 
-        try{
-            if(userRepo.findByEmail(userbean.getEmail())!= null){
-                throw new UserAlreadyExistsException("L'email: "+userbean.getEmail()+" è già in uso");
-            }
-        }catch (EntityNotFoundException _){
-            LOGGER.log(Level.INFO, "Owner non trovato, procedo con i valori di default.");
+        if(userRepo.findByEmail(userbean.getEmail())!= null){
+            throw new DuplicateEntityException("User",userbean.getEmail());
         }
+
         UserInfo userentity = new UserInfo(userbean.getEmail(), userbean.getName(), userbean.getSurname());
 
         try {
             String hashedPass = SecurityUtils.hashPassword(userbean.getPassword());
             userentity.setPasswordHash(hashedPass);
-        }catch(FetchDataException _){
-            LOGGER.info("Errore nella creazione dell' hash password");
+            userRepo.save(userentity);
+        }catch(DataFetchException e){
+            LOGGER.log(Level.SEVERE, "Errore di persistenza durante la registrazione", e);
+            throw e;
         }
 
-        userRepo.save(userentity);
+
 
     }
 

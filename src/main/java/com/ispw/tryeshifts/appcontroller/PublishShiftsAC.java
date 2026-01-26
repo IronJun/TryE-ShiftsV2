@@ -6,8 +6,9 @@ import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.excpetion.ValidationException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,22 +19,21 @@ public class PublishShiftsAC {
     private static final UserDAO userRepo = AppConfig.getUserRepository();
     private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
-    public void publish(WorkplaceBean wp, String weekId){
+    public void publish(WorkplaceBean wp, String weekId) throws BaseException {
 
-
+        if(wp==null || weekId == null){throw new NullPointerException("Workplace or weekId passed null");}
         Map<String, List<String>> availabilities = availabilityRepo.getAvailabilitiesByWeek(wp.getWorkplaceName(),weekId);
 
+        if(availabilities.isEmpty()){throw new ValidationException("No availabilities found for week " + weekId,"grid");}
         workplaceRepo.savePublishedShifts(wp.getWorkplaceName(), weekId, availabilities);
-
-        // 5. Aggiorniamo lo stato della settimana
         workplaceRepo.updateWeekStatus(wp.getWorkplaceName(), weekId, "PUBLISHED");
 
     }
 
-    public Map<String, List<String>> getAssignmentsForWeek(WorkplaceBean wp, String weekId) throws DAOException, EntityNotFoundException {
+    public Map<String, List<String>> getAssignmentsForWeek(WorkplaceBean wp, String weekId) throws BaseException {
         // Chiediamo al repo tutti i turni pubblicati per quel contesto
+        if(wp==null || weekId == null){throw new NullPointerException("Workplace or weekId passed null");}
         Map<String, List<String>> rawData = workplaceRepo.getPublishedShiftsByWeek(wp.getWorkplaceName(), weekId);
-
         // Possiamo convertire le email in nomi reali qui
         Map<String, List<String>> formattedData = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : rawData.entrySet()) {

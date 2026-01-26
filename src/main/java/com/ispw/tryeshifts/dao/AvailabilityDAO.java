@@ -1,16 +1,18 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Availability;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
+import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
+import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Map;
 
 public interface AvailabilityDAO {
-    void saveAvailability(Availability availability)throws DAOException;
-    void deleteAvailabilitiesByUser(String email,String workplaceName)throws DAOException;
-    List<Availability> getAvailabilitiesByWorkplace(String workplaceName)throws DAOException;
-    List<Availability> getAvailabilitiesByUser(String email,String workplaceName)throws DAOException;
-    Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId);
+    void saveAvailability(Availability availability)throws DuplicateEntityException, DataFetchException;
+    void deleteAvailabilitiesByUser(String email,String workplaceName)throws EntityNotFoundException, DataFetchException;
+    List<Availability> getAvailabilitiesByWorkplace(String workplaceName)throws DataFetchException;
+    List<Availability> getAvailabilitiesByUser(String email,String workplaceName)throws DataFetchException;
+    Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId)throws DataFetchException;
 
 }

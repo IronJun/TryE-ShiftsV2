@@ -17,32 +17,27 @@ public class CreateWorkplaceAC {
     private static final UserDAO userRepo = AppConfig.getUserRepository();
     private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
 
-    public static void createWorkplace(WorkplaceBean wp) throws InvalidDataException, DuplicateEntityException, UserNotFoundException ,DAOException{
-        if(wp.getWorkplaceName().isEmpty()){throw new InvalidDataException("Workplace name cannot be empty");}
+    public static void createWorkplace(WorkplaceBean wp) throws BaseException{
+        if(wp.getWorkplaceName().isEmpty()){throw new NullPointerException("Workplace name cannot be empty");}
 
 
-        if(workplaceRepo.existsWorkplaceByName(wp.getWorkplaceName())){throw new DuplicateEntityException("This Workplace name is taken");}
+        if(workplaceRepo.existsWorkplaceByName(wp.getWorkplaceName())){throw new DuplicateEntityException("Workplace",wp.getWorkplaceName());}
 
-        UserInfo owner;
-        try{
-            owner = userRepo.findByEmail(wp.getOwnerEmail());
-        }catch(EntityNotFoundException _){
-            throw new UserNotFoundException("Owner not found");
+        UserInfo owner= userRepo.findByEmail(wp.getOwnerEmail());
+
+        if(owner == null){
+            throw new NullPointerException("Owner for "+wp.getWorkplaceName()+" not found");
         }
-
-
         Workplace newWp = new Workplace(wp.getWorkplaceName(),wp.getAddress(),wp.getSelectedDays(),wp.getShiftsBean(),wp.getOwnerEmail());
         newWp.setId(java.util.UUID.randomUUID().toString());
-
         Membership membership = new Membership(owner,newWp,"MANAGER",true);
-
         workplaceRepo.saveWorkplace(newWp);
         membershipRepo.saveMembership(membership);
     }
 
-    public void updateWorkplaceAC(WorkplaceBean wp,String oldname) throws DuplicateEntityException, UserNotFoundException, DAOException, EntityNotFoundException {
+    public void updateWorkplaceAC(WorkplaceBean wp,String oldname) throws BaseException {
         Workplace workplace = workplaceRepo.findWorkplaceByName(oldname);
-        if(workplace == null) throw new EntityNotFoundException("Workplace not found");
+        if(workplace == null) throw new NullPointerException("Workplace not found");
 
         workplace.setName(wp.getWorkplaceName());
         workplace.setAddress(wp.getAddress());

@@ -5,8 +5,9 @@ import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -55,9 +56,9 @@ public class WorkersGC {
 
             setupCells();
         }catch(EntityNotFoundException _){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace");
-        }catch(DAOException _){
-            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i membri");
+            ErrorViewManager.ScreenError("Errore","Impossibile trovare il workplace");
+        }catch(BaseException _){
+            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i membri");
         }
     }
 
@@ -113,9 +114,9 @@ public class WorkersGC {
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
         }catch(EntityNotFoundException _){
-            SceneManager.getInstance().showErrorAlert("Errore","Impossibile trovare il workplace");
-        }catch(DAOException _){
-            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile aggiornare il DB");
+            ErrorViewManager.ScreenError("Errore","Impossibile trovare il workplace");
+        }catch(BaseException _){
+            ErrorViewManager.ScreenError("Errore tecnico","Impossibile aggiornare il DB");
         }
 
     }

@@ -1,7 +1,8 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Availability;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
+import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +24,8 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
     private final String week_id = "week_id";
     private static final Logger LOGGER = Logger.getLogger(AvailabilityDAOJdbc.class.getName());
 
-    public void saveAvailability(Availability availability) throws DAOException {
+
+    public void saveAvailability(Availability availability) throws DuplicateEntityException, DataFetchException {
         String query = "INSERT INTO availabilities (user_email, workplace_name,week_id, day_name, start_shift, end_shift) VALUES (?, ?, ?, ?, ?,?)";
 
         try (Connection conn = DBconnection.getConnection();
@@ -42,10 +44,15 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             LOGGER.info("Disponibilità salvata per l'utente: " + availability.getUserEmail());
 
         } catch (SQLException e) {
-            throw new DAOException("Errore nel salvataggio della disponibilità: " + e.getMessage());
-        }
+            if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
+                throw new DuplicateEntityException("Availability",
+                        availability.getUserEmail() + " il " + availability.getDay());
+            }
+            // 2. Errore generico di database (Connessione, permessi, tabella mancante)
+            throw new DataFetchException("Impossibile salvare la disponibilità nel database");        }
     }
-    public void deleteAvailabilitiesByUser(String email, String workplaceName) throws DAOException {
+
+    public void deleteAvailabilitiesByUser(String email, String workplaceName) throws DataFetchException {
         String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ?";
 
         try (Connection conn = DBconnection.getConnection();
@@ -58,10 +65,10 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             LOGGER.info(msg);
 
         } catch (SQLException e) {
-            throw new DAOException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
+            throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
         }
     }
-    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName) throws DAOException {
+    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
         String query = "SELECT user_email, day_name, start_shift, end_shift, week_id FROM availabilities WHERE workplace_name = ?";
 
@@ -85,11 +92,11 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": " + e.getMessage());
         }
         return list;
     }
-    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName) throws DAOException {
+    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
         String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift FROM availabilities WHERE user_email = ? AND workplace_name = ?";
 
@@ -111,12 +118,12 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("Errore nel recupero disponibilità: " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero disponibilità: " + e.getMessage());
         }
         return list;
     }
     @Override
-    public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) {
+    public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) throws DataFetchException {
         Map<String, List<String>> availabilitiesMap = new HashMap<>();
 
         // Query che seleziona l'email e compone la chiave della cella
@@ -147,6 +154,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                 }
             }
         } catch (SQLException e) {
+            throw new DataFetchException("impossibile recupare le diposniblità dalla settimana");
         }
 
         return availabilitiesMap;

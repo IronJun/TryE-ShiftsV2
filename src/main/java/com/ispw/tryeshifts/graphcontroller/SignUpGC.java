@@ -3,9 +3,7 @@ package com.ispw.tryeshifts.graphcontroller;
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.InvalidDataException;
-import com.ispw.tryeshifts.excpetion.UserAlreadyExistsException;
+import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -43,10 +41,12 @@ public class SignUpGC {
             UserBean bean = new UserBean(email, pwd, name, surname, repeat);
             SignupAC.registerUser(bean);
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        } catch (InvalidDataException | UserAlreadyExistsException e) {
-            ErrorViewManager.showError(errorLabel, e.getMessage());
-        } catch (DAOException _) {
-            SceneManager.getInstance().showErrorAlert("Errore tecnico", "Impossibile registrare l'utente");
+        } catch (ValidationException e) {
+            ErrorViewManager.showError(errorLabel, "campi non validi");
+        } catch (DuplicateEntityException e) {
+            ErrorViewManager.showError(errorLabel, "questa mail è già in uso");
+        } catch (BaseException e){
+            ErrorViewManager.ScreenError("System Error",e.getMessage());
         }
 
     }

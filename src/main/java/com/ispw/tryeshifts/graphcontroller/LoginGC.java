@@ -4,9 +4,9 @@ import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.LoginAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
-import com.ispw.tryeshifts.excpetion.UserNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -41,10 +41,10 @@ public class LoginGC {
             SessionContext.getInstance().setLoggeduser(loggedUser);
             SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
 
-        } catch (UserNotFoundException | InvalidCredentialException e) {
+        } catch (EntityNotFoundException | InvalidCredentialException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
-        } catch (DAOException _) {
-            SceneManager.getInstance().showErrorAlert("Errore Tecnico", "Server non raggiungibile.");
+        } catch (BaseException _) {
+            ErrorViewManager.ScreenError("Errore Tecnico", "Server non raggiungibile.");
         }
     }
 

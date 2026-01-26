@@ -14,6 +14,8 @@ module com.ispw.tryeshifts {
     requires java.logging;
     requires java.sql;
     requires mysql.connector.j;
+    requires java.xml.crypto;
+    requires com.fasterxml.jackson.databind;
 
     opens com.ispw.tryeshifts to javafx.fxml;
     opens com.ispw.tryeshifts.view  to javafx.fxml;

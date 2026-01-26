@@ -25,6 +25,7 @@ public class WorkplaceBean {
         return this.workplaceName;
     }
     public String getOwnerEmail(){return this.ownerEmail;}
+    public void setOwnerEmail(String email){this.ownerEmail = email;}
     public void setWorkplaceName(String name){this.workplaceName = name;}
     public String getAddress(){return this.address;}
     public void setAddress(String address){this.address = address;}

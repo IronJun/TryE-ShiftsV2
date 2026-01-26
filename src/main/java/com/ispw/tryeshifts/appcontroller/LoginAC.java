@@ -15,24 +15,13 @@ public class LoginAC {
     private LoginAC(){
         throw new IllegalStateException("Utility class");
     }
-    public static UserBean loginUser(UserBean userBean) throws UserNotFoundException, InvalidCredentialException, DAOException {
-
+    public static UserBean loginUser(UserBean userBean) throws BaseException{
         UserDAO userRepo = AppConfig.getUserRepository();
-
         UserInfo savedUser;
-        try{
-            savedUser=userRepo.findByEmail(userBean.getEmail());
-        }catch(EntityNotFoundException _){
-            throw new UserNotFoundException("Errore di recupero utente");
-        }
-
-        try {
-            String hashedInputPassword = SecurityUtils.hashPassword(userBean.getPassword());
-            if (!savedUser.getPasswordHash().equals(hashedInputPassword)) {
-                throw new InvalidCredentialException("Password non corretta. Riprova.");
-            }
-        }catch (FetchDataException _){
-            LOGGER.info("Errore nella creazione dell' hash password");
+        savedUser=userRepo.findByEmail(userBean.getEmail());
+        String hashedInputPassword = SecurityUtils.hashPassword(userBean.getPassword());
+        if (!savedUser.getPasswordHash().equals(hashedInputPassword)) {
+            throw new InvalidCredentialException("Password non corretta. Riprova.");
         }
 
 

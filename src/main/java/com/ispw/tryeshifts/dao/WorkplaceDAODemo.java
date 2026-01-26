@@ -1,9 +1,8 @@
 package com.ispw.tryeshifts.dao;
 
-import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DAOException;
+import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.util.ArrayList;
@@ -14,54 +13,45 @@ import java.util.Map;
 public class WorkplaceDAODemo implements WorkplaceDAO {
     private final InMemory db = InMemory.getInstance();
 
-    public void saveWorkplace(Workplace wp) throws DAOException {
-        if(wp != null) {
-            db.getWorkplaces().put(wp.getName(), wp);
-        }else{
-            throw new DAOException("No workplace passed");
-        }
+    public void saveWorkplace(Workplace wp) throws DuplicateEntityException {
+        if(wp == null) {throw new NullPointerException("Invalid parameters");}
+        if(db.getWorkplaces().containsKey(wp.getName())){throw new DuplicateEntityException("Workplace", wp.getName());}
+        db.getWorkplaces().put(wp.getName(),wp);
     }
-    public void updateWorkplace(Workplace updateWp,String oldName) throws DAOException, EntityNotFoundException {
-        if(!db.getWorkplaces().containsKey(oldName)){throw new EntityNotFoundException("Workplace not found");}
+    public void updateWorkplace(Workplace updateWp,String oldName) throws DuplicateEntityException, EntityNotFoundException {
+        if(!db.getWorkplaces().containsKey(oldName)){throw new EntityNotFoundException("Workplace", oldName);}
         String newName = updateWp.getName();
         if(!newName.equals(oldName)) {
             if (db.getWorkplaces().containsKey(newName)) {
-                throw new DAOException("Workplace with name: " + newName + " already exists");
+                throw new DuplicateEntityException("Workplace", newName);
             }
-            for (Availability a : db.getAvailabilities()) {
-                if (a.getWorkplaceName().equals(oldName)) {
-                    a.setWorkplaceName(newName);
-                }
-            }
+            db.getAvailabilities().stream().filter(a -> a.getWorkplaceName().equals(oldName)).forEach(a -> a.setWorkplaceName(newName));
             db.getWorkplaces().remove(oldName);
         }
         db.getWorkplaces().put(newName, updateWp);
     }
-    public boolean existsWorkplaceByName(String name) throws DAOException{
-        if(name != null) {
-            return db.getWorkplaces().containsKey(name);
-        }else{
-            throw new DAOException("No workplace name passed");
-        }
+    public boolean existsWorkplaceByName(String name) {
+        return name!= null && db.getWorkplaces().containsKey(name);
     }
-    public Workplace findWorkplaceByName(String name) throws EntityNotFoundException,DAOException{
-        if(name == null || name.isEmpty()){throw new DAOException("Workplace name cannot be empty");}
+    public Workplace findWorkplaceByName(String name)throws EntityNotFoundException {
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("name passed null or empty");
+        }
         Workplace wp = db.getWorkplaces().get(name);
-        if(wp == null){throw new EntityNotFoundException("Workplace with name: " + name + " not found");}
+        if (wp == null) {
+            throw new EntityNotFoundException("Workplace", name);
+        }
         return wp;
     }
-    public List<Workplace> findWorkplacesbyEmail(String email) throws DAOException{
-        try{
-            return db.getMemberships().stream().filter(m -> m.getUser().getEmail().equals(email)).map(Membership::getWorkplace).toList();
-        }catch(Exception _){
-            throw new DAOException("Cannot resolve the Workplaces for this User");
-        }
+    public List<Workplace> findWorkplacesbyEmail(String email) {
+        if(email==null){throw new NullPointerException("email of the user cannot be null");}
+        return db.getMemberships().stream().filter(m -> m.getUser().getEmail().equals(email)).map(Membership::getWorkplace).toList();
     }
     public List<Workplace> findAllWorkplaces(){
         return new ArrayList<>(db.getWorkplaces().values());
     }
     public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException{
-        if(name == null || name.isEmpty()){throw new EntityNotFoundException("Workplace name cannot be empty");}
+        if(name == null || name.isEmpty()){throw new EntityNotFoundException("Workplace", name);}
         List<Workplace> result = new ArrayList<>();
         String lowerCaseQuery = name.toLowerCase();
         for(Workplace wp : db.getWorkplaces().values()){

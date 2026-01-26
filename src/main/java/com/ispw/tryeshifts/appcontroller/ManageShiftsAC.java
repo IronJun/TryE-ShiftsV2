@@ -9,11 +9,10 @@ import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DAOException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.excpetion.ShiftPersistenceException;
+import com.ispw.tryeshifts.excpetion.*;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {
@@ -22,11 +21,11 @@ public class ManageShiftsAC {
 
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 
-    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace,String weekId ) throws DAOException, EntityNotFoundException {
-        if(workplace == null||user == null){throw new DAOException("Workplace or User not found");}
+    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace,String weekId ) throws BaseException {
+        if(workplace == null||user == null){throw new NullPointerException("Workplace or User passed null");}
         Map<String, List<String>> viewMap = new HashMap<>();
 
-        if(workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName()) == null){throw new EntityNotFoundException("Workplace not found");}
+        workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName()); //lancia exception se non trova nulla
 
         boolean isBoss = user.getEmail().equals(workplace.getOwnerEmail());
 
@@ -47,22 +46,20 @@ public class ManageShiftsAC {
                 viewMap.computeIfAbsent(key, k -> new ArrayList<>()).add("SELECTED");
             }
         }
-        return availabilityRepo.getAvailabilitiesByWeek(workplace.getWorkplaceName(),weekId);
+        return viewMap;
     }
 
-    public void saveAvailabilities(List<AvailabilityBean> beans) throws ShiftPersistenceException {
+    public void saveAvailabilities(List<AvailabilityBean> beans) throws BaseException {
         LOGGER.info("salvataggio turni");
-        if(beans == null){throw new ShiftPersistenceException("Bean non valido");}
-
+        if(beans == null){throw new NullPointerException("Bean passed null");}
+        String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
+        String wpName = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
         try {
-            // Usiamo il SessionContext per sicurezza o i dati del primo bean
-            String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
-            String wpName = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
-
-            // 1. PULIZIA: Rimuoviamo le vecchie disponibilità per evitare duplicati
-            // Questo è fondamentale perché se l'utente cambia idea, il DB deve riflettere l'ultima scelta
-            availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName);
-
+            try {
+                availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName);
+            }catch(EntityNotFoundException _){
+                LOGGER.info("Nessna disponibilità precendente da rimuovere per: " + userEmail);
+            }
             // 2. SALVATAGGIO: Trasformiamo i Bean in Entity e le salviamo nel Repository
             for (AvailabilityBean bean : beans) {
                 LOGGER.info("LOG AC: Salvataggio per " + bean.getUserEmail() + " al " + bean.getDay());
@@ -76,45 +73,50 @@ public class ManageShiftsAC {
                 );
                 availabilityRepo.saveAvailability(entity);
             }
-        }catch(DAOException _){
-            throw new ShiftPersistenceException("Errire tecnico durante salvataggio disponibilità");
+        }catch(DataFetchException e){
+            LOGGER.log(Level.SEVERE, "Errore di persistenza durante il salvataggio", e);
+            throw e;
         }
     }
 
-    public String getWeekStatusShifts(String workplaceName, String weekId) {
-        // Chiamata al repository (sia esso in memoria o DB)
+    public String getWeekStatusShifts(String workplaceName, String weekId) throws BaseException {
+        if(workplaceName == null || weekId == null){throw new NullPointerException("Parametri di ricerca mancanti");}
         String status = workplaceRepo.getWeekStatus(workplaceName, weekId);
 
         // Logica di fallback: se il repository restituisce null, la settimana è nuova/aperta
         return (status != null) ? status : "OPEN";
     }
 
-    public void updateWeekStatusShifts(String workplaceName,String weekId, String status){
+    public void updateWeekStatusShifts(String workplaceName,String weekId, String status)throws BaseException{
         workplaceRepo.updateWeekStatus(workplaceName,weekId,status);
     }
 
-    public static Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws DAOException {
+    public static Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws BaseException {
+        if (userEmail == null || weekId == null) {
+            throw new NullPointerException("Parametri di ricerca mancanti");
+        }
+
         Map<String, String> assignments = new HashMap<>();
         TreeSet<String> timeSlots = new TreeSet<>();
 
         List<Workplace> myWorkplaces = workplaceRepo.findWorkplacesbyEmail(userEmail);
 
         for (Workplace wp : myWorkplaces) {
-            // Recuperiamo i turni pubblicati per questo locale
-            Map<String, List<String>> shifts = workplaceRepo.getPublishedShiftsByWeek(wp.getName(), weekId);
+                // Recuperiamo i turni pubblicati per questo locale
+                Map<String, List<String>> shifts = workplaceRepo.getPublishedShiftsByWeek(wp.getName(), weekId);
 
-            for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
-                if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
-                    // Esempio entry.getKey(): "Mon_08:00-09:00"
-                    String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
-                    String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
-                    assignments.put(cleanKey, wp.getName());
+                for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
+                    if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
+                        // Esempio entry.getKey(): "Mon_08:00-09:00"
+                        String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
+                        String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
+                        assignments.put(cleanKey, wp.getName());
 
-                    // Aggiungiamo l'orario al set per le righe della tabella
-                    String timePart = cleanKey.split("_")[1];
-                    timeSlots.add(timePart);
+                        // Aggiungiamo l'orario al set per le righe della tabella
+                        String timePart = cleanKey.split("_")[1];
+                        timeSlots.add(timePart);
+                    }
                 }
-            }
         }
 
         // Impacchettiamo tutto in una mappa generica
@@ -125,7 +127,7 @@ public class ManageShiftsAC {
     }
 
 
-    public static List<Workplace> getUserWorkplaces(String email) throws DAOException {
+    public static List<Workplace> getUserWorkplaces(String email) throws BaseException{
         return workplaceRepo.findWorkplacesbyEmail(email);
     }
 
