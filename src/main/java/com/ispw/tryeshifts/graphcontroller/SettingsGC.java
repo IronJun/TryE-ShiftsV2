@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
@@ -32,7 +33,6 @@ public class SettingsGC {
     @FXML private Label errorlbl2;
     @FXML private VBox leftPane;
     @FXML private VBox rightPane;
-    @FXML private HBox mainHBox;
     @FXML private TextField firstNameField;
     @FXML private TextField lastNameField;
     @FXML private TextField emailField;
@@ -50,7 +50,7 @@ public class SettingsGC {
         ErrorViewManager.setupAutoHide(errorlabel);
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-
+        shiftsListView.setCellFactory(lv -> new ShiftCellHandling());
         if (wp==null) {
             // Stato 1: Nessun workplace selezionato
             overlayPane.setVisible(true);
@@ -111,17 +111,10 @@ public class SettingsGC {
     }
     @FXML
     private void addShift(){
-        String start = startHourCombo.getValue() + ":" + startMinuteCombo.getValue();
-        String end = endHourCombo.getValue() + ":" + endMinuteCombo.getValue();
-        String fullShift = start + " - " + end;
-
-        // Evita duplicati nella lista
-        if (!shiftsListView.getItems().contains(fullShift)) {
-            shiftsListView.getItems().add(fullShift);
-        } else {
-            ErrorViewManager.showError(errorlabel,"turno già esistente");
-        }
+        ManageShiftsAC.addShiftstoWorkaplce(startHourCombo,endMinuteCombo,startHourCombo,endHourCombo,errorlabel,shiftsListView);
     }
+
+
     @FXML
     private void saveWorkplaceChanges(){
         try{
@@ -157,9 +150,11 @@ public class SettingsGC {
         }
     }
     public void onLogoutClicked() {
-        SessionContext.getInstance().setLoggeduser(null);
-        SessionContext.getInstance().setLoggedWorkplace(null);
-        SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
+        if(SessionContext.getInstance().logoutConfirmation()){
+            SessionContext.getInstance().clearPreferences();
+            SessionContext.getInstance().setLoggedWorkplace(null);
+            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
+        }
     }
     public void onHomeclicked() {
         SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);

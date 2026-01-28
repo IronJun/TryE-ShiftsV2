@@ -14,6 +14,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.StackPane?>
 <GridPane fx:controller="com.ispw.tryeshifts.graphcontroller.LoginGC"
           xmlns="http://javafx.com/javafx/21"
           xmlns:fx="http://javafx.com/fxml/1"
@@ -45,9 +47,16 @@
         </padding>
 
         <!-- Icona indietro in alto a sinistra -->
-        <Button text="⟵" onAction="#onBackClicked"
-                style="-fx-background-color: transparent; -fx-font-size: 18; -fx-text-fill: white; -fx-cursor: hand;"
-                mnemonicParsing="false"/>
+        <Button fx:id="backBtn" onAction="#onBackClicked"
+                style="-fx-background-color: transparent; -fx-cursor: hand;">
+            <graphic>
+                <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/backIcon.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
 
         <!-- Contenuto centrato sotto l'icona back -->
         <VBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
@@ -72,7 +81,19 @@
                     <Insets top="8.0"/>
                 </VBox.margin>
             </TextField>
-            <PasswordField fx:id="passwordField" promptText="Password"/>
+            <StackPane alignment="CENTER_RIGHT">
+                <TextField fx:id="passwordTextField" visible="false" />
+                <PasswordField fx:id="passwordField" promptText="Password"/>
+                <Button fx:id="toggleButton" onAction="#togglePassword"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <ImageView fx:id="eyeIcon" fitHeight="20" fitWidth="20">
+                        <Image url="@assets/closedEye.png" />
+                    </ImageView>
+                </graphic>
+                </Button>
+            </StackPane>
+
 
             <!-- Messaggio di errore per campi mancanti (inizialmente nascosto) -->
             <Label fx:id="errorLabel" textFill="red" visible="false" managed="false"
@@ -134,7 +155,10 @@
                     </graphic>
                 </Button>
             </HBox>
+            <CheckBox fx:id = "rememberMeCheckBox" text = "Remember Me" mnemonicParsing="false"
+            style="-fx-font-family: 'Arial'; -fx-text-fill: #333333;" />
         </VBox>
+
     </VBox>
 
     <!-- Colonna destra: area bianca con logo completo E-Shifts -->

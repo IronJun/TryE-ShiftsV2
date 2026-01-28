@@ -43,7 +43,7 @@ public class ShiftsGC {
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    private String shiftsMode= "Randomica" ;
+    private String shiftsMode= "Forzata" ;
 
 
     public void initialize(){
@@ -51,9 +51,9 @@ public class ShiftsGC {
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         this.weekOffset = 0;
-        this.currentWeekId = calculateWeekId(weekOffset);
+        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
-            lblWeekDisplay.setText("Settimana: "+getWeekRangeString(weekOffset));
+            lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
         }
 
         if (info != null) {
@@ -206,13 +206,6 @@ public class ShiftsGC {
         }
     }
 
-    private String calculateWeekId(int weekOffset) {
-        LocalDate targetDate = LocalDate.now().plusWeeks(weekOffset);
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
-        int year = targetDate.get(weekFields.weekBasedYear());
-        return year + "_" + String.format("%02d", weekNum);
-    }
     @FXML
     public void onSaveAvailability() {
         // 1. Recuperiamo i dati contestuali
@@ -331,10 +324,12 @@ public class ShiftsGC {
     }
 
     public void onLogoutClicked() {
-        this.loggeduser = null;
-        SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        msg = "Logout effettuato";
-        LOGGER.log(Level.FINE, msg);
+        if(SessionContext.getInstance().logoutConfirmation()){
+            SessionContext.getInstance().clearPreferences();
+            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
+            msg = "Logout effettuato";
+            LOGGER.log(Level.FINE, msg);
+        }
     }
     @FXML
     private void handleNextWeek() {
@@ -355,21 +350,14 @@ public class ShiftsGC {
     }
 
     private void updateView() {
-        this.currentWeekId = calculateWeekId(weekOffset);
+        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
         // Aggiorna la label per far capire all'utente dove si trova
         selectedCellsMap.clear();
-        lblWeekDisplay.setText("Settimana: "+ getWeekRangeString(weekOffset));
+        lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
         // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
         buildDynamicTable();
     }
 
-
-    private String getWeekRangeString(int offset) {
-        LocalDate start = LocalDate.now().plusWeeks(offset).with(DayOfWeek.MONDAY);
-        LocalDate end = start.plusDays(6);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
-        return start.format(formatter) + " - " + end.format(formatter);
-    }
 
     private void configureUIByStatus(String status,boolean isOwner) {
         if (isOwner) {

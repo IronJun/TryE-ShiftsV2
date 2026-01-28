@@ -62,8 +62,6 @@ public class WorkersGC {
         }
     }
 
-
-
     private void setupCells() {
         // Cella per i membri attivi: mostra "Email (Ruolo)"
         activeWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
@@ -73,7 +71,7 @@ public class WorkersGC {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item.getEmail() + " (" + item.getRole() + ")");
+                    setText(item.getEmail() + " (" + item.getRole() + ")" + "        " + item.getName() +" "+ item.getSurname());
                 }
             }
         });
@@ -89,9 +87,11 @@ public class WorkersGC {
                     HBox container = new HBox(10);
                     container.setAlignment(Pos.CENTER_LEFT);
 
-                    Label label = new Label(item.getEmail());
+                    Label label = new Label(item.getEmail() + "      "+ item.getName() +" "+ item.getSurname());
                     Button btnAcc = new Button("V");
+                    btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
                     Button btnRej = new Button("X");
+                    btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
 
                     btnAcc.setOnAction(e -> handleResponse(item.getEmail(), true));
                     btnRej.setOnAction(e -> handleResponse(item.getEmail(), false));
@@ -126,9 +126,11 @@ public class WorkersGC {
     }
 
     public void onLogoutClicked() {
-        SessionContext.getInstance().setLoggeduser(null);
-        SessionContext.getInstance().setLoggedWorkplace(null);
-        SceneManager.getInstance().switchScene("Login.fxml", "Login", 400, 500);
+        if (SessionContext.getInstance().logoutConfirmation()) {
+            SessionContext.getInstance().clearPreferences();
+            SessionContext.getInstance().setLoggedWorkplace(null);
+            SceneManager.getInstance().switchScene("Login.fxml", "Login", 400, 500);
+        }
     }
     public void goToShifts(){
         SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);

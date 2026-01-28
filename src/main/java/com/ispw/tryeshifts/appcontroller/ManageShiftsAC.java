@@ -10,7 +10,15 @@ import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,14 +112,14 @@ public class ManageShiftsAC {
         for (Workplace wp : myWorkplaces) {
                 // Recuperiamo i turni pubblicati per questo locale
                 Map<String, List<String>> shifts = workplaceRepo.getPublishedShiftsByWeek(wp.getName(), weekId);
-
+                System.out.println("Turni trovati per oggi: " + shifts.size());
                 for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
                     if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
                         // Esempio entry.getKey(): "Mon_08:00-09:00"
                         String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
                         String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
                         assignments.put(cleanKey, wp.getName());
-
+                        System.out.println("Turno: " + fullKey + " assegnato a " + wp.getName());
                         // Aggiungiamo l'orario al set per le righe della tabella
                         String timePart = cleanKey.split("_")[1];
                         timeSlots.add(timePart);
@@ -126,9 +134,74 @@ public class ManageShiftsAC {
         return result;
     }
 
+    public static String calculateWeekId(int weekOffset) {
+        LocalDate targetDate = LocalDate.now().plusWeeks(weekOffset);
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
+        int year = targetDate.get(weekFields.weekBasedYear());
+        return year + "_" + String.format("%02d", weekNum);
+    }
+
+    public static String getWeekRangeString(int offset) {
+        LocalDate start = LocalDate.now().plusWeeks(offset).with(DayOfWeek.MONDAY);
+        LocalDate end = start.plusDays(6);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
+        return start.format(formatter) + " - " + end.format(formatter);
+    }
 
     public static List<Workplace> getUserWorkplaces(String email) throws BaseException{
         return workplaceRepo.findWorkplacesbyEmail(email);
     }
+    public static void addShiftstoWorkaplce(ComboBox<String> startMcombo, ComboBox<String> endMcombo, ComboBox<String> startHcombo, ComboBox<String> endHcombo, Label error, ListView<String> shiftsListView){
+        String startH = startHcombo.getValue();
+        String startM = startMcombo.getValue();
+        String endH = endHcombo.getValue();
+        String endM = endMcombo.getValue();
 
+
+        int startTotalMinutes = Integer.parseInt(startH) * 60 + Integer.parseInt(startM);
+        int endTotalMinutes = Integer.parseInt(endH) * 60 + Integer.parseInt(endM);
+
+
+        if (endTotalMinutes  <= startTotalMinutes) {
+            ErrorViewManager.showError(error, "La fine deve essere dopo l'inizio");
+            return;
+        }
+
+        String fullShift = startH + ":" + startM + " - " + endH + ":" + endM;
+        for (String existing : shiftsListView.getItems()) {
+            if (existing.equals(fullShift)) {
+                ErrorViewManager.showError(error, "Turno già presente");
+                return;
+            }
+
+            // Logica Overlap
+            String[] parts = existing.split(" - ");
+            if (parts.length < 2) continue;
+            int existStart = parseToMinutes(parts[0]);
+            int existEnd = parseToMinutes(parts[1]);
+
+            if (startTotalMinutes < existEnd && existStart < startTotalMinutes + (endTotalMinutes - startTotalMinutes)) {
+                if (startTotalMinutes < existEnd && existStart < endTotalMinutes) {
+                    ErrorViewManager.showError(error, "Si sovrappone a: " + existing);
+                    return;
+                }
+            }
+        }
+
+        shiftsListView.getItems().add(fullShift);
+        java.util.Collections.sort(shiftsListView.getItems());
+    }
+    private static int parseToMinutes(String time) {
+        String[] hm = time.trim().split(":");
+
+        if (hm.length < 2) {
+            throw new IllegalArgumentException("Formato orario errato: " + time);
+        }
+
+        int hours = Integer.parseInt(hm[0]);
+        int minutes = Integer.parseInt(hm[1]);
+
+        return hours * 60 + minutes;
+    }
 }

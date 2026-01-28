@@ -2,6 +2,8 @@ package com.ispw.tryeshifts.graphcontroller;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
+import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.*;
@@ -107,8 +109,6 @@ public class NewWorkplaceGC {
     }
     private List<String> getSelectedDays() {
         List<String> days = new ArrayList<>();
-
-        // isSelected() è un metodo di JavaFX che restituisce true se la box è spuntata
         if (checkMon.isSelected()) days.add("Mon");
         if (checkTue.isSelected()) days.add("Tue");
         if (checkWed.isSelected()) days.add("Wed");
@@ -116,33 +116,14 @@ public class NewWorkplaceGC {
         if (checkFri.isSelected()) days.add("Fri");
         if (checkSat.isSelected()) days.add("Sat");
         if (checkSun.isSelected()) days.add("Sun");
-
         return days;
     }
+
     public void addShiftToList() {
-        String startH = startHourCombo.getValue();
-        String startM = startMinuteCombo.getValue();
-        String endH = endHourCombo.getValue();
-        String endM = endMinuteCombo.getValue();
-
-        String shiftString = startH + ":" + startM + "-" + endH + ":" + endM;
-
-        int startTotalMinutes = Integer.parseInt(startH) * 60 + Integer.parseInt(startM);
-        int endTotalMinutes = Integer.parseInt(endH) * 60 + Integer.parseInt(endM);
-
-        if (endTotalMinutes <= startTotalMinutes) {
-            ErrorViewManager.showError(errorLabel,"Orario di fine maggiore di quello di inizio!");
-            return;
-        }
-
-        if(!shiftsListView.getItems().contains(shiftString)){
-            shiftsListView.getItems().add(shiftString);
-            Collections.sort(shiftsListView.getItems());
-        }
-
-
+        ManageShiftsAC.addShiftstoWorkaplce(startMinuteCombo,endMinuteCombo,startHourCombo,endHourCombo,errorLabel,shiftsListView);
     }
     public TextField getNameField() {
         return nameField; // Ritorna il campo del nome per permettere alla Home di trovare la finestra
     }
+
 }

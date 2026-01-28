@@ -18,6 +18,8 @@ public class MembershipDAOJdbc implements MembershipDAO {
     private final String userEmail = "user_email";
     private final String isAccepted = "is_accepted";
     private final String workplaceStrName = "workplace_name";
+    private final String nome = "nome";
+    private final String cognome = "cognome";
 
 
     public void saveMembership(Membership m) throws DuplicateEntityException, DataFetchException {
@@ -97,13 +99,16 @@ public class MembershipDAOJdbc implements MembershipDAO {
     }
     public List<Membership> getMembershipsByWorkplace(String workplaceName) throws DataFetchException {
         List<Membership> list = new ArrayList<>();
-        String query = "SELECT user_email, role, is_accepted FROM memberships WHERE workplace_name = ?";
+        String query = "SELECT m.user_email, u.nome, u.cognome, m.role, m.is_accepted " +
+                "FROM memberships m " +
+                "JOIN users u ON m.user_email = u.email " +
+                "WHERE m.workplace_name = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, workplaceName);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    UserInfo ui = new UserInfo(rs.getString(userEmail), null, null);
+                    UserInfo ui = new UserInfo(rs.getString(userEmail), rs.getString(nome), rs.getString(cognome));
                     Workplace wp = new Workplace();
                     wp.setName(workplaceName);
                     list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted)));

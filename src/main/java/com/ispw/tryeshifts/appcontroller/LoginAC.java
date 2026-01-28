@@ -11,12 +11,12 @@ import java.util.logging.Logger;
 
 public class LoginAC {
     private static final Logger LOGGER = Logger.getLogger(LoginAC.class.getName());
+    private static UserDAO userRepo = AppConfig.getUserRepository();
 
     private LoginAC(){
         throw new IllegalStateException("Utility class");
     }
     public static UserBean loginUser(UserBean userBean) throws BaseException{
-        UserDAO userRepo = AppConfig.getUserRepository();
         UserInfo savedUser;
         savedUser=userRepo.findByEmail(userBean.getEmail());
         String hashedInputPassword = SecurityUtils.hashPassword(userBean.getPassword());
@@ -30,6 +30,15 @@ public class LoginAC {
         userBean.setSurname(savedUser.getSurname());
 
         return userBean;
+    }
+    public static UserBean autoLogin(String email)throws BaseException{
+        UserInfo user = userRepo.findByEmail(email);
+        if(user == null){throw new EntityNotFoundException("User",email);}
+        UserBean loggedUser = new UserBean();
+        loggedUser.setEmail(user.getEmail());
+        loggedUser.setName(user.getName());
+        loggedUser.setSurname(user.getSurname());
+        return loggedUser;
     }
 
 }

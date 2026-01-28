@@ -28,6 +28,8 @@ public class ManageMembersAC {
             if (m.isAccepted()) {
                 UserBean ub = new UserBean();
                 ub.setEmail(m.getUser().getEmail());
+                ub.setName(m.getUser().getName());
+                ub.setSurname(m.getUser().getSurname());
                 ub.setRole(m.getRole()); // Assicurati di avere setRole nel tuo UserBean
                 active.add(ub);
             }
@@ -76,6 +78,8 @@ public class ManageMembersAC {
             if(!m.isAccepted()){
                 UserBean ub = new UserBean();
                 ub.setEmail(m.getUser().getEmail());
+                ub.setName(m.getUser().getName());
+                ub.setSurname(m.getUser().getSurname());
                 beans.add(ub);
             }
 

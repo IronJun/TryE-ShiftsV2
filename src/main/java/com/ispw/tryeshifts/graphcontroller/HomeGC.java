@@ -18,6 +18,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +36,15 @@ public class HomeGC {
     @FXML private TextField searchField;
     @FXML private Label errorlbl;
     private final Map<String, String> workplaceColors = new HashMap<>();
+    @FXML Label lblWeekDisplay;
+    @FXML private Button btnNextWeek;
+    @FXML private Button btnPrevWeek;
+    private int weekOffset = 0;
+    private String currentWeekId;
 
     public void initialize() {
         ErrorViewManager.setupAutoHide(errorlbl);
         this.loggedUser = SessionContext.getInstance().getLoggeduser();
-
         // Aggiungiamo un listener: ogni volta che il testo cambia, cerchiamo
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleSearch(newValue);
@@ -50,7 +55,11 @@ public class HomeGC {
                 handleGlobalSearchSelection(newVal);
             }
         });
-
+        this.weekOffset = 0;
+        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+        if(lblWeekDisplay!=null){
+            lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
+        }
         if (this.loggedUser != null) {
             refreshWorkplaceList();
             handleSearch("");
@@ -297,9 +306,13 @@ public class HomeGC {
     }
 
     public void onLogoutClicked() {
-        this.loggedUser = null;
-        SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        LOGGER.info("Logout effettuato");
+        if(SessionContext.getInstance().logoutConfirmation()){
+            SessionContext.getInstance().clearPreferences();
+            SceneManager.getInstance().showInfoAlert("Logout", "");
+            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
+            LOGGER.info("Logout effettuato");
+        }
+
     }
 
     public void onShiftsclicked() {
@@ -337,4 +350,21 @@ public class HomeGC {
         }
     }
 
+    @FXML
+    private void handleNextWeek(){
+        weekOffset++;
+        updateUI();
+    }
+
+    @FXML
+    private void handlePrevWeek(){
+        weekOffset--;
+        updateUI();
+    }
+
+    private void updateUI() {
+        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+        lblWeekDisplay.setText(ManageShiftsAC.getWeekRangeString(weekOffset));
+        buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), this.currentWeekId);
+    }
 }

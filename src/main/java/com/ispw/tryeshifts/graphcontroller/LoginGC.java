@@ -9,20 +9,20 @@ import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class LoginGC {
 
-    @FXML
-    private TextField emailField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Label errorLabel;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Label errorLabel;
     @FXML private Button loginButton;
+    @FXML private CheckBox rememberMeCheckBox;
+    private boolean isPasswordVisible = false;
+    @FXML private ImageView eyeIcon;
+    @FXML private TextField passwordTextField;
 
     public void initialize(){
         loginButton.setDefaultButton(true);
@@ -39,6 +39,9 @@ public class LoginGC {
             UserBean loggedUser = LoginAC.loginUser(inputBean);
 
             SessionContext.getInstance().setLoggeduser(loggedUser);
+
+            if(rememberMeCheckBox.isSelected()) SessionContext.getInstance().saveUserToPreferences(email);
+            else SessionContext.getInstance().clearPreferences();
             SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
 
         } catch (EntityNotFoundException | InvalidCredentialException e) {
@@ -53,5 +56,24 @@ public class LoginGC {
     public void onBackClicked() {
         // Torna alla scena di SignUp
         SceneManager.getInstance().switchScene("SignUp.fxml", "SignUp", 900, 600);
+    }
+
+    public void togglePassword() {
+        if(isPasswordVisible){
+            passwordField.setText(passwordField.getText());
+            passwordField.setVisible(true);
+            passwordTextField.setVisible(false);
+
+            eyeIcon.setImage(new Image(getClass().getResourceAsStream("/com/ispw/tryeshifts/view/assets/closedEye.png")));
+            isPasswordVisible = false;
+        }else{
+            passwordTextField.setText(passwordField.getText());
+            passwordTextField.setVisible(true);
+            passwordField.setVisible(false);
+
+            // Cambia l'icona in "occhio aperto"
+            eyeIcon.setImage(new Image(getClass().getResourceAsStream("/com/ispw/tryeshifts/view/assets/openedEye.png")));
+            isPasswordVisible = true;
+        }
     }
 }
