@@ -40,9 +40,7 @@ public enum SceneManager {
     }
 
     // Metodo per ottenere lo Stage (utile per chiudere l'applicazione o Stage multipli)
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
+
 
 
     // Metodo principale per caricare un FXML e cambiare la scena

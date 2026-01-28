@@ -5,7 +5,6 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;

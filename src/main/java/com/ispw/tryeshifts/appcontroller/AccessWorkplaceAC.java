@@ -3,11 +3,8 @@ package com.ispw.tryeshifts.appcontroller;
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.dao.MembershipDAO;
-
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
@@ -26,7 +23,7 @@ public class AccessWorkplaceAC {
 
         Membership membership = membershipDB.findMembership(user.getEmail(),workplaceName);
         if(membership == null){throw new UserNotMemberException("Non sei ancora membro di questo workplace.");}
-        if(!membership.isAccepted()){throw new MembershipPendingException("your membership is pending");}
+        if(!membership.isAccepted()){throw new MembershipPendingException("membership", workplaceName);}
         Workplace entity = workplaceDB.findWorkplaceByName(workplaceName);
         return new WorkplaceBean(entity.getName(),entity.getAddress(),entity.getSelectedDays(),entity.getShifts(),entity.getOwnerEmail());
     }
