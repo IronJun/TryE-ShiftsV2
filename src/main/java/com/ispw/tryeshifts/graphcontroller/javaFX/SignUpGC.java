@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller;
+package com.ispw.tryeshifts.graphcontroller.javaFX;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
@@ -13,8 +13,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import javax.swing.*;
 
 public class SignUpGC {
 

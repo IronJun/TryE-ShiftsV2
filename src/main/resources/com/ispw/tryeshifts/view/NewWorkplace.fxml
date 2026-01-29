@@ -11,7 +11,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ComboBox?>
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-border-color: #4B4488; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphcontroller.NewWorkplaceGC">
+<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-border-color: #4B4488; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphcontroller.javaFX.NewWorkplaceGC">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>

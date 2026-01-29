@@ -19,6 +19,7 @@ public class LoginAC {
     public static UserBean loginUser(UserBean userBean) throws BaseException{
         UserInfo savedUser;
         savedUser=userRepo.findByEmail(userBean.getEmail());
+        if(savedUser == null){throw new InvalidCredentialException("Email non registrata. Riprova.");}
         String hashedInputPassword = SecurityUtils.hashPassword(userBean.getPassword());
         if (!savedUser.getPasswordHash().equals(hashedInputPassword)) {
             throw new InvalidCredentialException("Password non corretta. Riprova.");

@@ -10,8 +10,6 @@ import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
 
 
-import java.util.logging.Logger;
-
 public class AccessWorkplaceAC {
 
     private AccessWorkplaceAC(){

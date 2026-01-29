@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller;
+package com.ispw.tryeshifts.graphcontroller.javaFX;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;

@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller;
+package com.ispw.tryeshifts.graphcontroller.javaFX;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;

@@ -55,7 +55,7 @@ public class ManageMembersAC {
             }
     }
 
-    public void requestJoin(UserBean userBean, String workplaceName) throws BaseException {
+    public static void requestJoin(UserBean userBean, String workplaceName) throws BaseException {
         UserInfo user = userRepo.findByEmail(userBean.getEmail());
         Workplace wp = workplaceRepo.findWorkplaceByName(workplaceName);
 

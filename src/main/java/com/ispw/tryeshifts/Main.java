@@ -11,12 +11,11 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.util.Scanner;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class Main extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    public void start(Stage primaryStage) throws Exception
-    {
+    public void start(Stage primaryStage) throws Exception {
         SceneManager manager = SceneManager.getInstance();
         manager.setPrimaryStage(primaryStage);
         String savedEmail = SessionContext.getInstance().getSavedEmail();
@@ -34,7 +33,7 @@ public class Main extends Application {
     }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
+        configureCLIOutput();
         LOGGER.info("Seleziona interfaccia: [1] GUI (JavaFX) | [2] CLI (Console)");
         String choice = scanner.nextLine();
 
@@ -47,5 +46,31 @@ public class Main extends Application {
         } else {
             LOGGER.severe("Scelta non valida.");
         }
+    }
+
+    public static void configureCLIOutput() {
+        Logger rootLogger = Logger.getLogger("");
+        // Puliamo tutti gli handler esistenti
+        for (Handler handler : rootLogger.getHandlers()) {
+            rootLogger.removeHandler(handler);
+        }
+
+        // Creiamo un handler che scrive su System.out
+        StreamHandler stdoutHandler = new StreamHandler(System.out, new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                // RESTITUISCE SOLO IL MESSAGGIO.
+                // Niente data, niente ora, niente "vai a capo" automatico.
+                return record.getMessage();
+            }
+        }) {
+            @Override
+            public synchronized void publish(LogRecord record) {
+                super.publish(record);
+                flush(); // Fondamentale per vedere l'output prima dell'input
+            }
+        };
+
+        rootLogger.addHandler(stdoutHandler);
     }
 }

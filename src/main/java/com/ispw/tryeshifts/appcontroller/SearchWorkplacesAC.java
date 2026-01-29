@@ -12,7 +12,7 @@ import java.util.List;
 public class SearchWorkplacesAC {
     private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
-    public List<WorkplaceBean> getAllWorkplaces()throws BaseException{
+    public static List<WorkplaceBean> getAllWorkplaces()throws BaseException{
 
         List<Workplace> workplaceEntities = workplaceRepo.findAllWorkplaces();
 
@@ -27,7 +27,6 @@ public class SearchWorkplacesAC {
             bean.setAddress(entity.getAddress());
             // Se la Home o la lista richiede l'email del proprietario:
             bean.setOwnerEmail(entity.getOwnerEmail());
-
             resultBeans.add(bean);
         }
 
