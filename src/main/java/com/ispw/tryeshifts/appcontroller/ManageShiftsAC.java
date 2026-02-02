@@ -10,7 +10,7 @@ import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -47,7 +47,7 @@ public class ManageShiftsAC {
 
         for(Availability a : list){
             String shiftKey = a.getFullShift().replace(" ","");
-            String key = a.getDay() + "_" + shiftKey;
+            String key =a.getDay() + "_" + shiftKey;
             if(isBoss){
                 viewMap.computeIfAbsent(key, k -> new ArrayList<>()).add(a.getUserEmail());
             }else{

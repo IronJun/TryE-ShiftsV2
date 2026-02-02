@@ -19,28 +19,37 @@ public class LoginCLI{
 
     public static void start() throws BaseException {
         LOGGER.info("\n--- LOGIN E-SHIFTS ---\n");
+        LOGGER.info("Inserisci le tue credenziali per accedere al sistema.\n");
+
         boolean MemValidation = false;
         boolean login = false;
+
         while(!login) {
             try {
-                UserBean inputUser = new UserBean(CLIReader.readString("Email: "), CLIReader.readString("Password: "));
+                String quit = CLIReader.readString("Press Q to SignUP if you don't have an account...\n").toUpperCase();
+                if(quit.equalsIgnoreCase("Q")) {
+                    login = true;
+                    break;
+                } else {
+                    UserBean inputUser = new UserBean(CLIReader.readString("Email: "), CLIReader.readString("Password: "));
 
-                UserBean loggedUser = LoginAC.loginUser(inputUser);
-                SessionContext.getInstance().setLoggeduser(loggedUser);
-                login = true;
-                while (!MemValidation) {
-                    String Mem = CLIReader.readString("Do you want the system to remember your credentials? Y/n : \n  ");
+                    UserBean loggedUser = LoginAC.loginUser(inputUser);
+                    SessionContext.getInstance().setLoggeduser(loggedUser);
+                    login = true;
+                    while (!MemValidation) {
+                        String Mem = CLIReader.readString("Do you want the system to remember your credentials? Y/n : \n  ").toUpperCase();
 
-                    if (Mem.equals("Y")) {
-                        SessionContext.getInstance().saveUserToPreferences(inputUser.getEmail());
-                        MemValidation = true;
-                    } else if (Mem.equals("n")) {
-                        SessionContext.getInstance().clearPreferences();
-                        MemValidation = true;
-                    } else LOGGER.severe("ERROR: You can insert just 'y' as yes or 'n' as no \n");
+                        if (Mem.equals("Y")) {
+                            SessionContext.getInstance().saveUserToPreferences(inputUser.getEmail());
+                            MemValidation = true;
+                        } else if (Mem.equals("n")) {
+                            SessionContext.getInstance().clearPreferences();
+                            MemValidation = true;
+                        } else LOGGER.severe("ERROR: You can insert just 'y' as yes or 'n' as no \n");
+                    }
+                    LOGGER.info("Login completed correctly!! \n");
+                    HomeCLI.start();
                 }
-                LOGGER.info("Login completed correctly!! \n");
-                HomeCLI.start();
             } catch (InvalidCredentialException e) {
                 LOGGER.severe("ERRORE: " + e.getMessage() +"\n");
             }catch (BaseException e){

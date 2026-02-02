@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

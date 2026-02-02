@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -16,7 +17,7 @@ public class CreateWorkplaceAC {
     private static final UserDAO userRepo = AppConfig.getUserRepository();
     private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
 
-    public static void createWorkplace(WorkplaceBean wp) throws BaseException{
+    public static void createWorkplace(WorkplaceBean wp) throws BaseException {
         if(wp.getWorkplaceName().isEmpty()){throw new NullPointerException("Workplace name cannot be empty");}
 
 

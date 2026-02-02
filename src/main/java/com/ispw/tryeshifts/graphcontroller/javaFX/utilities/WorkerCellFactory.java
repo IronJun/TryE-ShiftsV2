@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.utilities;
+package com.ispw.tryeshifts.graphcontroller.javaFX.utilities;
 
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;

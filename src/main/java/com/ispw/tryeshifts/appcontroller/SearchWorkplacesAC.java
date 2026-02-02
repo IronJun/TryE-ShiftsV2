@@ -50,4 +50,20 @@ public class SearchWorkplacesAC {
         return result;
 
     }
+
+    public static List<WorkplaceBean> getWorkplaceByUser(String email)throws BaseException{
+        List<Workplace> workplaceEntities = workplaceRepo.findWorkplacesbyEmail(email);
+        if (workplaceEntities == null || workplaceEntities.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<WorkplaceBean> resultBeans = new ArrayList<>();
+
+        for (Workplace entity : workplaceEntities) {
+            WorkplaceBean bean = new WorkplaceBean();
+            bean.setWorkplaceName((entity).getName());
+            bean.setAddress((entity).getAddress());
+            resultBeans.add(bean);
+        }
+        return resultBeans;
+    }
 }

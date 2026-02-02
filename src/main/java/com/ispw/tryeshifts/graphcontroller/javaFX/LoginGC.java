@@ -7,7 +7,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
-import com.ispw.tryeshifts.graphcontroller.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;

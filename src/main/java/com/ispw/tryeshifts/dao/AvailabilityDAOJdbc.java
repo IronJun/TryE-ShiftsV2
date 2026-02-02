@@ -41,7 +41,6 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             pstmt.setString(3, availability.getWeekId());
 
             pstmt.executeUpdate();
-            LOGGER.info("Disponibilità salvata per l'utente: " + availability.getUserEmail());
 
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
@@ -61,8 +60,8 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
             int rowsAffected = pstmt.executeUpdate();
-            msg = "Eliminate " + rowsAffected + " disponibilità per l'utente: " + email;
-            LOGGER.info(msg);
+//            msg= "Eliminate " + rowsAffected + " disponibilità per l'utente: " + email;
+//            LOGGER.info(msg);
 
         } catch (SQLException e) {
             throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());

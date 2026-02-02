@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.utilities;
+package com.ispw.tryeshifts.graphcontroller.javaFX.utilities;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

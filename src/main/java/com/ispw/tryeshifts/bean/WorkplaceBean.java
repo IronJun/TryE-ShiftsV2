@@ -21,6 +21,8 @@ public class WorkplaceBean {
 
     public List<String> getSelectedDays() {return selectedDaysBean;}
     public List<String> getShiftsBean() {return shiftsBean;}
+    public void setSelectedDays(List<String> selectedDays) {this.selectedDaysBean = selectedDays;}
+    public void setShiftsBean(List<String> shifts) {this.shiftsBean = shifts;}
     public String getWorkplaceName(){
         return this.workplaceName;
     }

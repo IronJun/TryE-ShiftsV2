@@ -67,14 +67,14 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 pstmtShift.executeBatch();
             }
             conn.commit();
-            msg = "Workplace " + wp.getName() + " salvato correttamente.";
-            LOGGER.log(Level.FINE, msg);
+//            msg = "Workplace " + wp.getName() + " salvato correttamente.";
+//            LOGGER.log(Level.FINE, msg);
         } catch (SQLException e) {
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    LOGGER.severe("Rollback fallito!");
+//                    LOGGER.severe("Rollback fallito!");
                 }
             }
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
@@ -87,7 +87,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    LOGGER.warning("Errore durante la chiusura della connessione: ");
+//                    LOGGER.warning("Errore durante la chiusura della connessione: ");
                 }
             }
         }

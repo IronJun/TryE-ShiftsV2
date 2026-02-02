@@ -55,8 +55,8 @@ public class UserDAOJdbc implements UserDAO{
             pstmt.setString(4, user.getPasswordHash());
 
             pstmt.executeUpdate();
-            msg = user.getEmail() + " registrato con successo nel database! ";
-            LOGGER.log(Level.FINE, msg);
+//            msg = user.getEmail() + " registrato con successo nel database! ";
+//            LOGGER.log(Level.FINE, msg);
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
                 throw new DuplicateEntityException("User",user.getEmail());
