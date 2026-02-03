@@ -35,7 +35,7 @@ public class HomeCLI {
             LOGGER.info("5. See your published shifts\n");
             LOGGER.info("5. Manage your Account\n");
             LOGGER.info("Q. Logout\n"); // Nuova opzione
-            LOGGER.info("0. To logout or \n");
+            LOGGER.info("0. To close the application \n");
 
             String choice = CLIReader.readString("Select an option: ").toUpperCase();
             switch(choice){
@@ -120,7 +120,6 @@ public class HomeCLI {
             LOGGER.severe("Error fetching workplaces: " + e.getMessage() + "\n");
         }
     }
-
     private static void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
         LOGGER.info("\n--- WORKPLACE DETAILS ---\n");
         LOGGER.info("Name: " + wb.getWorkplaceName() + "\n");
@@ -192,8 +191,6 @@ public class HomeCLI {
             LOGGER.severe("Error during join request: " + e.getMessage() + "\n");
         }
     }
-
-
     private static void showMyWorkingDays() {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         int offset = 0; // Settimana corrente
@@ -245,9 +242,8 @@ public class HomeCLI {
             LOGGER.severe("Errore nel recupero del calendario: " + e.getMessage());
         }
     }
-
     private static void logout() {
-        LOGGER.info("Logging out...");
+        LOGGER.info("Logging out...\n");
         // 1. Puliamo il SessionContext
         SessionContext.getInstance().setLoggeduser(null);
         SessionContext.getInstance().setLoggedWorkplace(null);

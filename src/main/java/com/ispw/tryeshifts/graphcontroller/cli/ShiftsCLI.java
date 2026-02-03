@@ -34,12 +34,8 @@ public class ShiftsCLI {
                 ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
                 String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
                 boolean isLocked = status.equals("LOCKED") || status.equals("PUBLISHED");
-                // 1. INTESTAZIONE
                 LOGGER.info("\n--- GESTIONE TURNI: " + wp.getWorkplaceName() + " ---\n");
-
-                // 2. MOSTRA LA TABELLA (Logica differenziata)
                 printWorkerTable(wp);
-                // 3. MENU AZIONI SOTTO LA TABELLA
                 LOGGER.info("\nAZIONI DISPONIBILI:\n");
                 if (!user.getEmail().equals(wp.getOwnerEmail())) {
                     if(!isLocked) {
@@ -211,7 +207,6 @@ public class ShiftsCLI {
             LOGGER.info("-".repeat(header.length()) + "\n");
 
             List<String> timeSlots = wp.getShiftsBean();
-            LOGGER.info("DEBUG: Chiavi ricevute dall'AC: " + shifts.keySet()+"\n");
             for (String slot : timeSlots) {
                 StringBuilder row = new StringBuilder(String.format("%-15s", slot));
 
@@ -230,8 +225,6 @@ public class ShiftsCLI {
                     if (!isDayActive) {
                         content = "  CLOSED  ";
                     } else {
-                         if (shifts.containsKey(searchKey)) LOGGER.info("TROVATA: " + searchKey);
-
                         content = getCellText(status, isOwner, searchKey, shifts, assignments, loggedUser);
                     }
                     row.append(String.format("| %-15s", content));
@@ -280,10 +273,8 @@ public class ShiftsCLI {
             return assigned.isEmpty() ? "-" : String.join(",", assigned);
         }
 
-        // 1. Prova a recuperare i candidati con la chiave esatta (es. Wed_00:00-01:00)
         List<String> candidates = shifts.get(key);
 
-        // 2. FALLBACK: Se non trova nulla, prova a cercare la chiave "rotta" (es. Wed_00:00-00:00)
         if (candidates == null || candidates.isEmpty()) {
             String[] parts = key.split("_"); // [Wed, 00:00-01:00]
             if (parts.length >= 2) {
@@ -293,7 +284,6 @@ public class ShiftsCLI {
             }
         }
 
-        // Se candidates è ancora null dopo il fallback, inizializzalo come lista vuota
         if (candidates == null) candidates = new ArrayList<>();
 
         if (!isOwner) {

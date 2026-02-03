@@ -1,11 +1,11 @@
 package com.ispw.tryeshifts;
 
 import com.ispw.tryeshifts.dao.*;
-
 import java.util.logging.Logger;
 
+
 public class AppConfig {
-    private static UserDAO UserRepo = null;
+    private static UserDAO userRepo = null;
     private static WorkplaceDAO workplaceRepo = null;
     private static MembershipDAO membershipRepo = null;
     private static AvailabilityDAO availabilityRepo = null;
@@ -18,30 +18,25 @@ public class AppConfig {
     }
 
     public static UserDAO getUserRepository(){
-        if(UserRepo  == null){
+        if(userRepo  == null){
             if(IS_DEMO_MODE){
                 if(SAVE_USER_TO_CSV){
-                    UserRepo = new UserDAOCsv();
-//                    LOGGER.info("Sistema: craeto un nuovo repository  per user su file csv");
+                    userRepo = new UserDAOCsv();
                 }else {
-                    UserRepo = new UserDAODemo();
-//                    LOGGER.info("Sistema: craeto un nuovo repository in memoria");
+                    userRepo = new UserDAODemo();
                 }
             }else{
-                UserRepo = new UserDAOJdbc();
-//                LOGGER.info("Sistema in Modalità persistenza");
+                userRepo = new UserDAOJdbc();
             }
         }
-        return UserRepo;
+        return userRepo;
     }
     public static WorkplaceDAO getWorkplaceRepository(){
         if(workplaceRepo == null){
             if(IS_DEMO_MODE){
                 workplaceRepo = new WorkplaceDAODemo();
-//                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
             }else{
                 workplaceRepo = new WorkplaceDAOJdbc();
-//                LOGGER.info("Sistema in Modalità persistenza");
             }
         }
         return workplaceRepo;
@@ -50,10 +45,8 @@ public class AppConfig {
         if(availabilityRepo == null){
             if(IS_DEMO_MODE){
                 availabilityRepo = new AvailabilityDAODemo();
-//                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
             }else{
                 availabilityRepo = new AvailabilityDAOJdbc();
-//                LOGGER.info("Sistema in Modalità persistenza");
             }
         }
         return availabilityRepo;
@@ -62,10 +55,8 @@ public class AppConfig {
         if(membershipRepo == null){
             if(IS_DEMO_MODE){
                 membershipRepo = new MembershipDAODemo();
-//                LOGGER.info("Sistema: craeto un nuovo repository in memoria");
             }else{
                 membershipRepo = new MembershipDAOJdbc();
-//                LOGGER.info("Sistema in Modalità persistenza");
             }
         }
         return membershipRepo;

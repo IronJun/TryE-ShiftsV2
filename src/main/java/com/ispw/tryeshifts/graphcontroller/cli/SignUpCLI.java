@@ -1,10 +1,11 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
+import com.ispw.tryeshifts.appcontroller.LoginAC;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
+import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.Collectors;
 
 import java.util.logging.Logger;
 
@@ -15,16 +16,32 @@ public class SignUpCLI {
     private static final Logger LOGGER = Logger.getLogger(SignUpCLI.class.getName());
 
     public static void start() {
-        // Loop infinito: finché l'app è aperta, fluttuiamo tra Login e Signup
+        // 1. L'AUTO-LOGIN va fatto SOLO QUI (una volta all'avvio)
+        try {
+            String savedEmail = SessionContext.getInstance().getSavedEmail();
+            if (savedEmail != null) {
+                UserBean user = LoginAC.autoLogin(savedEmail);
+                SessionContext.getInstance().setLoggeduser(user);
+                HomeCLI.start();
+                // Se l'utente fa Logout dalla Home, il codice prosegue sotto nel loop.
+            }
+        } catch (BaseException e) {
+            LOGGER.warning("Auto-login failed: " + e.getMessage());
+            SessionContext.getInstance().clearPreferences();
+        }
+
+        // 2. Loop principale di navigazione
         while (true) {
             boolean accVal = false;
             String acc = "";
 
             LOGGER.info("--- Welcome to E-Shifts ---\n");
 
+            // RIMOSSO IL BLOCCO AUTO-LOGIN DA QUI DENTRO!
+
             while (!accVal) {
                 acc = CLIReader.readString("Do you already have an account? Y/n (or 0 to exit): ").toUpperCase();
-                if (acc.equals("0")) System.exit(0); // Uscita pulita
+                if (acc.equals("0")) System.exit(0);
 
                 accVal = acc.equals("Y") || acc.equals("N");
                 if (!accVal) {
@@ -34,8 +51,6 @@ public class SignUpCLI {
 
             if (acc.equals("Y")) {
                 try {
-                    // Quando premi 'Q' in LoginCLI, il metodo start() finisce.
-                    // Il controllo torna qui e il 'while(true)' fa ripartire il menu.
                     LoginCLI.start();
                 } catch (BaseException e) {
                     LOGGER.severe("ERRORE: " + e.getMessage());

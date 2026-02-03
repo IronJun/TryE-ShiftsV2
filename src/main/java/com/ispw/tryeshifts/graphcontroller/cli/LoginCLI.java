@@ -20,40 +20,50 @@ public class LoginCLI{
     public static void start() throws BaseException {
         LOGGER.info("\n--- LOGIN E-SHIFTS ---\n");
         LOGGER.info("Inserisci le tue credenziali per accedere al sistema.\n");
+//        boolean login = false;
 
-        boolean MemValidation = false;
-        boolean login = false;
-
-        while(!login) {
+        while(true) {
             try {
-                String quit = CLIReader.readString("Press Q to SignUP if you don't have an account...\n").toUpperCase();
-                if(quit.equalsIgnoreCase("Q")) {
-                    login = true;
-                    break;
-                } else {
-                    UserBean inputUser = new UserBean(CLIReader.readString("Email: "), CLIReader.readString("Password: "));
-
-                    UserBean loggedUser = LoginAC.loginUser(inputUser);
-                    SessionContext.getInstance().setLoggeduser(loggedUser);
-                    login = true;
-                    while (!MemValidation) {
-                        String Mem = CLIReader.readString("Do you want the system to remember your credentials? Y/n : \n  ").toUpperCase();
-
-                        if (Mem.equals("Y")) {
-                            SessionContext.getInstance().saveUserToPreferences(inputUser.getEmail());
-                            MemValidation = true;
-                        } else if (Mem.equals("n")) {
-                            SessionContext.getInstance().clearPreferences();
-                            MemValidation = true;
-                        } else LOGGER.severe("ERROR: You can insert just 'y' as yes or 'n' as no \n");
-                    }
-                    LOGGER.info("Login completed correctly!! \n");
-                    HomeCLI.start();
+                LOGGER.info("Press Q to SignUP if you don't have an account at any moment\n");
+                String email = CLIReader.readString("Email: ");
+                if(email.equalsIgnoreCase("Q")){
+                    return;
                 }
+                String password = CLIReader.readString("Password: ");
+                if (password.equalsIgnoreCase("Q")) {
+                    return;
+                }
+                UserBean inputUser = new UserBean(email, password);
+                UserBean loggedUser = LoginAC.loginUser(inputUser);
+
+                SessionContext.getInstance().setLoggeduser(loggedUser);
+
+                handleRememberMe(inputUser);
+
+                LOGGER.info("Login completed correctly!! \n");
+                HomeCLI.start();
+                return;
+
             } catch (InvalidCredentialException e) {
                 LOGGER.severe("ERRORE: " + e.getMessage() +"\n");
             }catch (BaseException e){
                 LOGGER.severe("ERRORE: " + e.getMessage() +"\n");
+            }
+        }
+    }
+
+    private static void handleRememberMe(UserBean user){
+        boolean memValidation = false;
+        while (!memValidation) {
+            String mem = CLIReader.readString("Do you want to remember credentials? Y/n: ").toUpperCase();
+            if (mem.equals("Y")) {
+                SessionContext.getInstance().saveUserToPreferences(user.getEmail());
+                memValidation = true;
+            } else if (mem.equals("N")) {
+                SessionContext.getInstance().clearPreferences();
+                memValidation = true;
+            } else {
+                LOGGER.warning("Insert 'Y' or 'N'\n");
             }
         }
     }
