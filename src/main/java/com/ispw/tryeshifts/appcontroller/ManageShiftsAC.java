@@ -10,9 +10,7 @@ import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 import java.time.DayOfWeek;

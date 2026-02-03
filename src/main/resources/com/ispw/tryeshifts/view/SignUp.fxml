@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 
 <?import javafx.scene.layout.StackPane?>
-<GridPane fx:controller="com.ispw.tryeshifts.graphcontroller.javaFX.SignUpGC"
+<GridPane fx:controller="com.ispw.tryeshifts.graphcontroller.javafx.SignUpGC"
           xmlns="http://javafx.com/javafx/21"
           xmlns:fx="http://javafx.com/fxml/1"
           prefWidth="900.0" prefHeight="600.0"

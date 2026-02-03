@@ -16,11 +16,15 @@ public class Configurator {
         }
 
         // 2. Creiamo il tuo formatter personalizzato "minimalista"
-        Formatter minimalFormatter = new Formatter() {
+        Formatter minimalFormatter = new Formatter() {// Codici per resettare il colore al default del terminale
+            private static final String RESET = "\u001B[0m";
+            // 1;37m è il Bianco Brillante (Bold White)
+            private static final String BRIGHT_WHITE = "\u001B[1;37m";
+
             @Override
             public String format(LogRecord logRecord) {
-                // Stampa solo il messaggio, utile per la CLI
-                return logRecord.getMessage();
+                // Applichiamo il bianco brillante, formattiamo il messaggio, resettiamo e andiamo a capo
+                return BRIGHT_WHITE + formatMessage(logRecord) + RESET ;
             }
         };
 

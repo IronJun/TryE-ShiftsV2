@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.javaFX;
+package com.ispw.tryeshifts.graphcontroller.javafx;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
@@ -10,7 +10,7 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.*;
+import com.ispw.tryeshifts.graphcontroller.javafx.utilities.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

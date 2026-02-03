@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.javaFX;
+package com.ispw.tryeshifts.graphcontroller.javafx;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.*;
@@ -7,7 +7,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.graphcontroller.javafx.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 public class HomeGC {
     private static final Logger LOGGER = Logger.getLogger(HomeGC.class.getName());
+    private static final String TECNICAL_ERROR = "Technical error: ";
     private UserBean loggedUser;
     @FXML private ListView<String> workplaceListView;
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
@@ -40,6 +41,7 @@ public class HomeGC {
     @FXML private Button btnPrevWeek;
     private int weekOffset = 0;
     private String currentWeekId;
+    private String msg="";
 
     public void initialize() {
         ErrorViewManager.setupAutoHide(errorlbl);
@@ -62,7 +64,7 @@ public class HomeGC {
         if (this.loggedUser != null) {
             refreshWorkplaceList();
             handleSearch("");
-            String currentWeekId = getCurrentWeekId();
+            currentWeekId = getCurrentWeekId();
             buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), currentWeekId);
         }
     }
@@ -105,7 +107,7 @@ public class HomeGC {
                 }catch(EntityNotFoundException _){
                     ErrorViewManager.ScreenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
                 }catch(BaseException _){
-                    ErrorViewManager.ScreenError("Errore tecnico","Impossibile inviare la richiesta");
+                    ErrorViewManager.ScreenError(TECNICAL_ERROR,"Impossibile inviare la richiesta");
                 }
 
             }
@@ -125,25 +127,25 @@ public class HomeGC {
         }catch(EntityNotFoundException _){
             ErrorViewManager.ScreenError("Errore Workplace", "il workpalce selezionato non esiste");
         }catch(BaseException e){
-            ErrorViewManager.ScreenError("Errore tecnico", e.getMessage());
+            ErrorViewManager.ScreenError(TECNICAL_ERROR, e.getMessage());
         }
     }
 
     public void handleSearch(String query) {
-        SearchWorkplacesAC searchWorkplacesAC = new SearchWorkplacesAC();
         try {
             List<WorkplaceBean> result;
             if (query == null || query.isEmpty()) {
-                result = searchWorkplacesAC.getAllWorkplaces();
+                result = SearchWorkplacesAC.getAllWorkplaces();
             } else {
-                result = searchWorkplacesAC.searchByName(query);
+                result = SearchWorkplacesAC.searchByName(query);
             }
-
-            System.out.println("Risultati trovati: " + result.size()); // DEBUG
+            msg = "Risultati trovati: " + result.size();
+            LOGGER.info(msg); // DEBUG
 
             workplaceListView.getItems().clear();
             for (WorkplaceBean wp : result) {
-                System.out.println("Aggiungo: " + wp.getWorkplaceName()); // DEBUG
+                msg = "Aggiungo: " + wp.getWorkplaceName();
+                LOGGER.info(msg); // DEBUG
                 workplaceListView.getItems().add(wp.getWorkplaceName());
             }
         }catch(DataFetchException e){
@@ -152,7 +154,7 @@ public class HomeGC {
                     "Non è stato possibile recuperare i dati. Riprova più tardi.");
             workplaceListView.getItems().clear();
         }catch(BaseException e){
-            ErrorViewManager.ScreenError("Errore tecnico", e.getMessage());
+            ErrorViewManager.ScreenError(TECNICAL_ERROR, e.getMessage());
             workplaceListView.getItems().clear();
         }
     }
@@ -272,8 +274,8 @@ public class HomeGC {
                 row.getChildren().addAll(rect, name);
                 vboxWorkplaceLegend.getChildren().add(row);
             }
-        } catch (BaseException e) {
-            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i workplace");
+        } catch (BaseException _) {
+            ErrorViewManager.ScreenError(TECNICAL_ERROR,"Impossibile recuperare i workplace");
         }
 
     }

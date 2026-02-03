@@ -23,12 +23,12 @@ module com.ispw.tryeshifts {
     opens com.ispw.tryeshifts.bean to javafx.base;
 
     exports com.ispw.tryeshifts;
-    exports com.ispw.tryeshifts.graphcontroller.javaFX;
+    exports com.ispw.tryeshifts.graphcontroller.javafx;
     exports com.ispw.tryeshifts.appcontroller;
     exports com.ispw.tryeshifts.entity;
     exports com.ispw.tryeshifts.excpetion;
     exports com.ispw.tryeshifts.bean;
     exports com.ispw.tryeshifts.dao;
-    opens com.ispw.tryeshifts.graphcontroller.javaFX to javafx.fxml;
+    opens com.ispw.tryeshifts.graphcontroller.javafx to javafx.fxml;
 
 }

@@ -32,7 +32,7 @@ public class SearchWorkplacesAC {
 
         return resultBeans;
     }
-    public List<WorkplaceBean> searchByName(String query) throws BaseException {
+    public static List<WorkplaceBean> searchByName(String query) throws BaseException {
 
         if (query == null || query.isEmpty()) {
             return new ArrayList<>();

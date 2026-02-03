@@ -70,7 +70,8 @@ public class ShiftsCLI {
             printWorkerMenu(isLocked);
         }
 
-        LOGGER.info("N. Next Week | P. Previous Week | 0. Torna alla Home\n");
+        LOGGER.info("N. Next Week \nP. Previous Week \n0. Torna alla Home\n");
+
     }
 
     private static void printOwnerMenu(String status) {
@@ -330,7 +331,7 @@ public class ShiftsCLI {
         List<AvailabilityBean> beansToSave = convertMapToBeans(currentData, user, wp, searchKey);
 
         // Gestione Toggle (Aggiunta se non presente)
-        boolean alreadySelected = currentData.getOrDefault(searchKey, new ArrayList<>()).contains("SELECTED");
+        boolean alreadySelected = currentData.getOrDefault(searchKey, new ArrayList<>()).contains(SELECTED_STATUS);
         if (!alreadySelected) {
             String[] parts = fullSlot.split("\\s*-\\s*");
             beansToSave.add(new AvailabilityBean(user.getEmail(), wp.getWorkplaceName(),
@@ -468,34 +469,35 @@ public class ShiftsCLI {
 
         List<String> timeSlots = wp.getShiftsBean();
         List<String> activeDays = wp.getSelectedDays();
+        TableContext ctx = new TableContext(status, isOwner, shifts, assignments, user);
 
         for (String slot : timeSlots) {
             StringBuilder row = new StringBuilder(String.format("%-15s", slot));
             for (String day : days) {
-                row.append(String.format("| %-15s",
-                        buildCellContent(day, slot, activeDays, new TableContext(status, isOwner, shifts, assignments, user))));
+                row.append(String.format("| %-15s", buildCellContent(day, slot, activeDays, ctx)));
             }
-            msg = row.toString();
-            LOGGER.info(msg);
+            // Niente variabile statica msg: usiamo una locale o chiamiamo direttamente
+            LOGGER.info(row.toString()+"\n");
         }
     }
     private static void printDashboardHeader(String status) {
-        LOGGER.log(Level.INFO, "%nSTATUS: {0} | WEEK: {1}%n",
-                new Object[]{status, ManageShiftsAC.getWeekRangeString(weekOffset)});
+        // Creiamo la riga di stato
+        String statusLine = String.format("STATUS: %s | WEEK: %s",
+                status, ManageShiftsAC.getWeekRangeString(weekOffset));
+        LOGGER.info(statusLine+"\n");
 
         StringBuilder header = new StringBuilder(String.format("%-15s", "ORA"));
         for (String day : days) {
             header.append(String.format("| %-15s", day.toUpperCase()));
         }
-        msg = header.toString();
-        LOGGER.info(msg);
-        msg = "-".repeat(header.length());
-        LOGGER.info(msg);
+
+        LOGGER.info(header.toString()+"\n");
+        LOGGER.info("-".repeat(header.length())+"\n");
     }
     private static void publishShifts(WorkplaceBean wp){
         try {
             LOGGER.info("\n--- PUBBLICAZIONE TURNI DEFINITIVI ---");
-            LOGGER.info("Stai per rendere i turni visibili a tutti i lavoratori.");
+            LOGGER.info("\nStai per rendere i turni visibili a tutti i lavoratori.");
             String conferma = CLIReader.readString("Confermi la pubblicazione per la settimana " + currentWeekId + "? (y/n): ");
 
             if (conferma.equalsIgnoreCase("y")) {
@@ -506,7 +508,7 @@ public class ShiftsCLI {
 
                 LOGGER.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
             } else {
-                LOGGER.info("Operazione annullata.");
+                LOGGER.info("\nOperazione annullata.");
             }
         } catch (BaseException e) {
             LOGGER.severe("❌ Errore durante la pubblicazione: " + e.getMessage());

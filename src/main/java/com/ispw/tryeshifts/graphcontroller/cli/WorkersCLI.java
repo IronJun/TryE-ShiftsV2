@@ -53,11 +53,11 @@ public class WorkersCLI {
             int choice = CLIReader.readInt("\nSelect the number of the user to handle (0 to annul): ");
             if (choice > 0 && choice <= pending.size()) {
                 UserBean selected = pending.get(choice - 1);
-                String action = CLIReader.readString("Will you accept the User? y/n: ").toLowerCase();
+                String action = CLIReader.readString("\nWill you accept the User? y/n: ").toLowerCase();
 
                 boolean accept = action.equals("y");
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
-                LOGGER.info(accept ? "✅ User Accepted!" : "❌ User not accepted.");
+                LOGGER.info(accept ? "\n✅ User Accepted!" : "❌ User not accepted.");
             }
         } catch (BaseException e) {
             LOGGER.severe("Errore: " + e.getMessage());

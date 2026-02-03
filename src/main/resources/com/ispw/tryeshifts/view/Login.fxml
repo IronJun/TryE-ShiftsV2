@@ -16,7 +16,7 @@
 
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.StackPane?>
-<GridPane fx:controller="com.ispw.tryeshifts.graphcontroller.javaFX.LoginGC"
+<GridPane fx:controller="com.ispw.tryeshifts.graphcontroller.javafx.LoginGC"
           xmlns="http://javafx.com/javafx/21"
           xmlns:fx="http://javafx.com/fxml/1"
           prefWidth="900.0" prefHeight="600.0"

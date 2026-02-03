@@ -110,7 +110,7 @@ public class SignUpCLI {
         String name = "";
         while (!nameValid) {
             name = CLIReader.readString("Name: ");
-            nameValid = name != null && name.matches("[a-zA-ZÀ-ÿ\\\\s'-]+");
+            nameValid = name != null && name.matches("[a-zA-ZÀ-ÿ\\s'-]+");
             if (!nameValid) {
                 LOGGER.warning("Nome non valido! Riprova.\n");
             }
