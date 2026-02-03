@@ -16,7 +16,7 @@ public interface WorkplaceDAO {
     List<Workplace> findWorkplacesbyEmail(String email)throws DataFetchException;
     List<Workplace> findAllWorkplaces()throws DataFetchException;
     List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException, DataFetchException;
-    String getWeekStatus(String WorkplaceName, String weekId)throws DataFetchException;
+    String getWeekStatus(String workplaceName, String weekId)throws DataFetchException;
     void updateWeekStatus(String workplaceName, String weekId, String newStatus)throws DataFetchException;
     void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments)throws DataFetchException;
     Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId)throws DataFetchException;

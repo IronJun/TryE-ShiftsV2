@@ -17,7 +17,7 @@ public class UserDAOCsv implements UserDAO{
                     user.getName(),
                     user.getSurname());
             out.println(line);
-        }catch(IOException e){
+        }catch(IOException _){
             throw new DataFetchException("Errore di I/O durante la scrittura nel file CSV");
         }
     }
@@ -38,7 +38,7 @@ public class UserDAOCsv implements UserDAO{
                     lines.add(line);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException _) {
             throw new DataFetchException("impossibile aggioranre il file CSV");
         }
 
@@ -46,7 +46,7 @@ public class UserDAOCsv implements UserDAO{
             for (String l : lines) {
                 out.println(l);
             }
-        } catch (IOException e) {
+        } catch (IOException _) {
             throw new DataFetchException("impossibile aggioranre il file CSV");
         }
     }
@@ -62,8 +62,8 @@ public class UserDAOCsv implements UserDAO{
                     return ui;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException _) {
+            throw new DataFetchException("Errore durante la lettura del file CSV: ");
         }
         return null;
     }

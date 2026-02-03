@@ -18,8 +18,7 @@ public class UserDAODemo implements UserDAO{
         }
     }
     public UserInfo findByEmail(String email) {
-        UserInfo user = db.getUsers().get(email);
-        return user;
+        return  db.getUsers().get(email);
     }
     public void updateUser(UserInfo updatedUser) throws EntityNotFoundException{
         if(!db.getUsers().containsKey(updatedUser.getEmail())){throw new EntityNotFoundException("User", updatedUser.getEmail());}

@@ -22,72 +22,24 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
 
 
     public void saveWorkplace(Workplace wp) throws DataFetchException,DuplicateEntityException {
-        String insertWorkplace = "INSERT INTO workplaces (name, address, owner_email) VALUES (?, ?, ?)";
-        String insertDay = "INSERT INTO workplace_days (workplace_id, day_name) VALUES (?, ?)";
-        String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
-
         Connection conn = null;
         try {
-            conn = DBconnection.getConnection();
+            conn = DBconnection.getConnection(); // Usa il tuo metodo di connessione
             conn.setAutoCommit(false);
 
-            int workplaceId;
-            try (PreparedStatement pstmt = conn.prepareStatement(insertWorkplace, Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, wp.getName());
-                pstmt.setString(2, wp.getAddress());
-                pstmt.setString(3, wp.getOwnerEmail());
-                pstmt.executeUpdate();
+            // Delego le operazioni a metodi specializzati
+            insertMainWorkplace(conn, wp);
+            insertWorkplaceDays(conn, wp);
+            insertWorkplaceShifts(conn, wp);
 
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        workplaceId = rs.getInt(1);
-                        wp.setId(String.valueOf(workplaceId)); // Aggiorniamo l'oggetto Java
-                    } else {
-                        throw new DataFetchException("Errore: ID non generato.");
-                    }
-                }
-            }
-            try (PreparedStatement pstmtDay = conn.prepareStatement(insertDay)) {
-                for (String day : wp.getSelectedDays()) {
-                    pstmtDay.setInt(1, workplaceId);
-                    pstmtDay.setString(2, day);
-                    pstmtDay.addBatch(); // Ottimizziamo le prestazioni
-                }
-                pstmtDay.executeBatch();
-            }
-
-            // 3. Inserimento Turni
-            try (PreparedStatement pstmtShift = conn.prepareStatement(insertShift)) {
-                for (String shift : wp.getShifts()) {
-                    pstmtShift.setInt(1, workplaceId);
-                    pstmtShift.setString(2, shift);
-                    pstmtShift.addBatch();
-                }
-                pstmtShift.executeBatch();
-            }
             conn.commit();
-
         } catch (SQLException e) {
             if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                try { conn.rollback(); } catch (SQLException ex) { Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, ex); }
             }
-            if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
-                throw new DuplicateEntityException("Workplace", wp.getName());
-            }
-            throw new DataFetchException("Errore tecnico nel salvataggio del workplace");
+            throw new DataFetchException("Errore nel salvataggio del workplace: " + e.getMessage());
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException e) {
-                    Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, e);
-                }
-            }
+            try { if (conn != null) conn.close(); } catch (SQLException e) { Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, e); }
         }
     }
     public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException,EntityNotFoundException {
@@ -322,6 +274,39 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 while (rs.next()) shifts.add(rs.getString("shift_name"));
                 wp.setShifts(shifts);
             }
+        }
+    }
+    private void insertMainWorkplace(Connection dbc, Workplace wp) throws SQLException {
+        String sql = "INSERT INTO workplaces (name, address, owner_email) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = dbc.prepareStatement(sql)) {
+            pstmt.setString(1, wp.getName());
+            pstmt.setString(2, wp.getAddress());
+            pstmt.setString(3, wp.getOwnerEmail());
+            pstmt.executeUpdate();
+        }
+    }
+    private void insertWorkplaceDays(Connection dbc, Workplace wp) throws SQLException {
+        String insertDay = "INSERT INTO workplace_days (workplace_id, day_name) VALUES (?, ?)";
+        try (PreparedStatement pstmt = dbc.prepareStatement(insertDay)) {
+            for (String day : wp.getSelectedDays()) {
+                pstmt.setString(1, wp.getName());
+                pstmt.setString(2, day);
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
+    }
+    private void insertWorkplaceShifts(Connection dbc, Workplace wp) throws SQLException {
+        String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
+        try (PreparedStatement pstmt = dbc.prepareStatement(insertShift)) {
+            for (String shift : wp.getShifts()) { // Shift formato "08:00-14:00"
+                String[] parts = shift.split("-");
+                pstmt.setString(1, wp.getName());
+                pstmt.setString(2, parts[0]);
+                pstmt.setString(3, parts[1]);
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
         }
     }
 }

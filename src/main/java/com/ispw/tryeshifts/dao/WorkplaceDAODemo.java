@@ -61,8 +61,8 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         }
         return result;
     }
-    public String getWeekStatus(String WorkplaceName, String weekId){
-        return db.getWeekStatusDbDemo().get(WorkplaceName + "_" + weekId);
+    public String getWeekStatus(String workplaceName, String weekId){
+        return db.getWeekStatusDbDemo().get(workplaceName + "_" + weekId);
     }
     public void updateWeekStatus(String workplaceName, String weekId, String newStatus) {
         // Usiamo la stessa chiave usata per il recupero

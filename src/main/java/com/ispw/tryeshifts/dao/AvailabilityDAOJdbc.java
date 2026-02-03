@@ -139,7 +139,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                     String cellKey = day + "_" + start + "-" + end;
 
                     // 2. Recuperiamo l'email del lavoratore
-                    String email = rs.getString("user_email");
+                    String email = rs.getString(USER_EMAIL);
 
                     // 3. Aggiungiamo l'email alla lista corrispondente a quella cella
                     // Se la chiave non esiste, crea una nuova ArrayList
