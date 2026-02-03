@@ -12,8 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDAOJdbc implements UserDAO{
-    private static final Logger LOGGER = Logger.getLogger(UserDAOJdbc.class.getName());
-    private String msg;
 
     public UserInfo findByEmail(String email) throws DataFetchException {
         // Selezioniamo solo i campi che servono al tuo costruttore
@@ -38,7 +36,7 @@ public class UserDAOJdbc implements UserDAO{
                     return null;
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             // Incapsuliamo l'errore tecnico
             throw new DataFetchException("Errore durante la ricerca dell'utente: " + email);
         }
@@ -55,8 +53,7 @@ public class UserDAOJdbc implements UserDAO{
             pstmt.setString(4, user.getPasswordHash());
 
             pstmt.executeUpdate();
-//            msg = user.getEmail() + " registrato con successo nel database! ";
-//            LOGGER.log(Level.FINE, msg);
+
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
                 throw new DuplicateEntityException("User",user.getEmail());

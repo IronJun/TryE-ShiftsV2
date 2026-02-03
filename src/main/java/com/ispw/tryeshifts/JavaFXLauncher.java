@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import java.util.logging.Logger;
 
 public class JavaFXLauncher extends Application {
-    private static final Logger LOGGER = Logger.getLogger(LoginCLI.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JavaFXLauncher.class.getName());
 
     public static void startApp(String[] args) {
         launch(args);

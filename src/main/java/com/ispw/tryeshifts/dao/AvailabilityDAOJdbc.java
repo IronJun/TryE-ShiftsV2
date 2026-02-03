@@ -16,13 +16,12 @@ import java.util.logging.Logger;
 
 public class AvailabilityDAOJdbc implements AvailabilityDAO{
     private String msg;
-    private final String userEmail = "user_email";
-    private final String dayName = "day_name";
-    private final String workplaceStrName = "workplace_name";
-    private final String startShift = "start_shift";
-    private final String endShift = "end_shift";
-    private final String week_id = "week_id";
-    private static final Logger LOGGER = Logger.getLogger(AvailabilityDAOJdbc.class.getName());
+    private static final String userEmail = "user_email";
+    private static final String dayName = "day_name";
+    private static final String workplaceStrName = "workplace_name";
+    private static final String startShift = "start_shift";
+    private static final String endShift = "end_shift";
+    private static final String queryWeekId = "week_id";
 
 
     public void saveAvailability(Availability availability) throws DuplicateEntityException, DataFetchException {
@@ -59,9 +58,6 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
 
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
-            int rowsAffected = pstmt.executeUpdate();
-//            msg= "Eliminate " + rowsAffected + " disponibilità per l'utente: " + email;
-//            LOGGER.info(msg);
 
         } catch (SQLException e) {
             throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
@@ -85,7 +81,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                             rs.getString(dayName),
                             rs.getString(startShift),
                             rs.getString(endShift),
-                            rs.getString(week_id)
+                            rs.getString(queryWeekId)
 
                     ));
                 }
@@ -112,7 +108,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                             rs.getString(dayName),
                             rs.getString(startShift),
                             rs.getString(startShift),
-                            rs.getString(week_id)
+                            rs.getString(queryWeekId)
                     ));
                 }
             }
@@ -152,7 +148,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                     availabilitiesMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(email);
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("impossibile recupare le diposniblità dalla settimana");
         }
 

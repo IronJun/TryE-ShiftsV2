@@ -29,7 +29,7 @@ public class ManageShiftsAC {
 
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 
-    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace,String weekId ) throws BaseException {
+    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ) throws BaseException {
         if(workplace == null||user == null){throw new NullPointerException("Workplace or User passed null");}
         Map<String, List<String>> viewMap = new HashMap<>();
 
@@ -63,11 +63,8 @@ public class ManageShiftsAC {
         String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
         String wpName = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
         try {
-            try {
-                availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName);
-            }catch(EntityNotFoundException _){
-                LOGGER.info("Nessna disponibilità precendente da rimuovere per: " + userEmail);
-            }
+
+            availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName);
             // 2. SALVATAGGIO: Trasformiamo i Bean in Entity e le salviamo nel Repository
             for (AvailabilityBean bean : beans) {
                 LOGGER.info("LOG AC: Salvataggio per " + bean.getUserEmail() + " al " + bean.getDay());
@@ -81,9 +78,11 @@ public class ManageShiftsAC {
                 );
                 availabilityRepo.saveAvailability(entity);
             }
+        }catch(EntityNotFoundException _){
+            LOGGER.info("Nessna disponibilità precendente da rimuovere per: " + userEmail);
         }catch(DataFetchException e){
             LOGGER.log(Level.SEVERE, "Errore di persistenza durante il salvataggio", e);
-            throw e;
+
         }
     }
 
@@ -112,14 +111,12 @@ public class ManageShiftsAC {
         for (Workplace wp : myWorkplaces) {
                 // Recuperiamo i turni pubblicati per questo locale
                 Map<String, List<String>> shifts = workplaceRepo.getPublishedShiftsByWeek(wp.getName(), weekId);
-                System.out.println("Turni trovati per oggi: " + shifts.size());
                 for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
                     if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
                         // Esempio entry.getKey(): "Mon_08:00-09:00"
                         String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
                         String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
                         assignments.put(cleanKey, wp.getName());
-                        System.out.println("Turno: " + fullKey + " assegnato a " + wp.getName());
                         // Aggiungiamo l'orario al set per le righe della tabella
                         String timePart = cleanKey.split("_")[1];
                         timeSlots.add(timePart);
@@ -152,7 +149,8 @@ public class ManageShiftsAC {
     public static List<Workplace> getUserWorkplaces(String email) throws BaseException{
         return workplaceRepo.findWorkplacesbyEmail(email);
     }
-    public static void addShiftstoWorkaplce(ComboBox<String> startMcombo, ComboBox<String> endMcombo, ComboBox<String> startHcombo, ComboBox<String> endHcombo, Label error, ListView<String> shiftsListView){
+
+    public static void addShiftstoWorkaplce(ComboBox<String> startMcombo, ComboBox<String> endMcombo, ComboBox<String> startHcombo, ComboBox<String> endHcombo,  ListView<String> shiftsListView)throws BaseException{
         String startH = startHcombo.getValue();
         String startM = startMcombo.getValue();
         String endH = endHcombo.getValue();
@@ -164,15 +162,13 @@ public class ManageShiftsAC {
 
 
         if (endTotalMinutes  <= startTotalMinutes) {
-            ErrorViewManager.showError(error, "La fine deve essere dopo l'inizio");
-            return;
+            throw new IllegalArgumentException("La fine deve essere dopo l'inizio");
         }
 
         String fullShift = startH + ":" + startM + " - " + endH + ":" + endM;
         for (String existing : shiftsListView.getItems()) {
             if (existing.equals(fullShift)) {
-                ErrorViewManager.showError(error, "Turno già presente");
-                return;
+                throw new DuplicateEntityException("shifts","this shifts already exists");
             }
 
             // Logica Overlap
@@ -181,17 +177,16 @@ public class ManageShiftsAC {
             int existStart = parseToMinutes(parts[0]);
             int existEnd = parseToMinutes(parts[1]);
 
-            if (startTotalMinutes < existEnd && existStart < startTotalMinutes + (endTotalMinutes - startTotalMinutes)) {
-                if (startTotalMinutes < existEnd && existStart < endTotalMinutes) {
-                    ErrorViewManager.showError(error, "Si sovrappone a: " + existing);
-                    return;
-                }
+            if ((startTotalMinutes < existEnd && existStart < startTotalMinutes + (endTotalMinutes - startTotalMinutes))&&(startTotalMinutes < existEnd && existStart < endTotalMinutes)) {
+                    throw new IllegalArgumentException("not valid shift: overlapping other shifts");
+                    //ErrorViewManager.showError(error, "Si sovrappone a: " + existing);
             }
         }
 
         shiftsListView.getItems().add(fullShift);
         java.util.Collections.sort(shiftsListView.getItems());
     }
+
     private static int parseToMinutes(String time) {
         String[] hm = time.trim().split(":");
 

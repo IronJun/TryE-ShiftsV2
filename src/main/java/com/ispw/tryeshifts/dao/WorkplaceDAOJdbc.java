@@ -14,12 +14,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WorkplaceDAOJdbc implements WorkplaceDAO {
-    private static final Logger LOGGER = Logger.getLogger(WorkplaceDAOJdbc.class.getName());
-    private String msg;
-    private final String nameUser = "name";
-    private final String addressUser = "address";
-    private final String ownerEmail = "owner_email";
-    private final String dayName = "day_name";
+
+    private static final String nameUser = "name";
+    private static final String addressUser = "address";
+    private static final String ownerEmail = "owner_email";
+    private static final String dayName = "day_name";
 
 
     public void saveWorkplace(Workplace wp) throws DataFetchException,DuplicateEntityException {
@@ -67,14 +66,13 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 pstmtShift.executeBatch();
             }
             conn.commit();
-//            msg = "Workplace " + wp.getName() + " salvato correttamente.";
-//            LOGGER.log(Level.FINE, msg);
+
         } catch (SQLException e) {
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-//                    LOGGER.severe("Rollback fallito!");
+                    Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
@@ -87,7 +85,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-//                    LOGGER.warning("Errore durante la chiusura della connessione: ");
+                    Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
         }
@@ -243,7 +241,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(2, weekId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) return rs.getString("status_name");
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("Impossibile recuperare lo stato della settimana:");
         }
         return "OPEN";
@@ -259,7 +257,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(3, newStatus);
             pstmt.setString(4, newStatus);
             pstmt.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("Impossibile aggiornare lo stato della settimana:");
         }
     }
@@ -281,9 +279,8 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
-                throw e;
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("Errore DB: impossibile salvare le assegnazioni");
         }
     }
@@ -300,7 +297,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 String email = rs.getString("worker_email");
                 shifts.computeIfAbsent(key, k -> new ArrayList<>()).add(email);
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("Errore DB: impossibile recuperare le assegnazioni");
         }
         return shifts;

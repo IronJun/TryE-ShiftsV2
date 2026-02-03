@@ -118,7 +118,13 @@ public class NewWorkplaceGC {
     }
 
     public void addShiftToList() {
-        ManageShiftsAC.addShiftstoWorkaplce(startMinuteCombo,endMinuteCombo,startHourCombo,endHourCombo,errorLabel,shiftsListView);
+        try{
+        ManageShiftsAC.addShiftstoWorkaplce(startMinuteCombo,endMinuteCombo,startHourCombo,endHourCombo,shiftsListView);
+        }catch(IllegalArgumentException _){
+            ErrorViewManager.showError(errorLabel,"Invalid shift time!");
+        }catch(BaseException e){
+            ErrorViewManager.showError(errorLabel,e.getMessage());
+        }
     }
     public TextField getNameField() {
         return nameField; // Ritorna il campo del nome per permettere alla Home di trovare la finestra

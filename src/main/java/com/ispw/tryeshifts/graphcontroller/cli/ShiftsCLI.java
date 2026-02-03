@@ -123,7 +123,7 @@ public class ShiftsCLI {
             try {
                 // 1. Recuperiamo le disponibilità attuali dal DB tramite l'AC
                 // Passiamo currentWeekId per essere sicuri della settimana
-                Map<String, List<String>> currentData = ac.getShiftData(user, wp, currentWeekId);
+                Map<String, List<String>> currentData = ac.getShiftData(user, wp);
                 String searchKey = selectedDay + "_" + fullSlot.replace(" ", "");
 
                 // 2. Prepariamo la nuova lista di AvailabilityBean da inviare al tuo metodo saveAvailabilities
@@ -193,7 +193,7 @@ public class ShiftsCLI {
             PublishShiftsAC publishAC = new PublishShiftsAC();
             UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
             Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, currentWeekId);
-            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp, currentWeekId);
+            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp);
             List<String> activeDays = wp.getSelectedDays();
             String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
             boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());

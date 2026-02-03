@@ -15,11 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MembershipDAOJdbc implements MembershipDAO {
-    private final String userEmail = "user_email";
-    private final String isAccepted = "is_accepted";
-    private final String workplaceStrName = "workplace_name";
-    private final String nome = "nome";
-    private final String cognome = "cognome";
+    private static final String userEmail = "user_email";
+    private static final String isAccepted = "is_accepted";
+    private static final String nome = "nome";
+    private static final String cognome = "cognome";
 
 
     public void saveMembership(Membership m) throws DuplicateEntityException, DataFetchException {
@@ -56,7 +55,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 throw new EntityNotFoundException("Membership",
                         updateMembership.getUser().getEmail() + " in " + updateMembership.getWorkplace().getName());
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new DataFetchException("Errore critico durante l'aggiornamento SQL della membership");
         }
     }
@@ -73,7 +72,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 throw new EntityNotFoundException("Membership",
                         membership.getUser().getEmail() + " @ " + membership.getWorkplace().getName());
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             // Errore tecnico (connessione, permessi, etc.)
             throw new DataFetchException("Errore durante la rimozione della membership dal database");
         }

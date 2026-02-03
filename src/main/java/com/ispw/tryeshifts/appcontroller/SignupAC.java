@@ -1,7 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.AppConfig;
-import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.entity.UserInfo;
@@ -46,7 +45,6 @@ public class SignupAC {
             userRepo.save(userentity);
         }catch(DataFetchException e){
             LOGGER.log(Level.SEVERE, "Errore di persistenza durante la registrazione", e);
-            throw e;
         }
 
 

@@ -1,7 +1,5 @@
 package com.ispw.tryeshifts.bean;
 
-import com.ispw.tryeshifts.entity.Membership;
-
 public class UserBean {
     private String email;
     private String password;

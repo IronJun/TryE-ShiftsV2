@@ -1,10 +1,8 @@
 package com.ispw.tryeshifts.bean;
 
-//classe che funziona da cassetto per il passaggio dei dati tra le view, singleton
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-
 import java.util.Optional;
 import java.util.prefs.Preferences;
 

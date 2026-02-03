@@ -7,6 +7,8 @@ import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
+import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.javaFX.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -110,7 +112,13 @@ public class SettingsGC {
     }
     @FXML
     private void addShift(){
-        ManageShiftsAC.addShiftstoWorkaplce(startHourCombo,endMinuteCombo,startHourCombo,endHourCombo,errorlabel,shiftsListView);
+        try{
+        ManageShiftsAC.addShiftstoWorkaplce(startHourCombo,endMinuteCombo,startHourCombo,endHourCombo,shiftsListView);
+        }catch (InvalidCredentialException e){
+            ErrorViewManager.showError(errorlabel,"Invalid shift time!");
+        } catch (BaseException e) {
+            ErrorViewManager.showError(errorlabel,e.getMessage());
+        }
     }
 
 
