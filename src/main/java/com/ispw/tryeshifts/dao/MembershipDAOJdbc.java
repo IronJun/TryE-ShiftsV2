@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MembershipDAOJdbc implements MembershipDAO {
-    private static final String userEmail = "user_email";
-    private static final String isAccepted = "is_accepted";
-    private static final String nome = "nome";
-    private static final String cognome = "cognome";
+    private static final String USER_EMAIL = "user_email";
+
+    private static final String IS_ACCEPTED = "is_accepted";
+    private static final String NAME = "nome";
+    private static final String SURNAME = "cognome";
 
 
     public void saveMembership(Membership m) throws DuplicateEntityException, DataFetchException {
@@ -88,7 +89,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                     UserInfo ui = new UserInfo(email, null, null); // Nome e cognome non necessari qui
                     Workplace wp = new Workplace();
                     wp.setName(workplaceName);
-                    return new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted));
+                    return new Membership(ui, wp, rs.getString("role"), rs.getBoolean(IS_ACCEPTED));
                 }
             }
         } catch (SQLException e) {
@@ -107,10 +108,10 @@ public class MembershipDAOJdbc implements MembershipDAO {
             pstmt.setString(1, workplaceName);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    UserInfo ui = new UserInfo(rs.getString(userEmail), rs.getString(nome), rs.getString(cognome));
+                    UserInfo ui = new UserInfo(rs.getString(USER_EMAIL), rs.getString(NAME), rs.getString(SURNAME));
                     Workplace wp = new Workplace();
                     wp.setName(workplaceName);
-                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(isAccepted)));
+                    list.add(new Membership(ui, wp, rs.getString("role"), rs.getBoolean(IS_ACCEPTED)));
                 }
             }
         } catch (SQLException e) {

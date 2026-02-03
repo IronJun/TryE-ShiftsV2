@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 
 public class WorkplaceDAOJdbc implements WorkplaceDAO {
 
-    private static final String nameUser = "name";
-    private static final String addressUser = "address";
-    private static final String ownerEmail = "owner_email";
-    private static final String dayName = "day_name";
+    private static final String USER_NAME = "name";
+    private static final String USER_ADDRESS = "address";
+    private static final String OWNER_EMAIL = "owner_email";
+    private static final String DAY_NAME = "day_name";
 
 
     public void saveWorkplace(Workplace wp) throws DataFetchException,DuplicateEntityException {
@@ -135,10 +135,10 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Workplace wp = new Workplace(
-                            rs.getString(nameUser),
-                            rs.getString(addressUser),
+                            rs.getString(USER_NAME),
+                            rs.getString(USER_ADDRESS),
                             null, null,
-                            rs.getString(ownerEmail)
+                            rs.getString(OWNER_EMAIL)
                     );
                     wp.setId(String.valueOf(rs.getInt("id")));
 
@@ -174,10 +174,10 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Workplace wp = new Workplace(
-                            rs.getString(nameUser),
-                            rs.getString(addressUser),
+                            rs.getString(USER_NAME),
+                            rs.getString(USER_ADDRESS),
                             null, null,
-                            rs.getString(ownerEmail)
+                            rs.getString(OWNER_EMAIL)
                     );
                     wp.setId(String.valueOf(rs.getInt("id")));
 
@@ -200,7 +200,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                Workplace wp = new Workplace(rs.getString(nameUser), rs.getString(addressUser), null, null, rs.getString(ownerEmail));
+                Workplace wp = new Workplace(rs.getString(USER_NAME), rs.getString(USER_ADDRESS), null, null, rs.getString(OWNER_EMAIL));
                 wp.setId(String.valueOf(rs.getInt("id")));
                 fillWorkplaceDetails(wp, conn);
                 list.add(wp);
@@ -220,7 +220,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(1, "%" + name + "%");
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Workplace wp = new Workplace(rs.getString(nameUser), rs.getString(addressUser), null, null, rs.getString(ownerEmail));
+                    Workplace wp = new Workplace(rs.getString(USER_NAME), rs.getString(USER_ADDRESS), null, null, rs.getString(OWNER_EMAIL));
                     wp.setId(String.valueOf(rs.getInt("id")));
                     fillWorkplaceDetails(wp, conn);
                     list.add(wp);
@@ -309,7 +309,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setInt(1, Integer.parseInt(wp.getId()));
             try (ResultSet rs = pstmt.executeQuery()) {
                 List<String> days = new ArrayList<>();
-                while (rs.next()) days.add(rs.getString(dayName));
+                while (rs.next()) days.add(rs.getString(DAY_NAME));
                 wp.setSelectedDays(days);
             }
         }

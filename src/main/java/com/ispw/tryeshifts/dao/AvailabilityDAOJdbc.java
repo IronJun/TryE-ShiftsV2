@@ -12,16 +12,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class AvailabilityDAOJdbc implements AvailabilityDAO{
-    private String msg;
-    private static final String userEmail = "user_email";
-    private static final String dayName = "day_name";
-    private static final String workplaceStrName = "workplace_name";
-    private static final String startShift = "start_shift";
-    private static final String endShift = "end_shift";
-    private static final String queryWeekId = "week_id";
+    private static final String USER_EMAIL = "user_email";
+    private static final String DAY_NAME = "day_name";
+    private static final String WORKPLACE_STR_NAME = "workplace_name";
+    private static final String START_SHIFT = "start_shift";
+    private static final String END_SHIFT = "end_shift";
+    private static final String WEEK_ID = "week_id";
 
 
     public void saveAvailability(Availability availability) throws DuplicateEntityException, DataFetchException {
@@ -76,12 +74,12 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                 while (rs.next()) {
                     // Ricostruiamo l'oggetto Availability
                     list.add(new Availability(
-                            rs.getString(userEmail),
+                            rs.getString(USER_EMAIL),
                             workplaceName,
-                            rs.getString(dayName),
-                            rs.getString(startShift),
-                            rs.getString(endShift),
-                            rs.getString(queryWeekId)
+                            rs.getString(DAY_NAME),
+                            rs.getString(START_SHIFT),
+                            rs.getString(END_SHIFT),
+                            rs.getString(WEEK_ID)
 
                     ));
                 }
@@ -104,11 +102,11 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                 while (rs.next()) {
                     list.add(new Availability(
                             email,
-                            rs.getString(workplaceStrName),
-                            rs.getString(dayName),
-                            rs.getString(startShift),
-                            rs.getString(startShift),
-                            rs.getString(queryWeekId)
+                            rs.getString(WORKPLACE_STR_NAME),
+                            rs.getString(DAY_NAME),
+                            rs.getString(START_SHIFT),
+                            rs.getString(START_SHIFT),
+                            rs.getString(WEEK_ID)
                     ));
                 }
             }
@@ -135,9 +133,9 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     // 1. Ricostruiamo la cellKey per farla corrispondere a quella della UI
-                    String day = rs.getString("day_name");
-                    String start = rs.getString("start_shift");
-                    String end = rs.getString("end_shift");
+                    String day = rs.getString(DAY_NAME);
+                    String start = rs.getString(START_SHIFT);
+                    String end = rs.getString(END_SHIFT);
                     String cellKey = day + "_" + start + "-" + end;
 
                     // 2. Recuperiamo l'email del lavoratore

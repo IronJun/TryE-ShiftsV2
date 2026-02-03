@@ -179,7 +179,6 @@ public class ManageShiftsAC {
 
             if ((startTotalMinutes < existEnd && existStart < startTotalMinutes + (endTotalMinutes - startTotalMinutes))&&(startTotalMinutes < existEnd && existStart < endTotalMinutes)) {
                     throw new IllegalArgumentException("not valid shift: overlapping other shifts");
-                    //ErrorViewManager.showError(error, "Si sovrappone a: " + existing);
             }
         }
 
