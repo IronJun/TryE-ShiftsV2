@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.logging.Logger;
 

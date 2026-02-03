@@ -2,8 +2,8 @@ package com.ispw.tryeshifts;
 
 
 import com.ispw.tryeshifts.graphcontroller.cli.SignUpCLI;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.Configurator;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.Configurator;
 import javafx.application.Application;
 
 import java.util.logging.*;

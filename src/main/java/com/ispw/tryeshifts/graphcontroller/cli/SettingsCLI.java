@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import java.util.logging.Logger;
 
 import static com.ispw.tryeshifts.graphcontroller.cli.NewWorkplaceCLI.defineTimeSlots;

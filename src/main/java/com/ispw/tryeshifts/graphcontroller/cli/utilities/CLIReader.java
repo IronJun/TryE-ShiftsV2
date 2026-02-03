@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI;
+package com.ispw.tryeshifts.graphcontroller.cli.utilities;
 
 import java.util.Scanner;
 import java.util.logging.Logger;

@@ -8,7 +8,7 @@ import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.MembershipPendingException;
 import com.ispw.tryeshifts.excpetion.UserNotMemberException;
 import com.ispw.tryeshifts.excpetion.ValidationException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.List;
 import java.util.Map;
@@ -114,7 +114,7 @@ public class HomeCLI {
                     validChoice = true; // Usciamo dal loop dopo l'azione
                 } else {
                     msg = "Invalid choice! Please select a number between 0 and " + allWorkplaces.size() + "%n";
-                    LOGGER.warning("Invalid choice! Please select a number between 0 and " + allWorkplaces.size() + "\n");
+                    LOGGER.warning(msg);
                 }
             }
 

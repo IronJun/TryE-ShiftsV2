@@ -8,7 +8,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,79 +22,173 @@ public class ShiftsCLI {
     private static final String PUBLISHED_STATUS = "PUBLISHED";
     private static final String LOCKED_STATUS = "LOCKED";
     private static final String OPEN_STATUS = "OPEN";
+    private static final String SELECTED_STATUS = "SELECTED";
     private static int weekOffset ;
     private static String currentWeekId;
     private static final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     private ShiftsCLI(){}
+
     public static void shiftsDashboard(WorkplaceBean wp) {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean back = false;
-
         weekOffset = 0;
+
         while (!back) {
             try {
                 currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
-                ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
-                String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
-                boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
-                LOGGER.info("\n--- GESTIONE TURNI: " + wp.getWorkplaceName() + " ---\n");
-                printWorkerTable(wp);
-                LOGGER.info("\nAZIONI DISPONIBILI:\n");
-                if (!user.getEmail().equals(wp.getOwnerEmail())) {
-                    if(!isLocked) {
-                        LOGGER.info("1. Inserisci/Modifica le tue disponibilità\n");
-                    }else{
-                        LOGGER.info("[SETTIMANA BLOCCATA - Disponibilità non modificabili]\n");                    }
-                } else {
-                    if(status.equals(OPEN_STATUS)) {
-                        LOGGER.info("1. Blocca disponibilità (Chiudi prenotazioni)\n");
-                    }else if(status.equals(LOCKED_STATUS)){
-                        LOGGER.info("1. Pubblica Turni Definitivi\n");
-                    }
-                    LOGGER.info("2. Modifica Turni manualmente\n");
-                }
-                LOGGER.info("N. Next Week (Settimana Prossima)\n");
-                LOGGER.info("P. Previous Week (Settimana Precedente)\n");
-                LOGGER.info("0. Torna alla Home\n");
+                ManageShiftsAC ac = new ManageShiftsAC();
+                String status = ac.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
 
+                // 1. Visualizzazione
+                printUI(wp, status);
+
+                // 2. Gestione Input
                 String choice = CLIReader.readString("Seleziona: ").toUpperCase();
-                switch (choice) {
-                    case "0":
-                        back = true;
-                        break;
-                    case "1":
-                        if (!user.getEmail().equals(wp.getOwnerEmail())) GiveAvailability();
-                        else{
-                            if(status.equals(OPEN_STATUS)){
-                                LockShifts(wp);
-                            }else if(status.equals(LOCKED_STATUS)){
-                                publishShifts(wp);
-                            }else if(status.equals(PUBLISHED_STATUS)){
-                                LOGGER.info("I turni sono già stati pubblicati per questa settimana.");
-                            }
-                        }
-                        break;
-                    case "2":
-                        modifyShifts();
-                        break;
-                    case "N":
-                        weekOffset++;
-                        break;
-                    case "P":
-                        weekOffset--;
-                        break;
-                    default:
-                        LOGGER.warning("Invalid option!");
-                        break;
+                if (choice.equals("0")) {
+                    back = true;
+                } else {
+                    handleAction(choice, wp, status, user);
                 }
-            }catch(BaseException e){
+            } catch (BaseException e) {
                 LOGGER.severe("Errore: " + e.getMessage());
             }
         }
     }
 
-    private static void GiveAvailability() {
+    private static void printUI(WorkplaceBean wp, String status) {
+        UserBean user = SessionContext.getInstance().getLoggeduser();
+        boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
+
+        LOGGER.info("\n--- GESTIONE TURNI: " + wp.getWorkplaceName() + " ---\n");
+        printWorkerTable(wp);
+
+        LOGGER.info("\nAZIONI DISPONIBILI:\n");
+        if (user.getEmail().equals(wp.getOwnerEmail())) {
+            printOwnerMenu(status);
+        } else {
+            printWorkerMenu(isLocked);
+        }
+
+        LOGGER.info("N. Next Week | P. Previous Week | 0. Torna alla Home\n");
+    }
+
+    private static void printOwnerMenu(String status) {
+        if (status.equals(OPEN_STATUS)) {
+            LOGGER.info("1. Blocca disponibilità (Chiudi prenotazioni)\n");
+        } else if (status.equals(LOCKED_STATUS)) {
+            LOGGER.info("1. Pubblica Turni Definitivi\n");
+        }
+        LOGGER.info("2. Modifica Turni manualmente\n");
+    }
+
+    private static void printWorkerMenu(boolean isLocked) {
+        if (!isLocked) {
+            LOGGER.info("1. Inserisci/Modifica le tue disponibilità\n");
+        } else {
+            LOGGER.info("[SETTIMANA BLOCCATA - Disponibilità non modificabili]\n");
+        }
+    }
+    private static void handleAction(String choice, WorkplaceBean wp, String status, UserBean user) {
+        switch (choice) {
+            case "1":
+                executePrimaryAction(wp, status, user);
+                break;
+            case "2":
+                if (user.getEmail().equals(wp.getOwnerEmail())) modifyShifts();
+                break;
+            case "N":
+                weekOffset++;
+                break;
+            case "P":
+                weekOffset--;
+                break;
+            default:
+                LOGGER.warning("Opzione non valida!");
+        }
+    }
+
+    private static void executePrimaryAction(WorkplaceBean wp, String status, UserBean user) {
+        boolean isOwner = user.getEmail().equals(wp.getOwnerEmail());
+
+        if (!isOwner) {
+            giveAvailability();
+            return;
+        }
+
+        // Logica Owner
+        if (status.equals(OPEN_STATUS)) lockshifts(wp);
+        else if (status.equals(LOCKED_STATUS)) publishShifts(wp);
+        else if (status.equals(PUBLISHED_STATUS)) {
+            LOGGER.info("I turni sono già stati pubblicati.");
+        }
+    }
+//    public static void shiftsDashboard(WorkplaceBean wp) {
+//        UserBean user = SessionContext.getInstance().getLoggeduser();
+//        boolean back = false;
+//
+//        weekOffset = 0;
+//        while (!back) {
+//            try {
+//                currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+//                ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
+//                String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
+//                boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
+//                LOGGER.info("\n--- GESTIONE TURNI: " + wp.getWorkplaceName() + " ---\n");
+//                printWorkerTable(wp);
+//                LOGGER.info("\nAZIONI DISPONIBILI:\n");
+//                if (!user.getEmail().equals(wp.getOwnerEmail())) {
+//                    if(!isLocked) {
+//                        LOGGER.info("1. Inserisci/Modifica le tue disponibilità\n");
+//                    }else{
+//                        LOGGER.info("[SETTIMANA BLOCCATA - Disponibilità non modificabili]\n");                    }
+//                } else {
+//                    if(status.equals(OPEN_STATUS)) {
+//                        LOGGER.info("1. Blocca disponibilità (Chiudi prenotazioni)\n");
+//                    }else if(status.equals(LOCKED_STATUS)){
+//                        LOGGER.info("1. Pubblica Turni Definitivi\n");
+//                    }
+//                    LOGGER.info("2. Modifica Turni manualmente\n");
+//                }
+//                LOGGER.info("N. Next Week (Settimana Prossima)\n");
+//                LOGGER.info("P. Previous Week (Settimana Precedente)\n");
+//                LOGGER.info("0. Torna alla Home\n");
+//
+//                String choice = CLIReader.readString("Seleziona: ").toUpperCase();
+//                switch (choice) {
+//                    case "0":
+//                        back = true;
+//                        break;
+//                    case "1":
+//                        if (!user.getEmail().equals(wp.getOwnerEmail())) GiveAvailability();
+//                        else{
+//                            if(status.equals(OPEN_STATUS)){
+//                                LockShifts(wp);
+//                            }else if(status.equals(LOCKED_STATUS)){
+//                                publishShifts(wp);
+//                            }else if(status.equals(PUBLISHED_STATUS)){
+//                                LOGGER.info("I turni sono già stati pubblicati per questa settimana.");
+//                            }
+//                        }
+//                        break;
+//                    case "2":
+//                        modifyShifts();
+//                        break;
+//                    case "N":
+//                        weekOffset++;
+//                        break;
+//                    case "P":
+//                   default:
+//                        LOGGER.warning("Invalid option!");
+//                        break;
+//                }
+//            }catch(BaseException e){
+//                LOGGER.severe("Errore: " + e.getMessage());
+//            }
+//        }
+//    }
+
+    private static void giveAvailability() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         UserBean user = SessionContext.getInstance().getLoggeduser();
         ManageShiftsAC ac = new ManageShiftsAC();
@@ -255,7 +349,7 @@ public class ShiftsCLI {
         List<AvailabilityBean> beans = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : currentData.entrySet()) {
             String key = entry.getKey();
-            if (entry.getValue().contains("SELECTED") && !key.equals(currentSelectionKey)) {
+            if (entry.getValue().contains(SELECTED_STATUS) && !key.equals(currentSelectionKey)) {
                 String[] keyParts = key.split("_");
                 String[] timeParts = keyParts[1].split("-");
 
@@ -265,7 +359,7 @@ public class ShiftsCLI {
         }
         return beans;
     }
-    private static void LockShifts(WorkplaceBean wp){
+    private static void lockshifts(WorkplaceBean wp){
         try {
         ManageShiftsAC ac = new ManageShiftsAC();
         // Cambiamo lo stato da OPEN a LOCKED
@@ -349,10 +443,14 @@ public class ShiftsCLI {
 //            LOGGER.warning("Errore tecnico Impossibile recuperare i turni\n");
 //        }
 //    }
-    private static String buildCellContent(String day, String slot, List<String> activeDays,
-                                           String status, boolean isOwner,
-                                           Map<String, List<String>> shifts,
-                                           Map<String, List<String>> assignments, UserBean user) {
+    public record TableContext(
+            String status,
+            boolean isOwner,
+            Map<String, List<String>> shifts,
+            Map<String, List<String>> assignments,
+            UserBean user
+    ) {}
+    private static String buildCellContent(String day, String slot, List<String> activeDays, TableContext ctx) {
 
         // Verifichiamo se il giorno è attivo (usando stream per ridurre i cicli for)
         boolean isDayActive = activeDays.stream().anyMatch(d -> d.equalsIgnoreCase(day));
@@ -362,7 +460,7 @@ public class ShiftsCLI {
         }
 
         String searchKey = day + "_" + slot.replace(" ", "");
-        return getCellText(status, isOwner, searchKey, shifts, assignments, user);
+        return getCellText(ctx.status, ctx.isOwner, searchKey, ctx.shifts, ctx.assignments, ctx.user);
     }
     private static void printGrid(WorkplaceBean wp, String status, boolean isOwner,
                                   Map<String, List<String>> shifts,
@@ -375,9 +473,10 @@ public class ShiftsCLI {
             StringBuilder row = new StringBuilder(String.format("%-15s", slot));
             for (String day : days) {
                 row.append(String.format("| %-15s",
-                        buildCellContent(day, slot, activeDays, status, isOwner, shifts, assignments, user)));
+                        buildCellContent(day, slot, activeDays, new TableContext(status, isOwner, shifts, assignments, user))));
             }
-            LOGGER.info(row.toString());
+            msg = row.toString();
+            LOGGER.info(msg);
         }
     }
     private static void printDashboardHeader(String status) {
@@ -388,8 +487,10 @@ public class ShiftsCLI {
         for (String day : days) {
             header.append(String.format("| %-15s", day.toUpperCase()));
         }
-        LOGGER.info(header.toString());
-        LOGGER.info("-".repeat(header.length()));
+        msg = header.toString();
+        LOGGER.info(msg);
+        msg = "-".repeat(header.length());
+        LOGGER.info(msg);
     }
     private static void publishShifts(WorkplaceBean wp){
         try {
@@ -439,7 +540,7 @@ public class ShiftsCLI {
 
         if (!isOwner) {
             // Se l'AC ha messo "SELECTED" (nella chiave corretta o in quella rotta), mostra il nome
-            if (candidates.contains("SELECTED")) {
+            if (candidates.contains(SELECTED_STATUS)) {
                 return user.getName();
             }
             return "-";

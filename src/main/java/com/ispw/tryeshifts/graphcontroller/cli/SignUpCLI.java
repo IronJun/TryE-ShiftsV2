@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.logging.Logger;
 
@@ -14,7 +14,9 @@ public class SignUpCLI {
 
 
     private static final Logger LOGGER = Logger.getLogger(SignUpCLI.class.getName());
-
+    private SignUpCLI(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void start() {
         // 1. L'AUTO-LOGIN va fatto SOLO QUI (una volta all'avvio)
         try {
@@ -32,71 +34,42 @@ public class SignUpCLI {
 
         // 2. Loop principale di navigazione
         while (true) {
-            boolean accVal = false;
-            String acc = "";
-
-            LOGGER.info("--- Welcome to E-Shifts ---\n");
-
-            // RIMOSSO IL BLOCCO AUTO-LOGIN DA QUI DENTRO!
-
-            while (!accVal) {
-                acc = CLIReader.readString("Do you already have an account? Y/n (or 0 to exit): ").toUpperCase();
-                if (acc.equals("0")) System.exit(0);
-
-                accVal = acc.equals("Y") || acc.equals("N");
-                if (!accVal) {
-                    LOGGER.warning("You can insert just 'y' as yes or 'n' as no.\n");
-                }
-            }
-
-            if (acc.equals("Y")) {
-                try {
-                    LoginCLI.start();
-                } catch (BaseException e) {
-                    LOGGER.severe("ERRORE: " + e.getMessage());
-                }
-            } else {
-                performRegistration();
-            }
+            preRegistration();
         }
     }
+    private static void preRegistration(){
+        boolean accVal = false;
+        String acc = "";
+        while (!accVal) {
+            acc = CLIReader.readString("Do you already have an account? Y/n (or 0 to exit): ").toUpperCase();
+            if (acc.equals("0")) System.exit(0);
 
+            accVal = acc.equals("Y") || acc.equals("N");
+            if (!accVal) {
+                LOGGER.warning("You can insert just 'y' as yes or 'n' as no.\n");
+            }
+        }
+
+        if (acc.equals("Y")) {
+            try {
+                LoginCLI.start();
+            } catch (BaseException e) {
+                LOGGER.severe("ERRORE: " + e.getMessage());
+            }
+        } else {
+            performRegistration();
+        }
+    }
     private static void performRegistration() {
-        boolean EmailValid = false;
-        boolean NameValid = false;
-        boolean SurnameValid = false;
-        boolean PasswordValid = false;
-        String email = "";
-        String name = "";
-        String surname = "";
+        boolean passwordValid = false;
         String pwd = "";
         String pwdRepeat = "";
-        while (!EmailValid) {
-            email = CLIReader.readString("Email: ");
-            EmailValid = email.contains("@") && email.contains(".");
-            if (!EmailValid) {
-                LOGGER.warning("Formato email non valido! Riprova.\n");
-            }
-        }
-        while (!NameValid) {
-            name = CLIReader.readString("Name: ");
-            NameValid = name != null && name.matches("[a-zA-ZÀ-ÿ\\\\s'-]+");
-            if (!NameValid) {
-                LOGGER.warning("Nome non valido! Riprova.\n");
-            }
-        }
-        while (!SurnameValid) {
-            surname = CLIReader.readString("Surname: ");
-            SurnameValid = surname != null && surname.matches("[a-zA-ZÀ-ÿ\\\\s'-]+");
-            if (!SurnameValid) {
-                LOGGER.warning("Cognome non valido! Riprova.\n");
-            }
-        }
-        while (!PasswordValid) {
+
+        while (!passwordValid) {
             pwd = CLIReader.readString("Password: ");
             pwdRepeat = CLIReader.readString("Conferma Password: ");
-            PasswordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
-            if (!PasswordValid) {
+            passwordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
+            if (!passwordValid) {
                 if (pwd.length() < 6) {
                     LOGGER.warning("La password deve essere di almeno 6 caratteri! Riprova.\n");
                 }
@@ -106,9 +79,8 @@ public class SignUpCLI {
             }
         }
         try{
-            UserBean user = new UserBean(email, pwd, name, surname, pwdRepeat);
+            UserBean user = new UserBean(emailRegister(), pwd, nameRegister(), nameRegister(), pwdRepeat);
 
-            // 2. Chiamiamo l'App Controller per la persistenza
             SignupAC.registerUser(user);
 
             LOGGER.info("\n✅ Registrazione avvenuta con successo! Ora puoi effettuare il login.\n");
@@ -119,5 +91,30 @@ public class SignUpCLI {
         } catch (BaseException e) {
             LOGGER.severe("❌ Errore durante la registrazione: " + e.getMessage() + "\n");
         }
+    }
+    private static String emailRegister(){
+        boolean emailValid = false;
+        String email = "";
+        while (!emailValid) {
+            email = CLIReader.readString("Email: ");
+            emailValid = email.contains("@") && email.contains(".");
+            if (!emailValid) {
+                LOGGER.warning("Formato email non valido! Riprova.\n");
+            }
+        }
+        return email;
+    }
+
+    private static String nameRegister(){
+        boolean nameValid = false;
+        String name = "";
+        while (!nameValid) {
+            name = CLIReader.readString("Name: ");
+            nameValid = name != null && name.matches("[a-zA-ZÀ-ÿ\\\\s'-]+");
+            if (!nameValid) {
+                LOGGER.warning("Nome non valido! Riprova.\n");
+            }
+        }
+        return name;
     }
 }

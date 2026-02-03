@@ -1,17 +1,20 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 public class WorkersCLI {
     private static final Logger LOGGER = Logger.getLogger(WorkersCLI.class.getName());
+    private static String msg;
+    private WorkersCLI(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void activeWorkers(WorkplaceBean wp){
         try {
             LOGGER.info("\n--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
@@ -20,9 +23,11 @@ public class WorkersCLI {
             if(active.isEmpty()){
                 LOGGER.info("No active members yet.");
             }else{
-                LOGGER.info(String.format("\n%-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL"));
+                msg = String.format("%n %-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL");
+                LOGGER.info(msg);
                 for(UserBean ub : active){
-                    LOGGER.info(String.format("\n%-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail()));
+                    msg = String.format("%n %-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail());
+                    LOGGER.info(msg);
                 }
             }
             CLIReader.readString("\nPress Enter to continue...");
@@ -41,7 +46,8 @@ public class WorkersCLI {
             LOGGER.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---");
             for (int i = 0; i < pending.size(); i++) {
                 UserBean u = pending.get(i);
-                LOGGER.info((i + 1) + ". " + u.getName() + " " + u.getSurname() + " (" + u.getEmail() + ")");
+                msg = String.format("%d. %s %s (%s)", (i + 1), u.getName(), u.getSurname(), u.getEmail());
+                LOGGER.info(msg);
             }
 
             int choice = CLIReader.readInt("\nSelect the number of the user to handle (0 to annul): ");
