@@ -4,11 +4,8 @@ import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilitiesCLI.CLIReader;
-
-import java.util.List;
 import java.util.logging.Logger;
 
 import static com.ispw.tryeshifts.graphcontroller.cli.NewWorkplaceCLI.defineTimeSlots;
@@ -16,6 +13,9 @@ import static com.ispw.tryeshifts.graphcontroller.cli.NewWorkplaceCLI.selectOper
 
 public class SettingsCLI {
     private static final Logger LOGGER = Logger.getLogger(SettingsCLI.class.getName());
+    private SettingsCLI(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void accountSettings(UserBean user){
         boolean back = false;
 
@@ -86,6 +86,8 @@ public class SettingsCLI {
                 case "0":
                     back = true;
                     continue; // Salta il salvataggio se vuoi solo uscire
+                default:
+                    LOGGER.warning("Scelta non valida.");
             }
 
             try {

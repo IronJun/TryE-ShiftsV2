@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 public class HomeCLI {
     private static final Logger LOGGER = Logger.getLogger(HomeCLI.class.getName());
-
+    private static String msg;
     private HomeCLI(){}
 
     public static void start(){
@@ -94,7 +94,8 @@ public class HomeCLI {
             for (int i = 0; i < allWorkplaces.size(); i++) {
                 WorkplaceBean wb = allWorkplaces.get(i);
                 // Esempio: 1. Ospedale San Raffaele (Roma)
-                LOGGER.info(String.format("%d. %s (%s)\n", (i + 1), wb.getWorkplaceName(), wb.getAddress()));
+                msg =String.format("%d. %s (%s)%n", (i + 1), wb.getWorkplaceName(), wb.getAddress());
+                LOGGER.info(msg);
             }
             LOGGER.info("0. Back to Home\n");
 
@@ -112,6 +113,7 @@ public class HomeCLI {
                     showWorkplaceDetails(selected, isPersonal);
                     validChoice = true; // Usciamo dal loop dopo l'azione
                 } else {
+                    msg = "Invalid choice! Please select a number between 0 and " + allWorkplaces.size() + "%n";
                     LOGGER.warning("Invalid choice! Please select a number between 0 and " + allWorkplaces.size() + "\n");
                 }
             }
@@ -171,9 +173,9 @@ public class HomeCLI {
                         LOGGER.warning("Invalid option!\n");
                 }
             }
-        }catch(UserNotMemberException e){
+        }catch(UserNotMemberException _){
             executeJoinRequest(loggedUser, wp.getWorkplaceName());
-        }catch (MembershipPendingException e){
+        }catch (MembershipPendingException _){
             LOGGER.info("Membership pending for " + wp.getWorkplaceName() + "!\n");
             CLIReader.readString("Press ENTER to continue...");
         }catch (BaseException e){
@@ -200,14 +202,13 @@ public class HomeCLI {
         try {
             // Chiamata al tuo metodo dell'Applicativo
             // Supponendo sia in PublishShiftsAC
-            ManageShiftsAC ac = new ManageShiftsAC();
-            Map<String, Object> data = ac.getHomeScheduleData(user.getEmail(), weekId);
+            Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(user.getEmail(), weekId);
 
             // Estraiamo i dati dalla mappa "Object"
             Map<String, String> assignments = (Map<String, String>) data.get("assignments");
             TreeSet<String> slots = (TreeSet<String>) data.get("slots");
-
-            LOGGER.info("\n--- IL TUO CALENDARIO SETTIMANALE (" + ManageShiftsAC.getWeekRangeString(offset) + ") ---");
+            msg = "\n--- IL TUO CALENDARIO SETTIMANALE (" + ManageShiftsAC.getWeekRangeString(offset) + ") ---";
+            LOGGER.info(msg);
 
             if (slots.isEmpty()) {
                 LOGGER.info("\nNessun turno assegnato per questa settimana.");
@@ -217,7 +218,8 @@ public class HomeCLI {
                 for (String day : days) {
                     header.append(String.format("| %-15s", day.toUpperCase()));
                 }
-                LOGGER.info(header.toString() + "\n" + "-".repeat(header.length()) + "\n");
+                msg = header.toString() + "\n" + "-".repeat(header.length()) + "\n";
+                LOGGER.info(msg);
 
                 // Ciclo sulle fasce orarie trovate dal tuo TreeSet
                 for (String slot : slots) {
@@ -232,7 +234,8 @@ public class HomeCLI {
 
                         row.append(String.format("| %-15s", wpName));
                     }
-                    LOGGER.info(row.toString() + "\n");
+                    msg = row.toString() + "\n";
+                    LOGGER.info(msg);
                 }
             }
 

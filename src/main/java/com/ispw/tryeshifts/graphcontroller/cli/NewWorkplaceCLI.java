@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 
 public class NewWorkplaceCLI {
     private static final Logger LOGGER = Logger.getLogger(NewWorkplaceCLI.class.getName());
-
+    private static String msg;
+    private NewWorkplaceCLI(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void start(){
             LOGGER.info("\n--- CREAZIONE NUOVO WORKPLACE ---\n");
 
@@ -31,12 +34,10 @@ public class NewWorkplaceCLI {
             // 4. Invio all'App Controller
             try {
                 WorkplaceBean newWp = new WorkplaceBean(name,address,selectedDays,slots,SessionContext.getInstance().getLoggeduser().getEmail());
-
                 // Chiamata all'AC (usa il metodo che hai già per JavaFX)
-                CreateWorkplaceAC ac = new CreateWorkplaceAC();
-                ac.createWorkplace(newWp);
-
-                LOGGER.info("\n✅ Workplace '" + name + "' creato con successo!\n");
+                CreateWorkplaceAC.createWorkplace(newWp);
+                msg = "\n✅ Workplace '" + name + "' creato con successo!\n";
+                LOGGER.info(msg);
             } catch (DuplicateEntityException e) {
                 LOGGER.severe("\n Workplace already existing " + e.getMessage() + "\n");
             } catch(DataFetchException e){
@@ -53,7 +54,8 @@ public class NewWorkplaceCLI {
 
         LOGGER.info("Select when the workplace is opened by numbers and separated by ',' example: 1,2,3):");
         for (int i = 0; i < allDays.length; i++) {
-            LOGGER.info((i + 1) + ". " + allDays[i] + "\n");
+            msg = (i + 1) + ". " + allDays[i] + "\n";
+            LOGGER.info(msg);
         }
 
         String input = CLIReader.readString("> ");

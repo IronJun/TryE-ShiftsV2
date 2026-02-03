@@ -20,9 +20,9 @@ public class WorkersCLI {
             if(active.isEmpty()){
                 LOGGER.info("No active members yet.");
             }else{
-                LOGGER.info(String.format("%-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL"));
+                LOGGER.info(String.format("\n%-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL"));
                 for(UserBean ub : active){
-                    LOGGER.info(String.format("%-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail()));
+                    LOGGER.info(String.format("\n%-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail()));
                 }
             }
             CLIReader.readString("\nPress Enter to continue...");

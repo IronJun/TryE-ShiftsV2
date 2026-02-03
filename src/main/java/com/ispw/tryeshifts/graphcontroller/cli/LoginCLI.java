@@ -13,14 +13,13 @@ import java.util.logging.Logger;
 public class LoginCLI{
     private static final Logger LOGGER = Logger.getLogger(LoginCLI.class.getName());
 
-    public LoginCLI(){
+    private LoginCLI(){
         throw new IllegalStateException("Utility class");
     }
 
     public static void start() throws BaseException {
         LOGGER.info("\n--- LOGIN E-SHIFTS ---\n");
         LOGGER.info("Inserisci le tue credenziali per accedere al sistema.\n");
-//        boolean login = false;
 
         while(true) {
             try {
