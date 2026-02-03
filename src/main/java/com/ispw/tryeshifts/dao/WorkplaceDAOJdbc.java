@@ -217,21 +217,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         String query = "INSERT INTO published_shifts (workplace_name, week_id, cell_key, worker_email) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection()) {
             conn.setAutoCommit(false); // Transazione per sicurezza
-            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-                for (Map.Entry<String, List<String>> entry : assignments.entrySet()) {
-                    for (String email : entry.getValue()) {
-                        pstmt.setString(1, workplace);
-                        pstmt.setString(2, weekId);
-                        pstmt.setString(3, entry.getKey());
-                        pstmt.setString(4, email);
-                        pstmt.addBatch();
-                    }
-                }
-                pstmt.executeBatch();
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-            }
+            mapPopulation(conn, workplace, weekId, assignments, query);
         } catch (SQLException _) {
             throw new DataFetchException("Errore DB: impossibile salvare le assegnazioni");
         }
@@ -297,7 +283,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         }
     }
     private void insertWorkplaceShifts(Connection dbc, Workplace wp) throws SQLException {
-        String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
+        String insertShift = "INSERT INTO workplace_shifts (workplace_id, start_time, end_time) VALUES (?, ?,?)";
         try (PreparedStatement pstmt = dbc.prepareStatement(insertShift)) {
             for (String shift : wp.getShifts()) { // Shift formato "08:00-14:00"
                 String[] parts = shift.split("-");
@@ -307,6 +293,23 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
+        }
+    }
+    private void mapPopulation(Connection conn, String workplace, String weekId, Map<String, List<String>> assignments,String query) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            for (Map.Entry<String, List<String>> entry : assignments.entrySet()) {
+                for (String email : entry.getValue()) {
+                    pstmt.setString(1, workplace);
+                    pstmt.setString(2, weekId);
+                    pstmt.setString(3, entry.getKey());
+                    pstmt.setString(4, email);
+                    pstmt.addBatch();
+                }
+            }
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException _) {
+            conn.rollback();
         }
     }
 }
