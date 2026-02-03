@@ -21,7 +21,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     private static final String DAY_NAME = "day_name";
 
 
-    public void saveWorkplace(Workplace wp) throws DataFetchException,DuplicateEntityException {
+    public void saveWorkplace(Workplace wp) throws DataFetchException {
         Connection conn = null;
         try {
             conn = DBconnection.getConnection(); // Usa il tuo metodo di connessione
