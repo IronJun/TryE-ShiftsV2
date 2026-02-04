@@ -56,7 +56,7 @@ public class SignUpGC {
         }catch(ValidationException | SecuriryException e){
             ErrorViewManager.showError(errorLabel, e.getMessage());
         } catch (BaseException e){
-            ErrorViewManager.ScreenError("System Error",e.getMessage());
+            ErrorViewManager.screenError("System Error",e.getMessage());
         }
 
     }

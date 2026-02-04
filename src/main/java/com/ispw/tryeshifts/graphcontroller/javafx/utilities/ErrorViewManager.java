@@ -34,7 +34,7 @@ public class ErrorViewManager {
             combo.valueProperty().addListener((observable, oldValue, newValue) -> hideError(errorLabel));
         }
     }
-    public static void ScreenError(String title, String message){
+    public static void screenError(String title, String message){
         SceneManager.getInstance().showErrorAlert(title, message);
     }
 }

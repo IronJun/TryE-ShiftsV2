@@ -11,6 +11,8 @@ import java.util.Map;
 public class WorkerCellFactory implements ShiftCellProvider{
     private final Map<String,Boolean> selectionMap;
     private final boolean isLocked;
+    private static final String SELECTED = "SELECTED";
+    private static final String FREE = "Free";
 
     public WorkerCellFactory(Map<String,Boolean> selectionMap, boolean locked){
         this.isLocked = locked;
@@ -37,7 +39,7 @@ public class WorkerCellFactory implements ShiftCellProvider{
         boolean isSelected = content.contains("SELECTED") || selectionMap.getOrDefault(cellKey,false);
         if(isSelected) selectionMap.put(cellKey,true);
 
-        Label status = new Label(isSelected ? "Selezionato" : "Libero");
+        Label status = new Label(isSelected ? SELECTED : FREE);
         applyStyle(cell,status,isSelected);
 
         if (this.isLocked) {
@@ -56,7 +58,7 @@ public class WorkerCellFactory implements ShiftCellProvider{
             cell.setOnMouseClicked(e -> {
                 boolean newState = !selectionMap.getOrDefault(cellKey, false);
                 selectionMap.put(cellKey, newState);
-                status.setText(newState ? "Selezionato" : "Libero");
+                status.setText(newState ? SELECTED : FREE);
                 applyStyle(cell, status, newState);
             });
             cell.getChildren().add(status);
@@ -67,7 +69,7 @@ public class WorkerCellFactory implements ShiftCellProvider{
 
     private void applyStyle(VBox cell, Label status, boolean sel) {
         cell.setStyle("-fx-border-color: #D1CFE2; -fx-padding: 5; -fx-background-color: " + (sel ? "#3498db;" : "white;"));
-        status.setText(sel ? "Selezionato" : "Libero");
+        status.setText(sel ? SELECTED : FREE);
         status.setStyle("-fx-text-fill: " + (sel ? "white;" : "#cccccc;"));
     }
 }

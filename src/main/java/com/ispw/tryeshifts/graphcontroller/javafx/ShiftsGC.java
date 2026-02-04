@@ -28,6 +28,9 @@ public class ShiftsGC {
     private String msg;
     private int weekOffset = 0;
     private String currentWeekId;
+    private static final String LOCKED_STATUS = "LOCKED";
+    private static final String PUBLISHED_STATUS = "PUBLISHED";
+    private static final String TECHNICAL_ERROR = "Technical Error";
     @FXML private GridPane shiftsGrid;
     @FXML private Label workplaceTitleLabel;
     @FXML private Button saveShiftsBtn;
@@ -80,127 +83,279 @@ public class ShiftsGC {
         LOGGER.log(Level.FINE,msg);
     }
 
+
     private void buildDynamicTable() {
-
-        // 1. Reset e Setup Iniziale (come prima)
         try {
-            shiftsGrid.setGridLinesVisible(false); // Reset
-            shiftsGrid.setGridLinesVisible(true);
+            // 1. Setup Strutturale della Grid
+            resetAndSetupGrid();
 
-            shiftsGrid.getChildren().clear();
-            shiftsGrid.getColumnConstraints().clear();
-            shiftsGrid.getRowConstraints().clear();
+            // 2. Recupero Dati e Context
+            TableContext context = fetchTableContext();
 
-            for (int i = 0; i < 8; i++) {
-                ColumnConstraints col = new ColumnConstraints();
-                col.setPercentWidth(100.0 / 8.0);
-                shiftsGrid.getColumnConstraints().add(col);
-            }
+            // 3. Selezione del Provider (Factory)
+            ShiftCellProvider cellProvider = selectCellProvider(context);
 
-            RowConstraints headerRow = new RowConstraints();
-            headerRow.setMinHeight(40);
-            headerRow.setPrefHeight(40);
-            headerRow.setVgrow(Priority.NEVER); // Impedisce che la riga si ridimensioni male
-            shiftsGrid.getRowConstraints().add(headerRow);
+            // 4. Popolamento Griglia
+            populateGrid(context, cellProvider);
 
-            for (int i = 0; i < daysShown.length; i++) {
-                Label lbl = new Label(daysShown[i].toUpperCase());
-                lbl.setStyle("-fx-font-weight: bold; " +
-                        "-fx-text-fill: #4B4488; " +
-                        "-fx-background-color: #E8E6F3; " + // Stesso colore degli orari
-                        "-fx-padding: 10; " +
-                        "-fx-border-color: #8379B5; " +    // Bordo viola chiaro
-                        "-fx-border-width: 0 0 1 0;");
-                lbl.setMaxWidth(Double.MAX_VALUE);
-                shiftsGrid.add(lbl, i + 1, 0);
-            }
-            Label timeHeader = new Label("ORA");
-            timeHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
-            shiftsGrid.add(timeHeader, 0, 0);
-
-            // 2. Recupero Dati e Scelta della Factory (Logica GoF)
-            ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
-            PublishShiftsAC publishAC = new PublishShiftsAC();
-            UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
-            WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-            Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, this.currentWeekId);
-            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp);
-            List<String> activeDays = wp.getSelectedDays();
-            String status =manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
-            boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
-
-            configureUIByStatus(status, isOwner);
-            // Qui applichiamo l'Abstract Factory
-            ShiftCellProvider cellProvider = null;
-            if (status.equals("PUBLISHED")) {
-                cellProvider = new PublishedCellFactory(assignments); // Mostra solo i nomi assegnati
-            } else if (isOwner) {
-                cellProvider = new OwnerCellFactory();
-            } else {
-                // Se è LOCKED, passiamo un flag alla factory per disabilitare i click
-                boolean isLocked = status.equals("LOCKED");
-                cellProvider = new WorkerCellFactory(selectedCellsMap, isLocked);
-            }
-
-            // 3. Costruzione dinamica della griglia..
-            List<String> timeSlots = wp.getShiftsBean();
-
-            for (int r = 0; r < timeSlots.size(); r++) {
-                RowConstraints rowConstraint = new RowConstraints();
-                rowConstraint.setMinHeight(80);
-                rowConstraint.setPrefHeight(80);
-                rowConstraint.setVgrow(Priority.ALWAYS); // Aiuta a mantenere la riga visibile
-                shiftsGrid.getRowConstraints().add(rowConstraint);
-
-                // Label Orario (Colonna 0)
-                Label timeLbl = new Label(timeSlots.get(r));
-                timeLbl.setStyle("-fx-font-weight: bold; " +
-                        "-fx-text-fill: #4B4488; " +
-                        "-fx-background-color: #E8E6F3; " +
-                        "-fx-padding: 10; " +
-                        "-fx-border-color: #8379B5; " +
-                        "-fx-border-width: 0 1 1 0;");
-                timeLbl.setMaxWidth(Double.MAX_VALUE);
-                timeLbl.setMaxHeight(Double.MAX_VALUE);
-                timeLbl.setAlignment(Pos.CENTER);
-                shiftsGrid.add(timeLbl, 0, r + 1);
-
-
-                for (int c = 1; c <= 7; c++) {
-                    String currentDay = days[c - 1];
-                    String timeKey =timeSlots.get(r).replace(" ","");
-                    String cellKey = currentWeekId+"_"+ currentDay + "_" + timeKey;
-
-                    msg = "DEBUG UI: Cerco in mappa la chiave: " +cellKey;
-                    LOGGER.log(Level.FINE, msg);
-                    boolean isDayActive = activeDays.contains(currentDay);
-                    List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
-                    if (!isOwner && cellContent.contains(loggedUser.getEmail())) {
-                        selectedCellsMap.put(cellKey, true);
-                        msg = "DEBUG UI: Trovata corrispondenza! Attivo " + cellKey;
-                        LOGGER.log(Level.FINE, msg);
-                    } else {
-                        // Importante: se non c'è nel DB, assicurati che sia false nella mappa locale
-                        selectedCellsMap.put(cellKey, false);
-                    }
-                    if (!cellContent.isEmpty()) {
-                        msg = "DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent;
-                        LOGGER.log(Level.FINE ,msg);
-                    }
-                    // DELEGA ALLA FACTORY: Non c'è più IF/ELSE qui!
-                    VBox cell = cellProvider.createCell(cellKey, cellContent, isDayActive);
-
-                    shiftsGrid.add(cell, c, r + 1);
-                }
-            }
-        }catch(DataFetchException _){
-            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i turni");
-        }catch(EntityNotFoundException _){
-            ErrorViewManager.ScreenError("availability not found","Impossibile recuperare i turni");
-        }catch(BaseException _){
-            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i turni");
+        } catch (BaseException e) {
+            msg = TECHNICAL_ERROR + ": " + e.getMessage();
+            LOGGER.severe(msg);
         }
     }
+
+    private void resetAndSetupGrid() {
+        shiftsGrid.setGridLinesVisible(false);
+        shiftsGrid.setGridLinesVisible(true);
+        shiftsGrid.getChildren().clear();
+        shiftsGrid.getColumnConstraints().clear();
+        shiftsGrid.getRowConstraints().clear();
+
+        // Setup Colonne
+        for (int i = 0; i < 8; i++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setPercentWidth(100.0 / 8.0);
+            shiftsGrid.getColumnConstraints().add(col);
+        }
+
+        // Setup Header Row
+        RowConstraints headerRow = new RowConstraints();
+        headerRow.setMinHeight(40);
+        headerRow.setPrefHeight(40);
+        headerRow.setVgrow(Priority.NEVER);
+        shiftsGrid.getRowConstraints().add(headerRow);
+
+        addTableHeaders();
+    }
+    private ShiftCellProvider selectCellProvider(TableContext ctx) {
+        if (ctx.status.equals("PUBLISHED")) {
+            return new PublishedCellFactory(ctx.assignments);
+        }
+        if (ctx.isOwner) {
+            return new OwnerCellFactory();
+        }
+
+        boolean isLocked = ctx.status.equals(LOCKED_STATUS);
+        return new WorkerCellFactory(selectedCellsMap, isLocked);
+    }
+    private void populateGrid(TableContext ctx, ShiftCellProvider provider) {
+        List<String> timeSlots = ctx.wp.getShiftsBean();
+
+        for (int r = 0; r < timeSlots.size(); r++) {
+            addTimeSlotLabel(timeSlots.get(r), r + 1);
+
+            for (int c = 1; c <= 7; c++) {
+                String currentDay = days[c - 1];
+                String cellKey = buildCellKey(currentDay, timeSlots.get(r));
+
+                boolean isDayActive = ctx.wp.getSelectedDays().contains(currentDay);
+                List<String> cellContent = ctx.shifts.getOrDefault(cellKey, new ArrayList<>());
+
+                updateLocalSelectionMap(cellKey, cellContent, ctx.loggedUser, ctx.isOwner);
+
+                VBox cell = provider.createCell(cellKey, cellContent, isDayActive);
+                shiftsGrid.add(cell, c, r + 1);
+            }
+        }
+    }
+    private record TableContext(
+            String status,
+            boolean isOwner,
+            Map<String, List<String>> shifts,
+            Map<String, List<String>> assignments,
+            UserBean loggedUser,
+            WorkplaceBean wp
+    ) {}
+    private TableContext fetchTableContext() throws BaseException {
+        ManageShiftsAC manageAC = new ManageShiftsAC();
+        PublishShiftsAC publishAC = new PublishShiftsAC();
+        UserBean user = SessionContext.getInstance().getLoggeduser();
+        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+
+        return new TableContext(
+                manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
+                user.getEmail().equals(wp.getOwnerEmail()),
+                manageAC.getShiftData(user, wp),
+                publishAC.getAssignmentsForWeek(wp, currentWeekId),
+                user,
+                wp
+        );
+    }
+    private void addTableHeaders() {
+        // Header ORA
+        Label timeHeader = new Label("ORA");
+        timeHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
+        shiftsGrid.add(timeHeader, 0, 0);
+
+        // Header GIORNI
+        for (int i = 0; i < daysShown.length; i++) {
+            Label lbl = new Label(daysShown[i].toUpperCase());
+            lbl.setStyle("-fx-font-weight: bold; " +
+                    "-fx-text-fill: #4B4488; " +
+                    "-fx-background-color: #E8E6F3; " +
+                    "-fx-padding: 10; " +
+                    "-fx-border-color: #8379B5; " +
+                    "-fx-border-width: 0 0 1 0;");
+            lbl.setMaxWidth(Double.MAX_VALUE);
+            shiftsGrid.add(lbl, i + 1, 0);
+        }
+    }
+    private void addTimeSlotLabel(String slotText, int rowIndex) {
+        RowConstraints rowConstraint = new RowConstraints();
+        rowConstraint.setMinHeight(80);
+        rowConstraint.setPrefHeight(80);
+        rowConstraint.setVgrow(Priority.ALWAYS);
+        shiftsGrid.getRowConstraints().add(rowConstraint);
+
+        Label timeLbl = new Label(slotText);
+        timeLbl.setStyle("-fx-font-weight: bold; " +
+                "-fx-text-fill: #4B4488; " +
+                "-fx-background-color: #E8E6F3; " +
+                "-fx-padding: 10; " +
+                "-fx-border-color: #8379B5; " +
+                "-fx-border-width: 0 1 1 0;");
+        timeLbl.setMaxWidth(Double.MAX_VALUE);
+        timeLbl.setMaxHeight(Double.MAX_VALUE);
+        timeLbl.setAlignment(Pos.CENTER);
+        shiftsGrid.add(timeLbl, 0, rowIndex);
+    }
+    private String buildCellKey(String day, String slot) {
+        String timeKey = slot.replace(" ", "");
+        return currentWeekId + "_" + day + "_" + timeKey;
+    }
+    private void updateLocalSelectionMap(String cellKey, List<String> cellContent, UserBean loggedUser, boolean isOwner) {
+        if (!isOwner && cellContent.contains(loggedUser.getEmail())) {
+            selectedCellsMap.put(cellKey, true);
+        } else {
+            selectedCellsMap.put(cellKey, false);
+        }
+
+        // Log di debug opzionale (se ti serve ancora)
+        if (!cellContent.isEmpty()) {
+            LOGGER.log(Level.FINE, "DEBUG UI: TROVATI DATI PER: {0} -> {1}", new Object[]{cellKey, cellContent});
+        }
+    }
+//    private void buildDynamicTable() {
+//
+//        // 1. Reset e Setup Iniziale (come prima)
+//        try {
+//            shiftsGrid.setGridLinesVisible(false); // Reset
+//            shiftsGrid.setGridLinesVisible(true);
+//
+//            shiftsGrid.getChildren().clear();
+//            shiftsGrid.getColumnConstraints().clear();
+//            shiftsGrid.getRowConstraints().clear();
+//
+//            for (int i = 0; i < 8; i++) {
+//                ColumnConstraints col = new ColumnConstraints();
+//                col.setPercentWidth(100.0 / 8.0);
+//                shiftsGrid.getColumnConstraints().add(col);
+//            }
+//
+//            RowConstraints headerRow = new RowConstraints();
+//            headerRow.setMinHeight(40);
+//            headerRow.setPrefHeight(40);
+//            headerRow.setVgrow(Priority.NEVER); // Impedisce che la riga si ridimensioni male
+//            shiftsGrid.getRowConstraints().add(headerRow);
+//
+//            for (int i = 0; i < daysShown.length; i++) {
+//                Label lbl = new Label(daysShown[i].toUpperCase());
+//                lbl.setStyle("-fx-font-weight: bold; " +
+//                        "-fx-text-fill: #4B4488; " +
+//                        "-fx-background-color: #E8E6F3; " + // Stesso colore degli orari
+//                        "-fx-padding: 10; " +
+//                        "-fx-border-color: #8379B5; " +    // Bordo viola chiaro
+//                        "-fx-border-width: 0 0 1 0;");
+//                lbl.setMaxWidth(Double.MAX_VALUE);
+//                shiftsGrid.add(lbl, i + 1, 0);
+//            }
+//            Label timeHeader = new Label("ORA");
+//            timeHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #4B4488;");
+//            shiftsGrid.add(timeHeader, 0, 0);
+//
+//            // 2. Recupero Dati e Scelta della Factory (Logica GoF)
+//            ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
+//            PublishShiftsAC publishAC = new PublishShiftsAC();
+//            UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
+//            WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+//            Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, this.currentWeekId);
+//            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp);
+//            List<String> activeDays = wp.getSelectedDays();
+//            String status =manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
+//            boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
+//
+//            configureUIByStatus(status, isOwner);
+//            // Qui applichiamo l'Abstract Factory
+//            ShiftCellProvider cellProvider = null;
+//            if (status.equals("PUBLISHED")) {
+//                cellProvider = new PublishedCellFactory(assignments); // Mostra solo i nomi assegnati
+//            } else if (isOwner) {
+//                cellProvider = new OwnerCellFactory();
+//            } else {
+//                // Se è LOCKED, passiamo un flag alla factory per disabilitare i click
+//                boolean isLocked = status.equals("LOCKED");
+//                cellProvider = new WorkerCellFactory(selectedCellsMap, isLocked);
+//            }
+//
+//            // 3. Costruzione dinamica della griglia..
+//            List<String> timeSlots = wp.getShiftsBean();
+//
+//            for (int r = 0; r < timeSlots.size(); r++) {
+//                RowConstraints rowConstraint = new RowConstraints();
+//                rowConstraint.setMinHeight(80);
+//                rowConstraint.setPrefHeight(80);
+//                rowConstraint.setVgrow(Priority.ALWAYS); // Aiuta a mantenere la riga visibile
+//                shiftsGrid.getRowConstraints().add(rowConstraint);
+//
+//                // Label Orario (Colonna 0)
+//                Label timeLbl = new Label(timeSlots.get(r));
+//                timeLbl.setStyle("-fx-font-weight: bold; " +
+//                        "-fx-text-fill: #4B4488; " +
+//                        "-fx-background-color: #E8E6F3; " +
+//                        "-fx-padding: 10; " +
+//                        "-fx-border-color: #8379B5; " +
+//                        "-fx-border-width: 0 1 1 0;");
+//                timeLbl.setMaxWidth(Double.MAX_VALUE);
+//                timeLbl.setMaxHeight(Double.MAX_VALUE);
+//                timeLbl.setAlignment(Pos.CENTER);
+//                shiftsGrid.add(timeLbl, 0, r + 1);
+//
+//
+//                for (int c = 1; c <= 7; c++) {
+//                    String currentDay = days[c - 1];
+//                    String timeKey =timeSlots.get(r).replace(" ","");
+//                    String cellKey = currentWeekId+"_"+ currentDay + "_" + timeKey;
+//
+//                    msg = "DEBUG UI: Cerco in mappa la chiave: " +cellKey;
+//                    LOGGER.log(Level.FINE, msg);
+//                    boolean isDayActive = activeDays.contains(currentDay);
+//                    List<String> cellContent = shifts.getOrDefault(cellKey, new ArrayList<>());
+//                    if (!isOwner && cellContent.contains(loggedUser.getEmail())) {
+//                        selectedCellsMap.put(cellKey, true);
+//                        msg = "DEBUG UI: Trovata corrispondenza! Attivo " + cellKey;
+//                        LOGGER.log(Level.FINE, msg);
+//                    } else {
+//                        // Importante: se non c'è nel DB, assicurati che sia false nella mappa locale
+//                        selectedCellsMap.put(cellKey, false);
+//                    }
+//                    if (!cellContent.isEmpty()) {
+//                        msg = "DEBUG UI: TROVATI DATI PER: " + cellKey + " -> " + cellContent;
+//                        LOGGER.log(Level.FINE ,msg);
+//                    }
+//                    // DELEGA ALLA FACTORY: Non c'è più IF/ELSE qui!
+//                    VBox cell = cellProvider.createCell(cellKey, cellContent, isDayActive);
+//
+//                    shiftsGrid.add(cell, c, r + 1);
+//                }
+//            }
+//        }catch(DataFetchException _){
+//            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile recuperare i turni");
+//        }catch(EntityNotFoundException _){
+//            ErrorViewManager.ScreenError("availability not found","Impossibile recuperare i turni");
+//        }catch(BaseException _){
+//            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i turni");
+//        }
+//    }
 
     @FXML
     public void onSaveAvailability() {
@@ -278,19 +433,18 @@ public class ShiftsGC {
             String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
 
             if("OPEN".equals(currentStatus)){
-                managShiftsAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,"LOCKED");
+                managShiftsAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,LOCKED_STATUS);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
             }
-            else if("LOCKED".equals(currentStatus)){
+            else if(LOCKED_STATUS.equals(currentStatus)){
                 PublishShiftsAC publishAC = new PublishShiftsAC();
                 publishAC.publish(wp, this.currentWeekId);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();
         }catch(BaseException _){
-            SceneManager.getInstance().showErrorAlert("Errore tecnico","Impossibile aggiornare lo stato dei turni.");
+            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,"Impossibile aggiornare lo stato dei turni.");
         }
-        //SceneManager.getInstance().showInfoAlert("Implementation problmea", "tasto non implementato");
     }
 
     public void onWorkersclicked() {
@@ -361,7 +515,7 @@ public class ShiftsGC {
             publicShiftsBtn.setVisible(true);
             if (status.equals("OPEN")) {
                 publicShiftsBtn.setText("Lock Availability");
-            } else if (status.equals("LOCKED")) {
+            } else if (status.equals(LOCKED_STATUS)) {
                 publicShiftsBtn.setText("Publish Shifts");
             } else {
                 publicShiftsBtn.setVisible(false); // Nascondi se già pubblicato
@@ -371,7 +525,7 @@ public class ShiftsGC {
             boolean canSave = status.equals("OPEN");
             saveShiftsBtn.setDisable(!canSave);
 
-            if (status.equals("LOCKED")) {
+            if (status.equals(LOCKED_STATUS)) {
                 instructionLabel.setText("Inserimento chiuso: il Boss sta elaborando i turni.");
             } else if (status.equals("PUBLISHED")) {
                 instructionLabel.setText("Turni ufficiali pubblicati.");

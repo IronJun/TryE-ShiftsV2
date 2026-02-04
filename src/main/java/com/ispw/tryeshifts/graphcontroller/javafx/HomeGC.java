@@ -84,11 +84,11 @@ public class HomeGC {
         }catch(UserNotMemberException _) {
             showJoinConfirmation(workplaceName);
         }catch(MembershipPendingException _){
-            ErrorViewManager.ScreenError("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
+            ErrorViewManager.screenError("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
         }catch (EntityNotFoundException _){
-            ErrorViewManager.ScreenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
+            ErrorViewManager.screenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
         }catch (BaseException _){
-            ErrorViewManager.ScreenError("unkown error","ask the programmer");
+            ErrorViewManager.screenError("unkown error","ask the programmer");
         }
     }
 
@@ -105,9 +105,9 @@ public class HomeGC {
                     ac.requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
-                    ErrorViewManager.ScreenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
+                    ErrorViewManager.screenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
                 }catch(BaseException _){
-                    ErrorViewManager.ScreenError(TECNICAL_ERROR,"Impossibile inviare la richiesta");
+                    ErrorViewManager.screenError(TECNICAL_ERROR,"Impossibile inviare la richiesta");
                 }
 
             }
@@ -123,11 +123,11 @@ public class HomeGC {
             LOGGER.info("L'utente non è membro. Mostro popup di iscrizione per: " + workplaceName);
             showJoinConfirmation(workplaceName);
         }catch (MembershipPendingException e){
-            ErrorViewManager.ScreenError("Richiesta Pendente", e.getMessage());
+            ErrorViewManager.screenError("Richiesta Pendente", e.getMessage());
         }catch(EntityNotFoundException _){
-            ErrorViewManager.ScreenError("Errore Workplace", "il workpalce selezionato non esiste");
+            ErrorViewManager.screenError("Errore Workplace", "il workpalce selezionato non esiste");
         }catch(BaseException e){
-            ErrorViewManager.ScreenError(TECNICAL_ERROR, e.getMessage());
+            ErrorViewManager.screenError(TECNICAL_ERROR, e.getMessage());
         }
     }
 
@@ -150,11 +150,11 @@ public class HomeGC {
             }
         }catch(DataFetchException e){
             LOGGER.log(Level.SEVERE, "Errore durante la ricerca", e);
-            ErrorViewManager.ScreenError("Errore di Connessione",
+            ErrorViewManager.screenError("Errore di Connessione",
                     "Non è stato possibile recuperare i dati. Riprova più tardi.");
             workplaceListView.getItems().clear();
         }catch(BaseException e){
-            ErrorViewManager.ScreenError(TECNICAL_ERROR, e.getMessage());
+            ErrorViewManager.screenError(TECNICAL_ERROR, e.getMessage());
             workplaceListView.getItems().clear();
         }
     }
@@ -275,7 +275,7 @@ public class HomeGC {
                 vboxWorkplaceLegend.getChildren().add(row);
             }
         } catch (BaseException _) {
-            ErrorViewManager.ScreenError(TECNICAL_ERROR,"Impossibile recuperare i workplace");
+            ErrorViewManager.screenError(TECNICAL_ERROR,"Impossibile recuperare i workplace");
         }
 
     }

@@ -13,7 +13,6 @@ import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ShiftsCLI {
@@ -477,22 +476,25 @@ public class ShiftsCLI {
                 row.append(String.format("| %-15s", buildCellContent(day, slot, activeDays, ctx)));
             }
             // Niente variabile statica msg: usiamo una locale o chiamiamo direttamente
-            LOGGER.info(row.toString()+"\n");
+            msg = row.toString()+"\n";
+            LOGGER.info(msg);
         }
     }
     private static void printDashboardHeader(String status) {
         // Creiamo la riga di stato
         String statusLine = String.format("STATUS: %s | WEEK: %s",
                 status, ManageShiftsAC.getWeekRangeString(weekOffset));
-        LOGGER.info(statusLine+"\n");
+        msg = statusLine+"\n";
+        LOGGER.info(msg);
 
         StringBuilder header = new StringBuilder(String.format("%-15s", "ORA"));
         for (String day : days) {
             header.append(String.format("| %-15s", day.toUpperCase()));
         }
-
-        LOGGER.info(header.toString()+"\n");
-        LOGGER.info("-".repeat(header.length())+"\n");
+        msg = header.toString()+"\n";
+        LOGGER.info(msg);
+        msg = "-".repeat(header.length())+"\n";
+        LOGGER.info(msg);
     }
     private static void publishShifts(WorkplaceBean wp){
         try {

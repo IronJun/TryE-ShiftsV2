@@ -12,6 +12,10 @@ import java.util.List;
 public class SearchWorkplacesAC {
     private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
+    private SearchWorkplacesAC(){
+        throw new IllegalStateException("Utility class");
+    }
+
     public static List<WorkplaceBean> getAllWorkplaces()throws BaseException{
 
         List<Workplace> workplaceEntities = workplaceRepo.findAllWorkplaces();

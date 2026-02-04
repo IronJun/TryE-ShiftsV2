@@ -56,9 +56,9 @@ public class WorkersGC {
 
             setupCells();
         }catch(EntityNotFoundException _){
-            ErrorViewManager.ScreenError("Errore","Impossibile trovare il workplace");
+            ErrorViewManager.screenError("Errore","Impossibile trovare il workplace");
         }catch(BaseException _){
-            ErrorViewManager.ScreenError("Errore tecnico","Impossibile recuperare i membri");
+            ErrorViewManager.screenError("Errore tecnico","Impossibile recuperare i membri");
         }
     }
 
@@ -114,9 +114,9 @@ public class WorkersGC {
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
         }catch(EntityNotFoundException _){
-            ErrorViewManager.ScreenError("Errore","Impossibile trovare il workplace");
+            ErrorViewManager.screenError("Errore","Impossibile trovare il workplace");
         }catch(BaseException _){
-            ErrorViewManager.ScreenError("Errore tecnico","Impossibile aggiornare il DB");
+            ErrorViewManager.screenError("Errore tecnico","Impossibile aggiornare il DB");
         }
 
     }

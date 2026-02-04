@@ -58,7 +58,7 @@ public class SettingsGC {
             overlayPane.setManaged(true); // Se hai aggiunto managed
             ErrorViewManager.showError(overlayMessage,"Nessun workplace selezionato");
             applyBlur(true);
-        } else if (loggedUser.getEmail().equals(wp.getOwnerEmail()) == false) {
+        } else if (!loggedUser.getEmail().equals(wp.getOwnerEmail())) {
             // Stato 2: Selezionato ma non sei l'owner
             overlayPane.setVisible(true);
             overlayPane.setManaged(true);
@@ -114,7 +114,7 @@ public class SettingsGC {
     private void addShift(){
         try{
         ManageShiftsAC.addShiftstoWorkaplce(startHourCombo,endMinuteCombo,startHourCombo,endHourCombo,shiftsListView);
-        }catch (InvalidCredentialException e){
+        }catch (InvalidCredentialException _){
             ErrorViewManager.showError(errorlabel,"Invalid shift time!");
         } catch (BaseException e) {
             ErrorViewManager.showError(errorlabel,e.getMessage());
@@ -136,7 +136,7 @@ public class SettingsGC {
 
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 
-        }catch(Exception e){
+        }catch(Exception _){
             SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
         }
     }

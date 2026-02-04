@@ -47,7 +47,7 @@ public class LoginGC {
         } catch (EntityNotFoundException | InvalidCredentialException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
         } catch (BaseException _) {
-            ErrorViewManager.ScreenError("Errore Tecnico", "Server non raggiungibile.");
+            ErrorViewManager.screenError("Errore Tecnico", "Server non raggiungibile.");
         }
     }
 

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ColorManager {
+    private ColorManager() {
+        throw new IllegalStateException("Utility class");
+    }
     private static final Map<String, String> workerColorMap = new HashMap<>();
     private static final String[] palette = {
             "#E74C3C", "#3498DB", "#9B59B6", "#F1C40F",
