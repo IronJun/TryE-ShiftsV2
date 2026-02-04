@@ -83,13 +83,9 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         String prefix = workplaceName + "_" ;
 
         db.getPublishedShifts().forEach((fullKey, workers) -> {
-            System.out.println("DEBUG DAO: Analizzo fullKey: " + fullKey); // Controlla se finisce con -00:00 o -01:00
             if (fullKey.startsWith(prefix)) {
                 // Rimuoviamo il prefisso per ridare all'AC solo la cellKey
                 String cellKey = fullKey.substring(prefix.length());
-                System.out.println("DEBUG DAO: Trovato match!");
-                System.out.println("      FullKey nel DB: " + fullKey);
-                System.out.println("      CellKey estratta: " + cellKey);
                 filteredAssignments.put(cellKey, new ArrayList<>(workers));
             }
         });
