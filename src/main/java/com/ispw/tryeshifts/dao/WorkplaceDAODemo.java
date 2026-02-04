@@ -62,33 +62,37 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         return result;
     }
     public String getWeekStatus(String workplaceName, String weekId){
-        return db.getWeekStatusDbDemo().get(workplaceName + "_" + weekId);
+        return db.getWeekStatusDbDemo().getOrDefault(workplaceName + "_" + weekId, "OPEN");
     }
     public void updateWeekStatus(String workplaceName, String weekId, String newStatus) {
         // Usiamo la stessa chiave usata per il recupero
         db.getWeekStatusDbDemo().put(workplaceName + "_" + weekId, newStatus);
     }
+
     public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) {
         assignments.forEach((cellKey, email) -> {
             String fullKey = workplace + "_" + weekId + "_" + cellKey;
             db.getPublishedShifts().put(fullKey, new ArrayList<>(email));
         });
     }
+
     public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) {
         Map<String, List<String>> filteredAssignments = new HashMap<>();
 
         // Il prefisso che identifica univocamente la settimana per quel posto di lavoro
-        String prefix = workplaceName + "_" + weekId + "_";
+        String prefix = workplaceName + "_" ;
 
-        for (Map.Entry<String, List<String>> entry : db.getPublishedShifts().entrySet()) {
-            String key = entry.getKey();
-            if (key.startsWith(prefix)) {
-                // Rimuoviamo il prefisso per restituire alla UI solo la "CellKey"
-                // (es. "Mon_08:00-09:00") così la Factory la trova subito
-                String cellKey = key.substring(prefix.length());
-                filteredAssignments.put(cellKey, new ArrayList<>(entry.getValue()));
+        db.getPublishedShifts().forEach((fullKey, workers) -> {
+            System.out.println("DEBUG DAO: Analizzo fullKey: " + fullKey); // Controlla se finisce con -00:00 o -01:00
+            if (fullKey.startsWith(prefix)) {
+                // Rimuoviamo il prefisso per ridare all'AC solo la cellKey
+                String cellKey = fullKey.substring(prefix.length());
+                System.out.println("DEBUG DAO: Trovato match!");
+                System.out.println("      FullKey nel DB: " + fullKey);
+                System.out.println("      CellKey estratta: " + cellKey);
+                filteredAssignments.put(cellKey, new ArrayList<>(workers));
             }
-        }
+        });
 
         return filteredAssignments;
     }

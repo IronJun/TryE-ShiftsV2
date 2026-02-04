@@ -43,10 +43,7 @@ public class ManageShiftsAC {
         if (isBoss) {
             list = availabilityRepo.getAvailabilitiesByWorkplace(workplace.getWorkplaceName(), weekId);
         } else {
-// PROVA TEMPORANEA
-            System.out.println("LOG AC: Cerco nel DB con WP=" + workplace.getWorkplaceName() + " e Week=" + weekId);
             list = availabilityRepo.getAvailabilitiesByUser(user.getEmail(), workplace.getWorkplaceName(), weekId);
-            System.out.println("LOG AC: Il Repository ha restituito " + list.size() + " righe.");
         }
 
         for(Availability a : list){
@@ -62,31 +59,39 @@ public class ManageShiftsAC {
     }
 
     public void saveAvailabilities(List<AvailabilityBean> beans) throws BaseException {
-        LOGGER.info("salvataggio turni");
         if(beans == null){throw new NullPointerException("Bean passed null");}
         String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
         String wpName = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
-        try {
 
-            availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName);
-            // 2. SALVATAGGIO: Trasformiamo i Bean in Entity e le salviamo nel Repository
+        // ATTENZIONE: Se sei nella "settimana prossima", calculateWeekId(0) ti darà la settimana SBAGLIATA.
+        // Sarebbe meglio passare il weekId corrente direttamente dalla GUI come parametro.
+        String currentWeekId = beans.isEmpty() ?
+                ManageShiftsAC.calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
+                beans.get(0).getWeekId();
+
+        // 1. CANCELLAZIONE (fuori dal try-catch principale se vuoi che sia ignorabile)
+        try {
+            availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
+        } catch(EntityNotFoundException e) {
+            LOGGER.info("Nessuna disponibilità precedente da rimuovere, procedo al salvataggio.");
+        }
+
+        // 2. SALVATAGGIO (deve essere garantito)
+        try {
             for (AvailabilityBean bean : beans) {
-                LOGGER.info("LOG AC: Salvataggio per " + bean.getUserEmail() + " al " + bean.getDay());
                 Availability entity = new Availability(
                         bean.getUserEmail(),
                         bean.getWorkplaceName(),
                         bean.getDay(),
                         bean.getStartShift(),
                         bean.getEndShifts(),
-                        bean.getWeekId()// Assicurati che nel Bean si chiami shift o timeSlot come nella Entity
+                        bean.getWeekId()
                 );
                 availabilityRepo.saveAvailability(entity);
             }
-        }catch(EntityNotFoundException _){
-            LOGGER.info("Nessna disponibilità precendente da rimuovere per: " + userEmail);
-        }catch(DataFetchException e){
+        } catch(DataFetchException e) {
             LOGGER.log(Level.SEVERE, "Errore di persistenza durante il salvataggio", e);
-
+            throw e; // Rilancia per far sapere alla GUI che è fallito
         }
     }
 

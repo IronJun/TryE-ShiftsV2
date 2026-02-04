@@ -15,6 +15,12 @@ public class PublishedCellFactory implements ShiftCellProvider{
         this.finalAssignments = assignments;
     }
     public VBox createCell(String cellKey, List<String> content, boolean active) {
+        System.out.println("UI sta cercando la chiave: [" + cellKey + "]");
+
+        // STAMPA COSA C'E' NELLA MAPPA (solo per la prima cella per non intasare il log)
+        if (!finalAssignments.isEmpty()) {
+            System.out.println("Esempio chiave presente in mappa: [" + finalAssignments.keySet().iterator().next() + "]");
+        }
         VBox cell = new VBox(3);
         cell.setAlignment(Pos.TOP_CENTER);
         cell.setStyle("-fx-padding: 5; -fx-border-color: #D1CFE2; -fx-background-color: #ffffff;");

@@ -126,10 +126,11 @@ public class WorkersGC {
     }
 
     public void onLogoutClicked() {
-        if (SessionContext.getInstance().logoutConfirmation()) {
+        System.out.println("DEBUG: Click Logout 1");
+        if(SessionContext.getInstance().logoutConfirmation()){
+            System.out.println("DEBUG: Conferma ricevuta, cambio scena...");
             SessionContext.getInstance().clearPreferences();
-            SessionContext.getInstance().setLoggedWorkplace(null);
-            SceneManager.getInstance().switchScene("Login.fxml", "Login", 400, 500);
+            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         }
     }
     public void goToShifts(){

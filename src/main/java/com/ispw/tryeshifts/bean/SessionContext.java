@@ -19,12 +19,14 @@ public class SessionContext {
         return instance;
     }
 
+
     public boolean logoutConfirmation(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout Confirmation");
-        alert.setHeaderText("Sei sicuro di voler effettuare il logout?");
-        Optional<ButtonType> result = alert.showAndWait();
+        alert.setTitle("Logout");
+        alert.setHeaderText(null); // Rimuove lo spazio grigio dell'header che può sembrare "vuoto"
+        alert.setContentText("Sei sicuro di voler effettuare il logout?");
 
+        Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
 
     }

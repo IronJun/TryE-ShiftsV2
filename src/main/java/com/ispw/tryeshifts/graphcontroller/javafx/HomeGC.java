@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Window;
 
 import java.util.HashMap;
 import java.util.List;
@@ -293,25 +294,30 @@ public class HomeGC {
         // 2. Passiamo l'utente loggato al controller del popup
         if (popupController != null) {
             popupController.setLoggedUser(this.loggedUser);
-            LOGGER.info("utente passato al popup: " + this.loggedUser.getEmail());
-            popupController.getNameField().getScene().getWindow().setOnHiding(e -> {
-                LOGGER.info("DEBUG HOME: Popup in chiusura, eseguo il refresh...");
+
+            // RECUPERA LA FINESTRA (Window/Stage) E AGGIUNGI IL LISTENER
+            // Usiamo lo shortcut tramite il controller
+            Window window = popupController.getNameField().getScene().getWindow();
+
+            window.setOnHiding(e -> {
+                LOGGER.info("DEBUG HOME: Popup effettivamente chiuso. Ricarico tutto!");
                 refreshWorkplaceList();
+                refreshAllData(); // <--- SPOSTATO QUI DENTRO
+                handleSearch(""); // Opzionale: pulisce la ricerca per mostrare il nuovo item
             });
+
         } else {
             LOGGER.info("Errore nel caricamento del popup");
         }
 
-        refreshAllData();
-
     }
 
     public void onLogoutClicked() {
+        System.out.println("DEBUG: Click Logout 1");
         if(SessionContext.getInstance().logoutConfirmation()){
+            System.out.println("DEBUG: Conferma ricevuta, cambio scena...");
             SessionContext.getInstance().clearPreferences();
-            SceneManager.getInstance().showInfoAlert("Logout", "");
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-            LOGGER.info("Logout effettuato");
         }
 
     }

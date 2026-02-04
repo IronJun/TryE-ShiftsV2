@@ -48,14 +48,15 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             throw new DataFetchException("Impossibile salvare la disponibilità nel database");        }
     }
 
-    public void deleteAvailabilitiesByUser(String email, String workplaceName) throws DataFetchException {
-        String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ?";
-
+    public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
+        String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ? AND week_id = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
+            pstmt.setString(3, weekId);
+            pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
@@ -91,6 +92,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
         }
         return list;
     }
+
     public List<Availability> getAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
         String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift " +
@@ -109,7 +111,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
                             rs.getString(WORKPLACE_STR_NAME),
                             rs.getString(DAY_NAME),
                             rs.getString(START_SHIFT),
-                            rs.getString(START_SHIFT),
+                            rs.getString(END_SHIFT),
                             rs.getString(WEEK_ID)
                     ));
                 }

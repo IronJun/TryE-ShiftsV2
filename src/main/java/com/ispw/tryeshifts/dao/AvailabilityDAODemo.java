@@ -47,14 +47,12 @@ public class AvailabilityDAODemo implements AvailabilityDAO{
         }
         return result;
     }
-    public void deleteAvailabilitiesByUser(String email, String workplaceName) throws EntityNotFoundException {
-        if(email == null || workplaceName == null){throw new NullPointerException("Invalid parameters");}
-        boolean removed = db.getAvailabilities().removeIf(a ->
-                a.getUserEmail().equals(email) && a.getWorkplaceName().equals(workplaceName)
+    public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws EntityNotFoundException {
+        db.getAvailabilities().removeIf(a ->
+                a.getUserEmail().equals(email) &&
+                        a.getWorkplaceName().equals(workplaceName) &&
+                        a.getWeekId().equals(weekId)
         );
-        if (!removed) {
-            throw new EntityNotFoundException("Availability", email + " in " + workplaceName);
-        }
     }
     public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) {
         Map<String, List<String>> weekMap = new HashMap<>();

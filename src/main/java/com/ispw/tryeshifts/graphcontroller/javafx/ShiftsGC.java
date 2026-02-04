@@ -44,7 +44,7 @@ public class ShiftsGC {
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private String shiftsMode= "Forzata" ;
 
-    public void initialize(){
+    public void initialize()  {
         ErrorViewManager.setupAutoHide(errorlbl);
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
@@ -58,19 +58,23 @@ public class ShiftsGC {
             this.selectedWorkplace = info;
             setSelectedWorkplace(info);
         }
+        try{
+            TableContext context = fetchTableContext(); // Recuperiamo i dati freschi
 
 
-
-
-        ShiftsUIStrat strat;
-        if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
-            strat = new BossShiftsStrat();
-        }else{
-            strat = new WorkerShiftsStrat();
+            ShiftsUIStrat strat;
+            if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
+                strat = new BossShiftsStrat();
+            }else{
+                strat = new WorkerShiftsStrat();
+            }
+            strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn,context.status());
+            lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
+            buildDynamicTable();
+        }catch(BaseException e){
+            LOGGER.log(Level.SEVERE, "Errore durante l'inizializzazione della UI", e);
         }
-        strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn);
-        lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
-        buildDynamicTable();
+
     }
 
     public void setSelectedWorkplace(WorkplaceBean wp) {
@@ -89,7 +93,11 @@ public class ShiftsGC {
 
             // 2. Recupero Dati e Context
             TableContext context = fetchTableContext();
+            ShiftsUIStrat strat = (loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail()))
+                    ? new BossShiftsStrat()
+                    : new WorkerShiftsStrat();
 
+            strat.customizeUI(instructionLabel, saveShiftsBtn, publicShiftsBtn, context.status());
             // 3. Selezione del Provider (Factory)
             ShiftCellProvider cellProvider = selectCellProvider(context);
 
@@ -226,16 +234,14 @@ public class ShiftsGC {
     }
     private void updateLocalSelectionMap(String cellKey, List<String> cellContent, UserBean loggedUser, boolean isOwner) {
         if (!isOwner) {
-            // Se sei un worker, la mappa deve essere true SE nella lista c'è "SELECTED"
-            // OPPURE se c'è la tua email (dipende da cosa restituisce il tuo AC)
-            boolean isSelected = cellContent.contains("SELECTED") || cellContent.contains(loggedUser.getEmail());
+            boolean isSelected = cellContent.contains("SELECTED");
             selectedCellsMap.put(cellKey, isSelected);
 
+            // SE QUESTO NON STAMPA, LA CHIAVE cellKey NON MATCHATA CON ctx.shifts
             if (isSelected) {
-                LOGGER.log(Level.FINE, "UI DEBUG: Cella {0} ricaricata come SELEZIONATA", cellKey);
+                msg ="!!! MATCH TROVATO per chiave: " + cellKey;
+                LOGGER.info(msg);
             }
-        } else {
-            selectedCellsMap.put(cellKey, false);
         }
     }
 
@@ -308,9 +314,9 @@ public class ShiftsGC {
         }
     }
 
-
     public void onPublic() {
         ManageShiftsAC managShiftsAC = new ManageShiftsAC();
+        PublishShiftsAC publishAC = new PublishShiftsAC();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
 
@@ -322,7 +328,6 @@ public class ShiftsGC {
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
             }
             else if(LOCKED_STATUS.equals(currentStatus)){
-                PublishShiftsAC publishAC = new PublishShiftsAC();
                 publishAC.publish(wp, this.currentWeekId);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
@@ -375,7 +380,6 @@ public class ShiftsGC {
             ErrorViewManager.showError(errorlbl,"puoi dare disponibilità solo per la settimana successiva");
         }
     }
-
     @FXML
     private void handlePrevWeek() {
         if(weekOffset>0){
