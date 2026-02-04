@@ -178,16 +178,14 @@ public class ShiftsGC {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-        TableContext ctx = new TableContext(
+
+        return new TableContext(
                 manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
                 user.getEmail().equals(wp.getOwnerEmail()),
                 manageAC.getShiftData(user, wp,currentWeekId),
                 publishAC.getAssignmentsForWeek(wp, currentWeekId),
                 user,
                 wp);
-
-        ctx.shifts().forEach((key, val) -> System.out.println("Chiave in Mappa: " + key + " | Valore: " + val));
-        return ctx;
     }
     private void addTableHeaders() {
         // Header ORA
