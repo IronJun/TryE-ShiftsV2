@@ -1,7 +1,6 @@
 package com.ispw.tryeshifts;
 
 import com.ispw.tryeshifts.dao.*;
-import java.util.logging.Logger;
 
 
 public class AppConfig {
@@ -11,7 +10,6 @@ public class AppConfig {
     private static AvailabilityDAO availabilityRepo = null;
     public static final boolean IS_DEMO_MODE = false;
     public static final boolean SAVE_USER_TO_CSV = true;
-    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
     private AppConfig(){
         throw new IllegalStateException("Utility class");

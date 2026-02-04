@@ -36,11 +36,18 @@ public class WorkerCellFactory implements ShiftCellProvider{
         }
 
         cell.setCursor(Cursor.HAND);
-        boolean isSelected = content.contains(SELECTED) || selectionMap.getOrDefault(cellKey,false);
-        if(isSelected) selectionMap.put(cellKey,true);
+        boolean isSelectedFromDB = content.stream().anyMatch(s -> s.equalsIgnoreCase(SELECTED));
+        boolean isSelectedInMap = selectionMap.getOrDefault(cellKey, false);
 
-        Label status = new Label(isSelected ? SELECTED : FREE);
-        applyStyle(cell,status,isSelected);
+        boolean finalSelectedState = isSelectedFromDB || isSelectedInMap;
+
+        if(finalSelectedState) {
+            selectionMap.put(cellKey, true);
+        }
+
+        // 3. CREA LA LABEL E APPLICA LO STILE
+        Label statusLabel = new Label();
+        applyStyle(cell, statusLabel, finalSelectedState);
 
         if (this.isLocked) {
             // Se la settimana è bloccata, mostriamo lo stato ma impediamo modifiche
@@ -51,17 +58,17 @@ public class WorkerCellFactory implements ShiftCellProvider{
             // Opzionalmente aggiungiamo un tooltip o un piccolo testo
             Label lockText = new Label("Sola Lettura");
             lockText.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
-            cell.getChildren().addAll(status, lockText);
+            cell.getChildren().addAll(statusLabel, lockText);
         } else {
             // 4. LOGICA DI INTERAZIONE (OPEN)
             cell.setCursor(Cursor.HAND);
             cell.setOnMouseClicked(e -> {
                 boolean newState = !selectionMap.getOrDefault(cellKey, false);
                 selectionMap.put(cellKey, newState);
-                status.setText(newState ? SELECTED : FREE);
-                applyStyle(cell, status, newState);
+                statusLabel.setText(newState ? SELECTED : FREE);
+                applyStyle(cell, statusLabel, newState);
             });
-            cell.getChildren().add(status);
+            cell.getChildren().add(statusLabel);
         }
 
         return cell;

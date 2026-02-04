@@ -19,21 +19,29 @@ public class AvailabilityDAODemo implements AvailabilityDAO{
         }
         db.getAvailabilities().add(availability);
     }
-    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName){
-        if(workplaceName == null || workplaceName.isEmpty()){throw new NullPointerException("Invalid parameters");}
+    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName,String weekId){
+        if (workplaceName == null || workplaceName.isEmpty() || weekId == null) {
+            throw new NullPointerException("Invalid parameters: workplace or weekId is null");
+        }
         List<Availability> result = new ArrayList<>();
         for (Availability a : db.getAvailabilities()) {
-            if (a.getWorkplaceName().equals(workplaceName)) {
+            // Aggiungiamo il controllo sulla settimana
+            if (a.getWorkplaceName().equals(workplaceName) && a.getWeekId().equals(weekId)) {
                 result.add(a);
             }
         }
         return result;
     }
-    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName){
-        if(email == null || workplaceName == null){throw new NullPointerException("Invalid parameters");}
+    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName,String weekId){
+        if (email == null || workplaceName == null || weekId == null) {
+            throw new NullPointerException("Invalid parameters");
+        }
         List<Availability> result = new ArrayList<>();
         for (Availability a : db.getAvailabilities()) {
-            if (a.getUserEmail().equals(email) && a.getWorkplaceName().equals(workplaceName)) {
+            // Aggiungiamo il controllo sulla settimana per filtrare le proprie disponibilità
+            if (a.getUserEmail().equals(email) &&
+                    a.getWorkplaceName().equals(workplaceName) &&
+                    a.getWeekId().equals(weekId)) {
                 result.add(a);
             }
         }

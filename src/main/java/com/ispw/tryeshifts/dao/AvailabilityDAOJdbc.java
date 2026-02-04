@@ -61,14 +61,16 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
             throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
         }
     }
-    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName) throws DataFetchException {
+    public List<Availability> getAvailabilitiesByWorkplace(String workplaceName,String weekId) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
-        String query = "SELECT user_email, day_name, start_shift, end_shift, week_id FROM availabilities WHERE workplace_name = ?";
+        String query = "SELECT user_email, day_name, start_shift, end_shift, week_id " +
+                "FROM availabilities WHERE workplace_name = ? AND week_id = ?";
 
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, workplaceName);
+            pstmt.setString(2, weekId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -89,15 +91,17 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO{
         }
         return list;
     }
-    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName) throws DataFetchException {
+    public List<Availability> getAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
-        String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift FROM availabilities WHERE user_email = ? AND workplace_name = ?";
-
+        String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift " +
+                "FROM availabilities WHERE user_email = ? AND workplace_name = ? AND week_id = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
+            pstmt.setString(3, weekId);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new Availability(

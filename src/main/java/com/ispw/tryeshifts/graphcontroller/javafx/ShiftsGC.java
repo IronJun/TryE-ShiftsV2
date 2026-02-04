@@ -8,7 +8,9 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.javafx.utilities.*;
+import com.mysql.cj.xdevapi.Table;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -41,7 +43,6 @@ public class ShiftsGC {
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private String shiftsMode= "Forzata" ;
-
 
     public void initialize(){
         ErrorViewManager.setupAutoHide(errorlbl);
@@ -80,7 +81,6 @@ public class ShiftsGC {
         msg = "DEBUG UI: Workplace selezionato: " + wp.getWorkplaceName();
         LOGGER.log(Level.FINE,msg);
     }
-
 
     private void buildDynamicTable() {
         try {
@@ -170,14 +170,18 @@ public class ShiftsGC {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-        return new TableContext(
+        TableContext ctx = new TableContext(
                 manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
                 user.getEmail().equals(wp.getOwnerEmail()),
-                manageAC.getShiftData(user, wp),
+                manageAC.getShiftData(user, wp,currentWeekId),
                 publishAC.getAssignmentsForWeek(wp, currentWeekId),
                 user,
-                wp
-        );
+                wp);
+
+        System.out.println("GUI DEBUG: Ricevute " + ctx.shifts().size() + " disponibilità.");
+        System.out.println("DEBUG GUI: Sto cercando disponibilità per la settimana: " + currentWeekId);
+        ctx.shifts().forEach((key, val) -> System.out.println("Chiave in Mappa: " + key + " | Valore: " + val));
+        return ctx;
     }
     private void addTableHeaders() {
         // Header ORA
@@ -218,19 +222,20 @@ public class ShiftsGC {
         shiftsGrid.add(timeLbl, 0, rowIndex);
     }
     private String buildCellKey(String day, String slot) {
-        String timeKey = slot.replace(" ", "");
-        return currentWeekId + "_" + day + "_" + timeKey;
+        return KeyGenerator.buildShiftKey(this.currentWeekId, day, slot);
     }
     private void updateLocalSelectionMap(String cellKey, List<String> cellContent, UserBean loggedUser, boolean isOwner) {
-        if (!isOwner && cellContent.contains(loggedUser.getEmail())) {
-            selectedCellsMap.put(cellKey, true);
+        if (!isOwner) {
+            // Se sei un worker, la mappa deve essere true SE nella lista c'è "SELECTED"
+            // OPPURE se c'è la tua email (dipende da cosa restituisce il tuo AC)
+            boolean isSelected = cellContent.contains("SELECTED") || cellContent.contains(loggedUser.getEmail());
+            selectedCellsMap.put(cellKey, isSelected);
+
+            if (isSelected) {
+                LOGGER.log(Level.FINE, "UI DEBUG: Cella {0} ricaricata come SELEZIONATA", cellKey);
+            }
         } else {
             selectedCellsMap.put(cellKey, false);
-        }
-
-        // Log di debug opzionale (se ti serve ancora)
-        if (!cellContent.isEmpty()) {
-            LOGGER.log(Level.FINE, "DEBUG UI: TROVATI DATI PER: {0} -> {1}", new Object[]{cellKey, cellContent});
         }
     }
 
@@ -250,8 +255,16 @@ public class ShiftsGC {
             LOGGER.log(Level.FINE, msg);
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
-                String[] parts = key.split("_", 2);
-                savePartShifts(loggedUser, wp, availabilityBeans, parts);
+                String[] parts = key.split("_");
+                if(parts.length >= 4){
+                    String year = parts[0];
+                    String week = parts[1];
+                    String day = parts[2];      // INDICE 2 per il GIORNO
+                    String fullTime = parts[3];
+                    String weekIdForDb = year + "_" + week;
+                    savePartShifts(loggedUser, wp, availabilityBeans, day ,fullTime,weekIdForDb);
+
+                }
             }
             msg ="DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size();
             LOGGER.log(Level.FINE, msg);
@@ -271,37 +284,30 @@ public class ShiftsGC {
         }
     }
 
-    private void savePartShifts(UserBean loggedUser, WorkplaceBean wp, List<AvailabilityBean> availabilityBeans, String[] parts){
-        if (parts.length >= 2) {
-            String day = parts[0];
-            String fullTime = parts[1]; // "00:00-01:00"
+    private void savePartShifts(UserBean loggedUser, WorkplaceBean wp, List<AvailabilityBean> availabilityBeans, String day, String fullTime,String weekIdForDb) {
+        String[] timeParts = fullTime.split("-");
+        if (timeParts.length >= 2) {
+            String start = timeParts[0].trim();
+            String end = timeParts[1].trim(); // "00:00-01:00"
 
-            // Usiamo una Regex più sicura per il trattino
-            // Questo divide la stringa su qualunque trattino, ignorando eventuali spazi
-            String[] timeParts = fullTime.split("-");
-
-            if (timeParts.length >= 2) {
-                String start = timeParts[0].trim();
-                String end = timeParts[1].trim();
-
-                // LOG DI CONTROLLO FINALE
-                msg ="DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
-                LOGGER.log(Level.FINE, msg);
-                AvailabilityBean bean = new AvailabilityBean(
-                        loggedUser.getEmail(),
-                        wp.getWorkplaceName(),
-                        day,
-                        start,
-                        end,
-                        this.currentWeekId
-                );
-                availabilityBeans.add(bean);
-            } else {
-                msg ="DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
-                LOGGER.log(Level.FINE, msg);
-            }
+            // LOG DI CONTROLLO FINALE
+            msg = "DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
+            LOGGER.log(Level.FINE, msg);
+            AvailabilityBean bean = new AvailabilityBean(
+                    loggedUser.getEmail(),
+                    wp.getWorkplaceName(),
+                    day,
+                    start,
+                    end,
+                    weekIdForDb
+            );
+            availabilityBeans.add(bean);
+        } else {
+            msg = "DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
+            LOGGER.log(Level.FINE, msg);
         }
     }
+
 
     public void onPublic() {
         ManageShiftsAC managShiftsAC = new ManageShiftsAC();

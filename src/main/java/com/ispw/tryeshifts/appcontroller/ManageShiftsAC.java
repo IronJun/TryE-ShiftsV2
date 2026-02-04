@@ -10,6 +10,7 @@ import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 
@@ -27,25 +28,30 @@ public class ManageShiftsAC {
 
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 
-    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ) throws BaseException {
-        if(workplace == null||user == null){throw new NullPointerException("Workplace or User passed null");}
+    public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
+        if (workplace == null || user == null || weekId == null) {
+            throw new NullPointerException("Workplace or User passed null");
+        }
         Map<String, List<String>> viewMap = new HashMap<>();
 
-        workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName()); //lancia exception se non trova nulla
+        workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName()); //lancia exception se non trova nullainterExcept
 
         boolean isBoss = user.getEmail().equals(workplace.getOwnerEmail());
 
         List<Availability> list;
 
-        if(isBoss){
-            list = availabilityRepo.getAvailabilitiesByWorkplace(workplace.getWorkplaceName());
-        }else{
-            list = availabilityRepo.getAvailabilitiesByUser(user.getEmail(),workplace.getWorkplaceName());
+        if (isBoss) {
+            list = availabilityRepo.getAvailabilitiesByWorkplace(workplace.getWorkplaceName(), weekId);
+        } else {
+// PROVA TEMPORANEA
+            System.out.println("LOG AC: Cerco nel DB con WP=" + workplace.getWorkplaceName() + " e Week=" + weekId);
+            list = availabilityRepo.getAvailabilitiesByUser(user.getEmail(), workplace.getWorkplaceName(), weekId);
+            System.out.println("LOG AC: Il Repository ha restituito " + list.size() + " righe.");
         }
 
         for(Availability a : list){
             String shiftKey = a.getFullShift().replace(" ","");
-            String key =a.getDay() + "_" + shiftKey;
+            String key = KeyGenerator.buildShiftKey(weekId,a.getDay(),shiftKey);
             if(isBoss){
                 viewMap.computeIfAbsent(key, k -> new ArrayList<>()).add(a.getUserEmail());
             }else{

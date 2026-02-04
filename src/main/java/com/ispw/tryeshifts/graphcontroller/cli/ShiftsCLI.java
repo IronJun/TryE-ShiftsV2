@@ -8,9 +8,11 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 
+import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -174,8 +176,8 @@ public class ShiftsCLI {
     private static void processAndSave(ManageShiftsAC ac, UserBean user, WorkplaceBean wp,
                                        String selectedDay, String fullSlot) throws BaseException {
 
-        Map<String, List<String>> currentData = ac.getShiftData(user, wp);
-        String searchKey = selectedDay + "_" + fullSlot.replace(" ", "");
+        Map<String, List<String>> currentData = ac.getShiftData(user, wp,currentWeekId);
+        String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
 
         List<AvailabilityBean> beansToSave = convertMapToBeans(currentData, user, wp, searchKey);
 
@@ -226,7 +228,7 @@ public class ShiftsCLI {
 
             // 1. Recupero Dati
             Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, currentWeekId);
-            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp);
+            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp,currentWeekId);
             String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
             boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
 
@@ -257,7 +259,7 @@ public class ShiftsCLI {
             return "  CLOSED  ";
         }
 
-        String searchKey = day + "_" + slot.replace(" ", "");
+        String searchKey = KeyGenerator.buildShiftKey(currentWeekId, day, slot);
         return getCellText(ctx.status, ctx.isOwner, searchKey, ctx.shifts, ctx.assignments, ctx.user);
     }
     private static void printGrid(WorkplaceBean wp, String status, boolean isOwner,
@@ -321,42 +323,34 @@ public class ShiftsCLI {
     private static String getCellText(String status, boolean isOwner, String key,
                                Map<String, List<String>> shifts,
                                Map<String, List<String>> assignments, UserBean user) {
-
         if (status.equals(PUBLISHED_STATUS)) {
-            List<String> assigned = assignments.getOrDefault(key, new ArrayList<>());
+            List<String> assigned = assignments.getOrDefault(key, Collections.emptyList());
             return assigned.isEmpty() ? "-" : String.join(",", assigned);
         }
 
-        List<String> candidates = shifts.get(key);
+        // 2. Recupero Candidati (Disponibilità)
+        // Ora la chiave è solida (weekId_Day_Slot), non serve più il workaround del brokenKey
+        List<String> candidates = shifts.getOrDefault(key, Collections.emptyList());
 
-        if (candidates == null || candidates.isEmpty()) {
-            String[] parts = key.split("_"); // [Wed, 00:00-01:00]
-            if (parts.length >= 2) {
-                String startTime = parts[1].split("-")[0]; // 00:00
-                String brokenKey = parts[0] + "_" + startTime + "-" + startTime; // Wed_00:00-00:00
-                candidates = shifts.get(brokenKey);
-            }
+        // 3. Logica per il Lavoratore (Worker)
+        if (!isOwner) {
+            // Se la lista contiene "SELECTED", significa che l'utente loggato è disponibile
+            return candidates.contains(SELECTED_STATUS) ? user.getName() : "-";
         }
 
-        if (candidates == null) candidates = new ArrayList<>();
-
-        if (!isOwner) {
-            // Se l'AC ha messo "SELECTED" (nella chiave corretta o in quella rotta), mostra il nome
-            if (candidates.contains(SELECTED_STATUS)) {
-                return user.getName();
-            }
+        // 4. Logica per l'Owner (Boss)
+        if (candidates.isEmpty()) {
             return "-";
         }
 
-        // LOGICA PER L'OWNER
-        if (candidates.isEmpty()) return "-";
-
-        List<String> shortNames = new ArrayList<>();
-        for (String email : candidates) {
-            shortNames.add(email.split("@")[0]);
-        }
+        // Trasformiamo le email in nomi brevi (es. mario.rossi@... -> mario.rossi)
+        List<String> shortNames = candidates.stream()
+                .map(email -> email.split("@")[0])
+                .toList();
 
         String content = String.join(", ", shortNames);
+
+        // Tronchiamo se la stringa è troppo lunga per la colonna della CLI (15 caratteri)
         return content.length() > 15 ? content.substring(0, 12) + "..." : content;
     }
 }

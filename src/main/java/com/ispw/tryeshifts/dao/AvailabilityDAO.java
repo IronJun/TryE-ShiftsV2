@@ -11,8 +11,8 @@ import java.util.Map;
 public interface AvailabilityDAO {
     void saveAvailability(Availability availability)throws DuplicateEntityException, DataFetchException;
     void deleteAvailabilitiesByUser(String email,String workplaceName)throws EntityNotFoundException, DataFetchException;
-    List<Availability> getAvailabilitiesByWorkplace(String workplaceName)throws DataFetchException;
-    List<Availability> getAvailabilitiesByUser(String email,String workplaceName)throws DataFetchException;
+    List<Availability> getAvailabilitiesByWorkplace(String workplaceName,String weekId)throws DataFetchException;
+    List<Availability> getAvailabilitiesByUser(String email,String workplaceName,String weekId)throws DataFetchException;
     Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId)throws DataFetchException;
 
 }
