@@ -297,9 +297,9 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     }
     private void mapPopulation(Connection conn, String workplace, String weekId, Map<String, List<String>> assignments,String query) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, workplace);
+            pstmt.setString(2, weekId);
             for (Map.Entry<String, List<String>> entry : assignments.entrySet()) {
-                pstmt.setString(1, workplace);
-                pstmt.setString(2, weekId);
                 pstmt.setString(3, entry.getKey());
                 for (String email : entry.getValue()) {
                     pstmt.setString(4, email);

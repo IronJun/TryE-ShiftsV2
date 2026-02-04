@@ -186,8 +186,6 @@ public class ShiftsGC {
                 user,
                 wp);
 
-        System.out.println("GUI DEBUG: Ricevute " + ctx.shifts().size() + " disponibilità.");
-        System.out.println("DEBUG GUI: Sto cercando disponibilità per la settimana: " + currentWeekId);
         ctx.shifts().forEach((key, val) -> System.out.println("Chiave in Mappa: " + key + " | Valore: " + val));
         return ctx;
     }
