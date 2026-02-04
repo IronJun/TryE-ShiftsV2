@@ -184,7 +184,10 @@ public class ShiftsCLI {
         // Gestione Toggle (Aggiunta se non presente)
         boolean alreadySelected = currentData.getOrDefault(searchKey, new ArrayList<>()).contains(SELECTED_STATUS);
         if (!alreadySelected) {
-            String[] parts = fullSlot.split("\\s*-\\s*");
+            String[] parts = fullSlot.split("-");
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].trim();
+            }
             beansToSave.add(new AvailabilityBean(user.getEmail(), wp.getWorkplaceName(),
                     selectedDay, parts[0], parts[1], currentWeekId));
             LOGGER.info("Aggiunta disponibilità...");
