@@ -36,7 +36,7 @@ public class WorkerCellFactory implements ShiftCellProvider{
         }
 
         cell.setCursor(Cursor.HAND);
-        boolean isSelected = content.contains("SELECTED") || selectionMap.getOrDefault(cellKey,false);
+        boolean isSelected = content.contains(SELECTED) || selectionMap.getOrDefault(cellKey,false);
         if(isSelected) selectionMap.put(cellKey,true);
 
         Label status = new Label(isSelected ? SELECTED : FREE);

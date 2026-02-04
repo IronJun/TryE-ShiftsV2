@@ -8,8 +8,6 @@ import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.excpetion.DataFetchException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.javafx.utilities.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -128,7 +126,7 @@ public class ShiftsGC {
         addTableHeaders();
     }
     private ShiftCellProvider selectCellProvider(TableContext ctx) {
-        if (ctx.status.equals("PUBLISHED")) {
+        if (ctx.status.equals(PUBLISHED_STATUS)) {
             return new PublishedCellFactory(ctx.assignments);
         }
         if (ctx.isOwner) {
@@ -253,37 +251,7 @@ public class ShiftsGC {
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
                 String[] parts = key.split("_", 2);
-
-                if (parts.length >= 2) {
-                    String day = parts[0];
-                    String fullTime = parts[1]; // "00:00-01:00"
-
-                    // Usiamo una Regex più sicura per il trattino
-                    // Questo divide la stringa su qualunque trattino, ignorando eventuali spazi
-                    String[] timeParts = fullTime.split("-");
-
-                    if (timeParts.length >= 2) {
-                        String start = timeParts[0].trim();
-                        String end = timeParts[1].trim();
-
-                        // LOG DI CONTROLLO FINALE
-                        msg ="DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
-                        LOGGER.log(Level.FINE, msg);
-                        AvailabilityBean bean = new AvailabilityBean(
-                                loggedUser.getEmail(),
-                                wp.getWorkplaceName(),
-                                day,
-                                start,
-                                end,
-                                this.currentWeekId
-                        );
-                        availabilityBeans.add(bean);
-                    } else {
-                        msg ="DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
-                        LOGGER.log(Level.FINE, msg);
-                    }
-                }
-
+                savePartShifts(loggedUser, wp, availabilityBeans, parts);
             }
             msg ="DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size();
             LOGGER.log(Level.FINE, msg);
@@ -300,6 +268,38 @@ public class ShiftsGC {
 
         } catch (Exception _) {
             SceneManager.getInstance().showErrorAlert("Errore", "Impossibile salvare le disponibilità.");
+        }
+    }
+
+    private void savePartShifts(UserBean loggedUser, WorkplaceBean wp, List<AvailabilityBean> availabilityBeans, String[] parts){
+        if (parts.length >= 2) {
+            String day = parts[0];
+            String fullTime = parts[1]; // "00:00-01:00"
+
+            // Usiamo una Regex più sicura per il trattino
+            // Questo divide la stringa su qualunque trattino, ignorando eventuali spazi
+            String[] timeParts = fullTime.split("-");
+
+            if (timeParts.length >= 2) {
+                String start = timeParts[0].trim();
+                String end = timeParts[1].trim();
+
+                // LOG DI CONTROLLO FINALE
+                msg ="DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
+                LOGGER.log(Level.FINE, msg);
+                AvailabilityBean bean = new AvailabilityBean(
+                        loggedUser.getEmail(),
+                        wp.getWorkplaceName(),
+                        day,
+                        start,
+                        end,
+                        this.currentWeekId
+                );
+                availabilityBeans.add(bean);
+            } else {
+                msg ="DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
+                LOGGER.log(Level.FINE, msg);
+            }
         }
     }
 
