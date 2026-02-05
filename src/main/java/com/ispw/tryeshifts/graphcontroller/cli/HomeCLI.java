@@ -119,7 +119,7 @@ public class HomeCLI {
                     LOGGER.warning("Invalid number!");
                 }
 
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException _) {
                 String query = input.toLowerCase();
                 List<WorkplaceBean> filtered = allWorkplaces.stream()
                         .filter(wp -> wp.getWorkplaceName().toLowerCase().contains(query))

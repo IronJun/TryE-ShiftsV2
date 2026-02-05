@@ -157,9 +157,7 @@ public class SettingsGC {
         }
     }
     public void onLogoutClicked() {
-        System.out.println("DEBUG: Click Logout 1");
         if(SessionContext.getInstance().logoutConfirmation()){
-            System.out.println("DEBUG: Conferma ricevuta, cambio scena...");
             SessionContext.getInstance().clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         }

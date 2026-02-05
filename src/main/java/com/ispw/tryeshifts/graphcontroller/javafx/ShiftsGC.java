@@ -157,7 +157,7 @@ public class ShiftsGC {
                 boolean isDayActive = ctx.wp.getSelectedDays().contains(currentDay);
                 List<String> cellContent = ctx.shifts.getOrDefault(cellKey, new ArrayList<>());
 
-                updateLocalSelectionMap(cellKey, cellContent, ctx.loggedUser, ctx.isOwner);
+                updateLocalSelectionMap(cellKey, cellContent, ctx.isOwner);
 
                 VBox cell = provider.createCell(cellKey, cellContent, isDayActive);
                 shiftsGrid.add(cell, c, r + 1);
@@ -228,7 +228,7 @@ public class ShiftsGC {
     private String buildCellKey(String day, String slot) {
         return KeyGenerator.buildShiftKey(this.currentWeekId, day, slot);
     }
-    private void updateLocalSelectionMap(String cellKey, List<String> cellContent, UserBean loggedUser, boolean isOwner) {
+    private void updateLocalSelectionMap(String cellKey, List<String> cellContent,  boolean isOwner) {
         if (!isOwner) {
             boolean isSelected = cellContent.contains("SELECTED");
             selectedCellsMap.put(cellKey, isSelected);

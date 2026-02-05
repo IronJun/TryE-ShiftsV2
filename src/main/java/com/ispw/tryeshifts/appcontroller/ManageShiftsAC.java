@@ -72,7 +72,7 @@ public class ManageShiftsAC {
         // 1. CANCELLAZIONE (fuori dal try-catch principale se vuoi che sia ignorabile)
         try {
             availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
-        } catch(EntityNotFoundException e) {
+        } catch(EntityNotFoundException _) {
             LOGGER.info("Nessuna disponibilità precedente da rimuovere, procedo al salvataggio.");
         }
 
@@ -90,8 +90,8 @@ public class ManageShiftsAC {
                 availabilityRepo.saveAvailability(entity);
             }
         } catch(DataFetchException e) {
-            LOGGER.log(Level.SEVERE, "Errore di persistenza durante il salvataggio", e);
-            throw e; // Rilancia per far sapere alla GUI che è fallito
+            LOGGER.severe( "Errore di persistenza durante il salvataggio");
+             // Rilancia per far sapere alla GUI che è fallito
         }
     }
 
