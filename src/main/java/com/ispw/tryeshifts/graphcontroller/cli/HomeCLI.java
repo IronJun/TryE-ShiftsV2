@@ -10,6 +10,7 @@ import com.ispw.tryeshifts.excpetion.UserNotMemberException;
 import com.ispw.tryeshifts.excpetion.ValidationException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -69,57 +70,68 @@ public class HomeCLI {
 
     }
 
-    private static void showWorkplacesList(boolean isPersonal){
-        LOGGER.info("---------------------------------------\n");
-        LOGGER.info("\n--- SEARCH WORKPLACES ---\n");
+    private static void showWorkplacesList(boolean isPersonal) {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
-        List<WorkplaceBean> allWorkplaces = null;
-        try {
-            // 1. Chiamata all'App Controller (usa quello che hai già per JavaFX)
-            if(isPersonal){
-                allWorkplaces = SearchWorkplacesAC.getWorkplaceByUser(loggedUser.getEmail());
 
-            }else {
+        try {
+            // 1. Carichiamo la lista originale una sola volta
+            List<WorkplaceBean> allWorkplaces;
+            if (isPersonal) {
+                allWorkplaces = SearchWorkplacesAC.getWorkplaceByUser(loggedUser.getEmail());
+            } else {
                 allWorkplaces = SearchWorkplacesAC.getAllWorkplaces();
             }
 
             if (allWorkplaces.isEmpty()) {
                 LOGGER.info("No workplaces found in the system.\n");
-                CLIReader.readString("Press ENTER to return to Home...");
                 return;
             }
+            workplacePrint(allWorkplaces, isPersonal);
 
-            // 2. STAMPA DELLA LISTA NUMERATA
-            LOGGER.info("Select a workplace to see details or join:\n");
-            for (int i = 0; i < allWorkplaces.size(); i++) {
-                WorkplaceBean wb = allWorkplaces.get(i);
-                // Esempio: 1. Ospedale San Raffaele (Roma)
-                msg =String.format("%d. %s (%s)%n", (i + 1), wb.getWorkplaceName(), wb.getAddress());
+        } catch (BaseException e) {
+            LOGGER.severe("Error fetching workplaces: " + e.getMessage() + "\n");
+        }
+    }
+
+    private static void workplacePrint(List<WorkplaceBean> allWorkplaces, boolean isPersonal) {
+        List<WorkplaceBean> currentList = new ArrayList<>(allWorkplaces);
+
+        while (true) {
+            LOGGER.info("\n--- ELENCO WORKPLACE ---");
+            for (int i = 0; i < currentList.size(); i++) {
+                WorkplaceBean wb = currentList.get(i);
+                msg = String.format("%d. %s (%s)", (i + 1), wb.getWorkplaceName(), wb.getAddress())+"\n";
                 LOGGER.info(msg);
             }
             LOGGER.info("0. Back to Home\n");
 
-            // 3. GESTIONE DELLA SCELTA
-            boolean validChoice = false;
-            while (!validChoice) {
-                int choice = CLIReader.readInt("Choice (0 to go back): ");
+            String input = CLIReader.readString("Select a number or type a name to search: ");
 
-                if (choice == 0) {
-                    return; // Torna alla Home
+            try {
+                int choiceInt = Integer.parseInt(input);
+
+                if (choiceInt == 0) return; // Torna effettivamente alla Home
+
+                if (choiceInt > 0 && choiceInt <= currentList.size()) {
+                    showWorkplaceDetails(currentList.get(choiceInt - 1), isPersonal);
+                    return;
+                } else {
+                    LOGGER.warning("Invalid number!");
                 }
 
-                if (choice > 0 && choice <= allWorkplaces.size()) {
-                    WorkplaceBean selected = allWorkplaces.get(choice - 1);
-                    showWorkplaceDetails(selected, isPersonal);
-                    validChoice = true; // Usciamo dal loop dopo l'azione
+            } catch (NumberFormatException e) {
+                String query = input.toLowerCase();
+                List<WorkplaceBean> filtered = allWorkplaces.stream()
+                        .filter(wp -> wp.getWorkplaceName().toLowerCase().contains(query))
+                        .toList();
+
+                if (filtered.isEmpty()) {
+                    LOGGER.warning("No workplace found matching: " + input);
+                    currentList = allWorkplaces; // Reset per non restare bloccati su una lista vuota
                 } else {
-                    msg = "Invalid choice! Please select a number between 0 and " + allWorkplaces.size() + "%n";
-                    LOGGER.warning(msg);
+                    currentList = filtered; // Aggiorna la visualizzazione al prossimo ciclo
                 }
             }
-
-        } catch (BaseException e) {
-            LOGGER.severe("Error fetching workplaces: " + e.getMessage() + "\n");
         }
     }
     private static void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
