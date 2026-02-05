@@ -247,12 +247,12 @@ public class HomeGC {
     private void refreshWorkplaceList() {
         vboxWorkplaceLegend.getChildren().clear();
         try {
-            List<Workplace> workplaces = ManageShiftsAC.getUserWorkplaces(this.loggedUser.getEmail());
+            List<WorkplaceBean> workplaces = SearchWorkplacesAC.getWorkplacesByEmail(this.loggedUser.getEmail());
             if (workplaces == null || workplaces.isEmpty()) {
                 vboxWorkplaceLegend.getChildren().add(new Label("No workplaces joined yet."));
                 return;
             }
-            for (Workplace wp : workplaces) {
+            for (WorkplaceBean wp : workplaces) {
                 HBox row = new HBox(10);
                 row.setAlignment(Pos.CENTER_LEFT);
                 row.setPadding(new Insets(5));
@@ -263,14 +263,14 @@ public class HomeGC {
                 row.setOnMouseExited(e -> row.setStyle("-fx-background-color: transparent;"));
 
                 // Azione al click (sostituisce il vecchio listener della ListView)
-                row.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getName()));
+                row.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getWorkplaceName()));
 
                 // Quadratino colorato
                 Rectangle rect = new Rectangle(15, 15);
                 rect.setArcHeight(5); rect.setArcWidth(5);
-                rect.setFill(Color.web(getColorForWorkplace(wp.getName())));
+                rect.setFill(Color.web(getColorForWorkplace(wp.getWorkplaceName())));
 
-                Label name = new Label(wp.getName());
+                Label name = new Label(wp.getWorkplaceName());
 
                 row.getChildren().addAll(rect, name);
                 vboxWorkplaceLegend.getChildren().add(row);

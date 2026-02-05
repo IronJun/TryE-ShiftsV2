@@ -43,7 +43,7 @@ public class WorkersCLI {
                 LOGGER.info("\nNo pending requests.");
                 return;
             }
-            LOGGER.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---");
+            LOGGER.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---\n");
             for (int i = 0; i < pending.size(); i++) {
                 UserBean u = pending.get(i);
                 msg = String.format("%d. %s %s (%s)", (i + 1), u.getName(), u.getSurname(), u.getEmail());

@@ -155,9 +155,7 @@ public class ManageShiftsAC {
         return start.format(formatter) + " - " + end.format(formatter);
     }
 
-    public static List<Workplace> getUserWorkplaces(String email) throws BaseException{
-        return workplaceRepo.findWorkplacesbyEmail(email);
-    }
+
 
     public static void addShiftstoWorkaplce(ComboBox<String> startMcombo, ComboBox<String> endMcombo, ComboBox<String> startHcombo, ComboBox<String> endHcombo,  ListView<String> shiftsListView)throws BaseException{
         String startH = startHcombo.getValue();

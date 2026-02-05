@@ -59,7 +59,7 @@ public class NewWorkplaceGC {
         this.loggedUser = user;
     }
     @FXML
-    public void onSave() throws Exception {
+    public void onSave() {
         if (loggedUser == null) {
             LOGGER.warning("ERRORE: Il popup non ha ricevuto l'utente loggato!");
             return;

@@ -11,11 +11,9 @@ import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ShiftsCLI {
     private static final Logger LOGGER = Logger.getLogger(ShiftsCLI.class.getName());
@@ -274,13 +272,42 @@ public class ShiftsCLI {
         TableContext ctx = new TableContext(status, isOwner, shifts, assignments, user);
 
         for (String slot : timeSlots) {
-            StringBuilder row = new StringBuilder(String.format("%-15s", slot));
+            // 1. Recuperiamo le liste di nomi per ogni giorno della settimana in questa fascia oraria
+            Map<String, List<String>> cellData = new HashMap<>();
+            int maxRowsInSlot = 1;
+
             for (String day : days) {
-                row.append(String.format("| %-15s", buildCellContent(day, slot, activeDays, ctx)));
+                String content = buildCellContent(day, slot, activeDays, ctx);
+                // Split dei nomi se separati da virgola
+                List<String> names = content.equals("-") || content.equals("  CLOSED  ")
+                        ? Collections.singletonList(content)
+                        : Arrays.asList(content.split(","));
+                cellData.put(day, names);
+                maxRowsInSlot = Math.max(maxRowsInSlot, names.size());
             }
-            // Niente variabile statica msg: usiamo una locale o chiamiamo direttamente
-            msg = row.toString()+"\n";
-            LOGGER.info(msg);
+
+            // 2. Stampiamo tante righe fisiche quante sono i nomi (maxRowsInSlot)
+            for (int r = 0; r < maxRowsInSlot; r++) {
+                StringBuilder line = new StringBuilder();
+
+                // Solo sulla prima riga del blocco stampiamo l'orario, altrimenti spazi vuoti
+                if (r == 0) {
+                    line.append(String.format("%-15s", slot));
+                } else {
+                    line.append(String.format("%-15s", ""));
+                }
+
+                for (String day : days) {
+                    List<String> namesInCell = cellData.get(day);
+                    String nameToPrint = (r < namesInCell.size()) ? namesInCell.get(r) : "";
+                    line.append(String.format("| %-20s", nameToPrint));
+                }
+
+                LOGGER.info(line.toString() + "\n");
+            }
+
+            // Una linea di separazione opzionale tra una fascia oraria e l'altra
+            LOGGER.info("-".repeat(15 + (days.length * 22)) + "\n");
         }
     }
     private static void printDashboardHeader(String status) {
@@ -292,7 +319,7 @@ public class ShiftsCLI {
 
         StringBuilder header = new StringBuilder(String.format("%-15s", "ORA"));
         for (String day : days) {
-            header.append(String.format("| %-15s", day.toUpperCase()));
+            header.append(String.format("| %-20s", day.toUpperCase())); // <--- Portato a 20
         }
         msg = header.toString()+"\n";
         LOGGER.info(msg);
@@ -324,36 +351,23 @@ public class ShiftsCLI {
     }
 
     private static String getCellText(String status, boolean isOwner, String key,
-                               Map<String, List<String>> shifts,
-                               Map<String, List<String>> assignments, UserBean user) {
+                                      Map<String, List<String>> shifts,
+                                      Map<String, List<String>> assignments, UserBean user) {
+        List<String> rawList;
         if (status.equals(PUBLISHED_STATUS)) {
-            List<String> assigned = assignments.getOrDefault(key, Collections.emptyList());
-            return assigned.isEmpty() ? "-" : String.join(",", assigned);
+            rawList = assignments.getOrDefault(key, Collections.emptyList());
+        } else {
+            rawList = shifts.getOrDefault(key, Collections.emptyList());
+            if (!isOwner) {
+                return rawList.contains(SELECTED_STATUS) ? user.getName() : "-";
+            }
         }
 
-        // 2. Recupero Candidati (Disponibilità)
-        // Ora la chiave è solida (weekId_Day_Slot), non serve più il workaround del brokenKey
-        List<String> candidates = shifts.getOrDefault(key, Collections.emptyList());
+        if (rawList.isEmpty()) return "-";
 
-        // 3. Logica per il Lavoratore (Worker)
-        if (!isOwner) {
-            // Se la lista contiene "SELECTED", significa che l'utente loggato è disponibile
-            return candidates.contains(SELECTED_STATUS) ? user.getName() : "-";
-        }
-
-        // 4. Logica per l'Owner (Boss)
-        if (candidates.isEmpty()) {
-            return "-";
-        }
-
-        // Trasformiamo le email in nomi brevi (es. mario.rossi@... -> mario.rossi)
-        List<String> shortNames = candidates.stream()
+        // Restituiamo i nomi brevi separati da virgola, senza troncamento finale
+        return rawList.stream()
                 .map(email -> email.split("@")[0])
-                .toList();
-
-        String content = String.join(", ", shortNames);
-
-        // Tronchiamo se la stringa è troppo lunga per la colonna della CLI (15 caratteri)
-        return content.length() > 15 ? content.substring(0, 12) + "..." : content;
+                .collect(Collectors.joining(","));
     }
 }

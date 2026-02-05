@@ -65,22 +65,25 @@ public class SignUpCLI {
         String pwd = "";
         String pwdRepeat = "";
 
-        while (!passwordValid) {
-            pwd = CLIReader.readString("Password: ");
-            pwdRepeat = CLIReader.readString("Conferma Password: ");
-            passwordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
-            if (!passwordValid) {
-                if (pwd.length() < 6) {
-                    LOGGER.warning("La password deve essere di almeno 6 caratteri! Riprova.\n");
-                }
-                if (!pwd.equals(pwdRepeat)) {
-                    LOGGER.warning("Le password non coincidono! Riprova.\n");
+
+        try{
+            String email = emailRegister();
+            String name = nameRegister();
+            String surname = nameRegister();
+            while (!passwordValid) {
+                pwd = CLIReader.readString("Password: ");
+                pwdRepeat = CLIReader.readString("Conferma Password: ");
+                passwordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
+                if (!passwordValid) {
+                    if (pwd.length() < 6) {
+                        LOGGER.warning("La password deve essere di almeno 6 caratteri! Riprova.\n");
+                    }
+                    if (!pwd.equals(pwdRepeat)) {
+                        LOGGER.warning("Le password non coincidono! Riprova.\n");
+                    }
                 }
             }
-        }
-        try{
-            UserBean user = new UserBean(emailRegister(), pwd, nameRegister(), nameRegister(), pwdRepeat);
-
+            UserBean user = new UserBean(email, pwd, name, surname, pwdRepeat);
             SignupAC.registerUser(user);
 
             LOGGER.info("\n✅ Registrazione avvenuta con successo! Ora puoi effettuare il login.\n");

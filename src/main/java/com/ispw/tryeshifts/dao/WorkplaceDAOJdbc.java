@@ -28,9 +28,9 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             conn.setAutoCommit(false);
 
             // Delego le operazioni a metodi specializzati
-            insertMainWorkplace(conn, wp);
-            insertWorkplaceDays(conn, wp);
-            insertWorkplaceShifts(conn, wp);
+            int generateID = insertMainWorkplace(conn, wp);
+            insertWorkplaceDays(conn,generateID, wp);
+            insertWorkplaceShifts(conn,generateID, wp);
 
             conn.commit();
         } catch (SQLException e) {
@@ -231,9 +231,14 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(2, weekId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String key = rs.getString("cell_key");
+                String cellKeyFromDb = rs.getString("cell_key"); // es: "Mon_00:00-01:00"
                 String email = rs.getString("worker_email");
-                shifts.computeIfAbsent(key, k -> new ArrayList<>()).add(email);
+
+                // RICOSTRUZIONE: Aggiungiamo il prefisso della settimana per far felice la UI
+                // La UI si aspetta: "weekId_cellKey" (es: "2026_06_Mon_00:00-01:00")
+                String fullKeyForUi = weekId + "_" + cellKeyFromDb;
+
+                shifts.computeIfAbsent(fullKeyForUi, k -> new ArrayList<>()).add(email);
             }
         } catch (SQLException _) {
             throw new DataFetchException("Errore DB: impossibile recuperare le assegnazioni");
@@ -262,34 +267,45 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             }
         }
     }
-    private void insertMainWorkplace(Connection dbc, Workplace wp) throws SQLException {
+
+    private int insertMainWorkplace(Connection dbc, Workplace wp) throws SQLException {
         String sql = "INSERT INTO workplaces (name, address, owner_email) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = dbc.prepareStatement(sql)) {
+        // Aggiungiamo Statement.RETURN_GENERATED_KEYS
+        try (PreparedStatement pstmt = dbc.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, wp.getName());
             pstmt.setString(2, wp.getAddress());
             pstmt.setString(3, wp.getOwnerEmail());
             pstmt.executeUpdate();
+
+            // Recuperiamo l'ID appena creato
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException("Salvataggio fallito, nessun ID generato.");
+                }
+            }
         }
     }
-    private void insertWorkplaceDays(Connection dbc, Workplace wp) throws SQLException {
+    private void insertWorkplaceDays(Connection dbc,int workplaceId, Workplace wp) throws SQLException {
         String insertDay = "INSERT INTO workplace_days (workplace_id, day_name) VALUES (?, ?)";
         try (PreparedStatement pstmt = dbc.prepareStatement(insertDay)) {
             for (String day : wp.getSelectedDays()) {
-                pstmt.setString(1, wp.getName());
+                if(day == null || day.isEmpty()) continue;
+                pstmt.setInt(1, workplaceId);
                 pstmt.setString(2, day);
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
         }
     }
-    private void insertWorkplaceShifts(Connection dbc, Workplace wp) throws SQLException {
-        String insertShift = "INSERT INTO workplace_shifts (workplace_id, start_time, end_time) VALUES (?, ?,?)";
+    private void insertWorkplaceShifts(Connection dbc, int workplaceId, Workplace wp) throws SQLException {
+        // La colonna corretta è shift_name
+        String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
         try (PreparedStatement pstmt = dbc.prepareStatement(insertShift)) {
-            for (String shift : wp.getShifts()) { // Shift formato "08:00-14:00"
-                String[] parts = shift.split("-");
-                pstmt.setString(1, wp.getName());
-                pstmt.setString(2, parts[0]);
-                pstmt.setString(3, parts[1]);
+            for (String shift : wp.getShifts()) {
+                pstmt.setInt(1, workplaceId);
+                pstmt.setString(2, shift); // Passa la stringa intera (es. "08:00-14:00")
                 pstmt.addBatch();
             }
             pstmt.executeBatch();

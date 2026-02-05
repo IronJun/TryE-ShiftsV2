@@ -33,7 +33,6 @@ public class HomeCLI {
             LOGGER.info("2. Create a new Workplace \n");
             LOGGER.info("3. Watch your Workplace List\n");
             LOGGER.info("4. See your Working days of the week\n");
-            LOGGER.info("5. See your published shifts\n");
             LOGGER.info("5. Manage your Account\n");
             LOGGER.info("Q. Logout\n"); // Nuova opzione
             LOGGER.info("0. To close the application \n");
@@ -77,7 +76,7 @@ public class HomeCLI {
             // 1. Carichiamo la lista originale una sola volta
             List<WorkplaceBean> allWorkplaces;
             if (isPersonal) {
-                allWorkplaces = SearchWorkplacesAC.getWorkplaceByUser(loggedUser.getEmail());
+                allWorkplaces = SearchWorkplacesAC.getWorkplacesByEmail(loggedUser.getEmail());
             } else {
                 allWorkplaces = SearchWorkplacesAC.getAllWorkplaces();
             }
@@ -97,7 +96,7 @@ public class HomeCLI {
         List<WorkplaceBean> currentList = new ArrayList<>(allWorkplaces);
 
         while (true) {
-            LOGGER.info("\n--- ELENCO WORKPLACE ---");
+            LOGGER.info("\n--- ELENCO WORKPLACE ---\n");
             for (int i = 0; i < currentList.size(); i++) {
                 WorkplaceBean wb = currentList.get(i);
                 msg = String.format("%d. %s (%s)", (i + 1), wb.getWorkplaceName(), wb.getAddress())+"\n";
