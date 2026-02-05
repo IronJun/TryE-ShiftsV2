@@ -89,7 +89,7 @@ public class ManageShiftsAC {
                 );
                 availabilityRepo.saveAvailability(entity);
             }
-        } catch(DataFetchException e) {
+        } catch(DataFetchException _) {
             LOGGER.severe( "Errore di persistenza durante il salvataggio");
              // Rilancia per far sapere alla GUI che è fallito
         }
