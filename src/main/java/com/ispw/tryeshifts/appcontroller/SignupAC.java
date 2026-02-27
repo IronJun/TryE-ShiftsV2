@@ -44,7 +44,7 @@ public class SignupAC {
             userentity.setPasswordHash(hashedPass);
             userRepo.save(userentity);
         }catch(DataFetchException e){
-            LOGGER.log(Level.SEVERE, "Errore di persistenza durante la registrazione", e);
+            LOGGER.log(Level.SEVERE, "Errore di persistenza durante la registrazione\n", e);
         }
 
 

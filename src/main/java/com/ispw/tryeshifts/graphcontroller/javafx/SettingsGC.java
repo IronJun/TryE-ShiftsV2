@@ -1,7 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.javafx;
 
 import com.ispw.tryeshifts.SceneManager;
-import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.SessionContext;
@@ -131,8 +130,8 @@ public class SettingsGC {
 
             WorkplaceBean updatedBean = new WorkplaceBean(nameField.getText(),addressField.getText(),selectedDays,shiftsListView.getItems(),currentWp.getOwnerEmail());
 
-            CreateWorkplaceAC ac = new CreateWorkplaceAC();
-            ac.updateWorkplaceAC(updatedBean,oldName);
+            SettingsAC ac = new SettingsAC();
+            ac.updateWorkplace(updatedBean,oldName);
 
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 

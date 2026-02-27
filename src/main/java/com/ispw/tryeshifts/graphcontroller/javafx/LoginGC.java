@@ -50,8 +50,6 @@ public class LoginGC {
             ErrorViewManager.screenError("Errore Tecnico", "Server non raggiungibile.");
         }
     }
-
-
     @FXML
     public void onBackClicked() {
         // Torna alla scena di SignUp

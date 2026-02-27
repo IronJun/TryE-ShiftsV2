@@ -38,8 +38,6 @@ public class HomeGC {
     @FXML private Label errorlbl;
     private final Map<String, String> workplaceColors = new HashMap<>();
     @FXML Label lblWeekDisplay;
-    @FXML private Button btnNextWeek;
-    @FXML private Button btnPrevWeek;
     private int weekOffset = 0;
     private String currentWeekId;
     private String msg="";

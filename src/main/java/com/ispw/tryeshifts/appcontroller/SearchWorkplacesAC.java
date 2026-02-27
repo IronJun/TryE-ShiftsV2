@@ -54,9 +54,6 @@ public class SearchWorkplacesAC {
         return result;
 
     }
-    public static List<Workplace> getUserWorkplaces(String email) throws BaseException{
-        return workplaceRepo.findWorkplacesbyEmail(email);
-    }
     public static List<WorkplaceBean> getWorkplacesByEmail(String email)throws BaseException{
         List<Workplace> workplaceEntities = workplaceRepo.findWorkplacesbyEmail(email);
         if (workplaceEntities == null || workplaceEntities.isEmpty()) {

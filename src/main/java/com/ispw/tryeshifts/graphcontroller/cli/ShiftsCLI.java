@@ -142,7 +142,7 @@ public class ShiftsCLI {
 
         // 3. Elaborazione e Salvataggio
         try {
-            processAndSave(ac, user, wp, selectedDay, fullSlot);
+            processAndSave(user, wp, selectedDay, fullSlot);
             LOGGER.info("Sincronizzazione completata!\n");
         } catch (BaseException e) {
             LOGGER.severe("Errore: " + e.getMessage());
@@ -171,9 +171,9 @@ public class ShiftsCLI {
             if (slotChoice <= 0 || slotChoice > slots.size()) return null;
             return slots.get(slotChoice - 1);
         }
-    private static void processAndSave(ManageShiftsAC ac, UserBean user, WorkplaceBean wp,
+    private static void processAndSave(UserBean user, WorkplaceBean wp,
                                        String selectedDay, String fullSlot) throws BaseException {
-
+        ManageShiftsAC ac = new ManageShiftsAC();
         Map<String, List<String>> currentData = ac.getShiftData(user, wp,currentWeekId);
         String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
 

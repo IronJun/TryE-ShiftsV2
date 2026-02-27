@@ -31,13 +31,11 @@ public class SignUpGC {
     private boolean isRepeatPasswordVisibile = false;
 
 
-
     public void initialize() {
         signUpButton.setDefaultButton(true);
     }
-
     @FXML
-    public void onSignUpclicked(ActionEvent event) {
+    public void onSignUpclicked() {
         ErrorViewManager.setupAutoHide(errorLabel);
 
         // Validate all required fields

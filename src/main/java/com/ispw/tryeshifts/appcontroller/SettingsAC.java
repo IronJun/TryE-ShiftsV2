@@ -3,8 +3,10 @@ package com.ispw.tryeshifts.appcontroller;
 import com.ispw.tryeshifts.AppConfig;
 import com.ispw.tryeshifts.bean.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
+import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.entity.UserInfo;
+import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
 public class SettingsAC {
     private static final Logger LOGGER = Logger.getLogger(SettingsAC.class.getName());
     private static final UserDAO userRepo = AppConfig.getUserRepository();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+
 
     public void updateUserProfile(UserBean user) throws BaseException {
         UserInfo existingUser = userRepo.findByEmail(user.getEmail());
@@ -33,5 +37,18 @@ public class SettingsAC {
         userRepo.updateUser(existingUser);
 
         SessionContext.getInstance().setLoggeduser(user);
+    }
+    public void updateWorkplace(WorkplaceBean wp, String oldname) throws BaseException {
+        Workplace workplace = workplaceRepo.findWorkplaceByName(oldname);
+        if(workplace == null) throw new NullPointerException("Workplace not found");
+
+        workplace.setName(wp.getWorkplaceName());
+        workplace.setAddress(wp.getAddress());
+        workplace.setSelectedDays(wp.getSelectedDays());
+        workplace.setShifts(wp.getShiftsBean());
+
+        workplaceRepo.updateWorkplace(workplace, oldname);
+
+        SessionContext.getInstance().setLoggedWorkplace(wp);
     }
 }

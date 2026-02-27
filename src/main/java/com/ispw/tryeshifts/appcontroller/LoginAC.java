@@ -7,10 +7,8 @@ import com.ispw.tryeshifts.dao.SecurityUtils;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.excpetion.*;
 
-import java.util.logging.Logger;
 
 public class LoginAC {
-    private static final Logger LOGGER = Logger.getLogger(LoginAC.class.getName());
     private static UserDAO userRepo = AppConfig.getUserRepository();
 
     private LoginAC(){

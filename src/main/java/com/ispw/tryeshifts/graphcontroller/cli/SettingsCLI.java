@@ -1,6 +1,5 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
-import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -91,8 +90,8 @@ public class SettingsCLI {
             }
 
             try {
-                CreateWorkplaceAC ac = new CreateWorkplaceAC();
-                ac.updateWorkplaceAC(wp, oldname);
+                SettingsAC ac = new SettingsAC();
+                ac.updateWorkplace(wp, oldname);
 
                 oldname = wp.getWorkplaceName();
 

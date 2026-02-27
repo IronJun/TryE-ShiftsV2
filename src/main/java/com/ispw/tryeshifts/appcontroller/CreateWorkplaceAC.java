@@ -34,17 +34,5 @@ public class CreateWorkplaceAC {
         membershipRepo.saveMembership(membership);
     }
 
-    public void updateWorkplaceAC(WorkplaceBean wp,String oldname) throws BaseException {
-        Workplace workplace = workplaceRepo.findWorkplaceByName(oldname);
-        if(workplace == null) throw new NullPointerException("Workplace not found");
 
-        workplace.setName(wp.getWorkplaceName());
-        workplace.setAddress(wp.getAddress());
-        workplace.setSelectedDays(wp.getSelectedDays());
-        workplace.setShifts(wp.getShiftsBean());
-
-        workplaceRepo.updateWorkplace(workplace, oldname);
-
-        SessionContext.getInstance().setLoggedWorkplace(wp);
-    }
 }
