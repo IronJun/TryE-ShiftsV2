@@ -157,23 +157,17 @@ public class ManageShiftsAC {
 
 
 
-    public static void addShiftstoWorkaplce(ComboBox<String> startMcombo, ComboBox<String> endMcombo, ComboBox<String> startHcombo, ComboBox<String> endHcombo,  ListView<String> shiftsListView)throws BaseException{
-        String startH = startHcombo.getValue();
-        String startM = startMcombo.getValue();
-        String endH = endHcombo.getValue();
-        String endM = endMcombo.getValue();
-
-
+    public static String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
         int startTotalMinutes = Integer.parseInt(startH) * 60 + Integer.parseInt(startM);
         int endTotalMinutes = Integer.parseInt(endH) * 60 + Integer.parseInt(endM);
-
 
         if (endTotalMinutes  <= startTotalMinutes) {
             throw new IllegalArgumentException("La fine deve essere dopo l'inizio");
         }
 
         String fullShift = startH + ":" + startM + " - " + endH + ":" + endM;
-        for (String existing : shiftsListView.getItems()) {
+
+        for (String existing : existingShifts) {
             if (existing.equals(fullShift)) {
                 throw new DuplicateEntityException("shifts","this shifts already exists");
             }
@@ -189,8 +183,7 @@ public class ManageShiftsAC {
             }
         }
 
-        shiftsListView.getItems().add(fullShift);
-        java.util.Collections.sort(shiftsListView.getItems());
+        return fullShift;
     }
 
     private static int parseToMinutes(String time) {

@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -118,8 +119,14 @@ public class NewWorkplaceGC {
     }
 
     public void addShiftToList() {
+        String startH = startHourCombo.getValue();
+        String startM = startMinuteCombo.getValue();
+        String endH = endHourCombo.getValue();
+        String endM = endMinuteCombo.getValue();
         try{
-        ManageShiftsAC.addShiftstoWorkaplce(startMinuteCombo,endMinuteCombo,startHourCombo,endHourCombo,shiftsListView);
+            String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
+            shiftsListView.getItems().add(formattedShift);
+            Collections.sort(shiftsListView.getItems());
         }catch(IllegalArgumentException _){
             ErrorViewManager.showError(errorLabel,"Invalid shift time!");
         }catch(BaseException e){

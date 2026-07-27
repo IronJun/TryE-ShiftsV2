@@ -16,6 +16,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -111,8 +112,14 @@ public class SettingsGC {
     }
     @FXML
     private void addShift(){
+        String startH = startHourCombo.getValue();
+        String startM = startMinuteCombo.getValue();
+        String endH = endHourCombo.getValue();
+        String endM = endMinuteCombo.getValue();
         try{
-        ManageShiftsAC.addShiftstoWorkaplce(startHourCombo,endMinuteCombo,startHourCombo,endHourCombo,shiftsListView);
+            String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
+            shiftsListView.getItems().add(formattedShift);
+            Collections.sort(shiftsListView.getItems());
         }catch (InvalidCredentialException _){
             ErrorViewManager.showError(errorlabel,"Invalid shift time!");
         } catch (BaseException e) {
