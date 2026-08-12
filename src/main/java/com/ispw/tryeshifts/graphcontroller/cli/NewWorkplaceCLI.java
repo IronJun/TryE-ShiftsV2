@@ -1,7 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
-import com.ispw.tryeshifts.bean.SessionContext;
+import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DataFetchException;

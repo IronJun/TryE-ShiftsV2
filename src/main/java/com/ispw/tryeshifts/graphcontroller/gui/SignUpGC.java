@@ -1,11 +1,10 @@
-package com.ispw.tryeshifts.graphcontroller.javafx;
+package com.ispw.tryeshifts.graphcontroller.gui;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.javafx.utilities.ErrorViewManager;
-import javafx.event.ActionEvent;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -1,6 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
-import com.ispw.tryeshifts.AppConfig;
+import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.SecurityUtils;

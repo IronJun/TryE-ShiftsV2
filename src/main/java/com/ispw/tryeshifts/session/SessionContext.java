@@ -1,6 +1,8 @@
-package com.ispw.tryeshifts.bean;
+package com.ispw.tryeshifts.session;
 
 
+import com.ispw.tryeshifts.bean.UserBean;
+import com.ispw.tryeshifts.bean.WorkplaceBean;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;

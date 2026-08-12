@@ -135,7 +135,7 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
+                        <!-- Default configuration for running with: mvn clean gui:run -->
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>com.ispw.tryeshiftsv2/com.ispw.tryeshifts.HelloApplication</mainClass>

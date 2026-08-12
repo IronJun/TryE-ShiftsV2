@@ -1,6 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
-import com.ispw.tryeshifts.AppConfig;
+import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.entity.Workplace;

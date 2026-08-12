@@ -1,11 +1,10 @@
 package com.ispw.tryeshifts;
 
 import com.ispw.tryeshifts.appcontroller.LoginAC;
-import com.ispw.tryeshifts.bean.SessionContext;
+import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
-import com.ispw.tryeshifts.graphcontroller.cli.LoginCLI;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

@@ -1,8 +1,8 @@
 package com.ispw.tryeshifts.appcontroller;
 
-import com.ispw.tryeshifts.AppConfig;
+import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
-import com.ispw.tryeshifts.bean.SessionContext;
+import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
@@ -11,15 +11,12 @@ import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {

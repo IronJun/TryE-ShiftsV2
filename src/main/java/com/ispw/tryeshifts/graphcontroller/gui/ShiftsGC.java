@@ -1,16 +1,15 @@
-package com.ispw.tryeshifts.graphcontroller.javafx;
+package com.ispw.tryeshifts.graphcontroller.gui;
 
 import com.ispw.tryeshifts.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
-import com.ispw.tryeshifts.bean.SessionContext;
+import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
-import com.ispw.tryeshifts.graphcontroller.javafx.utilities.*;
-import com.mysql.cj.xdevapi.Table;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

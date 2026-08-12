@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts;
+package com.ispw.tryeshifts.config;
 
 import com.ispw.tryeshifts.dao.*;
 
