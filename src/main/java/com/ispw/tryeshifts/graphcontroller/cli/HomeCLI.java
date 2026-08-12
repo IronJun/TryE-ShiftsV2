@@ -147,6 +147,10 @@ public class HomeCLI {
         }
     }
     private static void handleWorkplaceSelection(WorkplaceBean wp){
+        if(wp==null){
+            LOGGER.warning("Workplace selection empty!");
+            return;
+        }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         try{
             WorkplaceBean accessedWp = AccessWorkplaceAC.canAccess(loggedUser,wp.getWorkplaceName());
