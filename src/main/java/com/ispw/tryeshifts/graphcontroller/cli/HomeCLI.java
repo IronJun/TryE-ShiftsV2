@@ -134,6 +134,10 @@ public class HomeCLI {
         }
     }
     private static void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
+        if(wb == null){
+            LOGGER.warning("Workplace details are null!");
+            return;
+        }
         LOGGER.info("\n--- WORKPLACE DETAILS ---\n");
         LOGGER.info("Name: " + wb.getWorkplaceName() + "\n");
         LOGGER.info("Address: " + wb.getAddress() + "\n");
