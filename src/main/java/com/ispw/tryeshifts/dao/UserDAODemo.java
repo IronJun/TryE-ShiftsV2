@@ -2,7 +2,6 @@ package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.UserInfo;
 
-import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
@@ -20,8 +19,6 @@ public class UserDAODemo implements UserDAO{
         }
 
         db.getUsers().put(user.getEmail(), user);
-//        if(user != null) db.getUsers().put(user.getEmail(), user);
-//        else throw new DuplicateEntityException("User", user.getEmail());
     }
 
 

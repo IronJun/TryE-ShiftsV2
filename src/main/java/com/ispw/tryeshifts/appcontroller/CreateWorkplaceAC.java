@@ -15,6 +15,9 @@ public class CreateWorkplaceAC {
     private static final UserDAO userRepo = AppConfig.getUserRepository();
     private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
 
+    private CreateWorkplaceAC() {
+        //utility class should not be istantiated
+    }
     public static void createWorkplace(WorkplaceBean wp) throws BaseException {
         if(wp.getWorkplaceName().isEmpty()){throw new NullPointerException("Workplace name cannot be empty");}
 

@@ -25,6 +25,7 @@ public class ShiftsCLI {
     private static int weekOffset ;
     private static String currentWeekId;
     private static final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+    static String SpaceSlot = "%-15s";
 
     private ShiftsCLI(){}
 
@@ -132,7 +133,7 @@ public class ShiftsCLI {
         if(wp == null || user == null) {
             LOGGER.severe("User or Workplace is null!\n");
             return;
-        };
+        }
 
         LOGGER.info("\n--- Availability Insertion ---");
 
@@ -296,9 +297,9 @@ public class ShiftsCLI {
 
                 // Solo sulla prima riga del blocco stampiamo l'orario, altrimenti spazi vuoti
                 if (r == 0) {
-                    line.append(String.format("%-15s", slot));
+                    line.append(String.format(SpaceSlot, slot));
                 } else {
-                    line.append(String.format("%-15s", ""));
+                    line.append(String.format(SpaceSlot, ""));
                 }
 
                 for (String day : days) {
@@ -306,12 +307,12 @@ public class ShiftsCLI {
                     String nameToPrint = (r < namesInCell.size()) ? namesInCell.get(r) : "";
                     line.append(String.format("| %-20s", nameToPrint));
                 }
-
-                LOGGER.info(line.toString() + "\n");
+                msg =line + "\n";
+                LOGGER.info(msg);
             }
-
+            msg = "-".repeat(15 + (days.length * 22)) + "\n";
             // Una linea di separazione opzionale tra una fascia oraria e l'altra
-            LOGGER.info("-".repeat(15 + (days.length * 22)) + "\n");
+            LOGGER.info(msg);
         }
     }
     private static void printDashboardHeader(String status) {
@@ -321,7 +322,7 @@ public class ShiftsCLI {
         msg = statusLine+"\n";
         LOGGER.info(msg);
 
-        StringBuilder header = new StringBuilder(String.format("%-15s", "ORA"));
+        StringBuilder header = new StringBuilder(String.format(SpaceSlot, "ORA"));
         for (String day : days) {
             header.append(String.format("| %-20s", day.toUpperCase())); // <--- Portato a 20
         }

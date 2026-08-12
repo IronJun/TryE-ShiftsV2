@@ -117,6 +117,7 @@ public class WorkersGC {
 
             if(currentWp == null){
                 ErrorViewManager.showError(errorlbl,"Workplace is null\n");
+                return;
             }
 
             String wpName = currentWp.getWorkplaceName();

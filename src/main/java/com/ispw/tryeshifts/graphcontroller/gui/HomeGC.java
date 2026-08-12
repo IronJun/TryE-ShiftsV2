@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class HomeGC {
     }
 
     private String getCurrentWeekId() {
-        java.time.LocalDate now = java.time.LocalDate.now();
+        java.time.LocalDate now = java.time.LocalDate.now(ZoneId.systemDefault());
         java.time.temporal.TemporalField woy = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).weekOfWeekBasedYear();
         int weekNumber = now.get(woy);
         return now.getYear() + "_" + String.format("%02d", weekNumber);

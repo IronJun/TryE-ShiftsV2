@@ -16,6 +16,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -58,12 +59,12 @@ public class ManageShiftsAC {
     public void saveAvailabilities(List<AvailabilityBean> beans) throws BaseException {
         if(beans == null){throw new NullPointerException("Bean passed null");}
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
-        WorkplaceBean CurrentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
+        WorkplaceBean currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
 
-        if(loggedUser == null || CurrentWorkplace == null){throw new BaseException("User or Workplace passed null");}
+        if(loggedUser == null || currentWorkplace == null){throw new BaseException("User or Workplace passed null");}
 
         String userEmail = loggedUser.getEmail();
-        String wpName = CurrentWorkplace.getWorkplaceName();
+        String wpName = currentWorkplace.getWorkplaceName();
         // ATTENZIONE: Se sei nella "settimana prossima", calculateWeekId(0) ti darà la settimana SBAGLIATA.
         // Sarebbe meglio passare il weekId corrente direttamente dalla GUI come parametro.
         String currentWeekId = beans.isEmpty() ?
@@ -142,7 +143,7 @@ public class ManageShiftsAC {
     }
 
     public static String calculateWeekId(int weekOffset) {
-        LocalDate targetDate = LocalDate.now().plusWeeks(weekOffset);
+        LocalDate targetDate = LocalDate.now(ZoneId.systemDefault()).plusWeeks(weekOffset);
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
         int year = targetDate.get(weekFields.weekBasedYear());
@@ -150,7 +151,7 @@ public class ManageShiftsAC {
     }
 
     public static String getWeekRangeString(int offset) {
-        LocalDate start = LocalDate.now().plusWeeks(offset).with(DayOfWeek.MONDAY);
+        LocalDate start = LocalDate.now(ZoneId.systemDefault()).plusWeeks(offset).with(DayOfWeek.MONDAY);
         LocalDate end = start.plusDays(6);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
         return start.format(formatter) + " - " + end.format(formatter);
