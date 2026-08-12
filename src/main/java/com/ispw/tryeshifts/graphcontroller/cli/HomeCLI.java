@@ -75,7 +75,9 @@ public class HomeCLI {
 
     private static void showWorkplacesList(boolean isPersonal) {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
-
+        if(loggedUser == null){
+            LOGGER.severe("User not logged in");
+        }
         try {
             // 1. Carichiamo la lista originale una sola volta
             List<WorkplaceBean> allWorkplaces;
@@ -218,6 +220,10 @@ public class HomeCLI {
     }
     private static void showMyWorkingDays() {
         UserBean user = SessionContext.getInstance().getLoggeduser();
+        if(user == null){
+            LOGGER.severe("User is null!\n");
+            return;
+        }
         int offset = 0; // Settimana corrente
         String weekId = ManageShiftsAC.calculateWeekId(offset);
         String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};

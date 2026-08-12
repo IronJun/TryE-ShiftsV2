@@ -128,7 +128,11 @@ public class ShiftsCLI {
     private static void giveAvailability() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         UserBean user = SessionContext.getInstance().getLoggeduser();
-        ManageShiftsAC ac = new ManageShiftsAC();
+
+        if(wp == null || user == null) {
+            LOGGER.severe("User or Workplace is null!\n");
+            return;
+        };
 
         LOGGER.info("\n--- Availability Insertion ---");
 

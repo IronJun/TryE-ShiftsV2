@@ -51,18 +51,22 @@ public class SettingsGC {
         ErrorViewManager.setupAutoHide(errorlabel);
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+        if(loggedUser == null || wp == null){
+            ErrorViewManager.showError(overlayMessage, "Workplace or User is null!\n");
+            return;
+        }
         shiftsListView.setCellFactory(lv -> new ShiftCellHandling());
         if (wp==null) {
             // Stato 1: Nessun workplace selezionato
             overlayPane.setVisible(true);
             overlayPane.setManaged(true); // Se hai aggiunto managed
-            ErrorViewManager.showError(overlayMessage,"Nessun workplace selezionato");
+            ErrorViewManager.showError(overlayMessage,"No Workplace Selected!\n");
             applyBlur(true);
         } else if (!loggedUser.getEmail().equals(wp.getOwnerEmail())) {
             // Stato 2: Selezionato ma non sei l'owner
             overlayPane.setVisible(true);
             overlayPane.setManaged(true);
-            ErrorViewManager.showError(overlayMessage,"Non sei l'owner del workplace");
+            ErrorViewManager.showError(overlayMessage,"You are not the owner of the workplace\n");
             applyBlur(true);
         } else {
             overlayPane.setVisible(false);
@@ -133,6 +137,10 @@ public class SettingsGC {
         try{
             List<String> selectedDays = dayCheckBoxes.stream().filter(CheckBox::isSelected).map(CheckBox::getText).toList();
             WorkplaceBean currentWp = SessionContext.getInstance().getLoggedWorkplace();
+            if(currentWp == null){
+                ErrorViewManager.showError(errorlabel,"No Workplace Selected!\n");
+                return;
+            }
             String oldName = currentWp.getWorkplaceName();
 
             WorkplaceBean updatedBean = new WorkplaceBean(nameField.getText(),addressField.getText(),selectedDays,shiftsListView.getItems(),currentWp.getOwnerEmail());
@@ -188,6 +196,10 @@ public class SettingsGC {
             }
 
             UserBean updatedUser = SessionContext.getInstance().getLoggeduser();
+            if(updatedUser == null){
+                ErrorViewManager.showError(errorlbl2,"User not found");
+                return;
+            }
             updatedUser.setName(firstNameField.getText());
             updatedUser.setSurname(lastNameField.getText());
 

@@ -177,7 +177,10 @@ public class ShiftsGC {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-
+        if(user == null || wp == null) {
+            ErrorViewManager.showError(errorlbl,"user or workplace is null!");
+            return null;
+        }
         return new TableContext(
                 manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
                 user.getEmail().equals(wp.getOwnerEmail()),
@@ -314,7 +317,10 @@ public class ShiftsGC {
         PublishShiftsAC publishAC = new PublishShiftsAC();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
-
+        if(wp == null){
+            ErrorViewManager.showError(errorlbl,"workplace is null\n");
+            return;
+        }
         try{
             String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
 
