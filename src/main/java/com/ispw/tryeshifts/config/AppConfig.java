@@ -9,7 +9,7 @@ public class AppConfig {
     private static MembershipDAO membershipRepo = null;
     private static AvailabilityDAO availabilityRepo = null;
     public static final boolean IS_DEMO_MODE = true;
-    public static final boolean SAVE_USER_TO_CSV = true;
+    public static final boolean SAVE_USER_TO_CSV = false;
 
     private AppConfig(){
         throw new IllegalStateException("Utility class");

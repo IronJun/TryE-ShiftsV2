@@ -19,7 +19,10 @@ public class AccessWorkplaceAC {
         MembershipDAO membershipDB = AppConfig.getMembershipRepository();
         WorkplaceDAO workplaceDB = AppConfig.getWorkplaceRepository();
 
+        if(user == null){throw new BaseException("User not logged in");}
+
         Membership membership = membershipDB.findMembership(user.getEmail(),workplaceName);
+
         if(membership == null){throw new UserNotMemberException("Non sei ancora membro di questo workplace.");}
         if(!membership.isAccepted()){throw new MembershipPendingException("membership", workplaceName);}
         Workplace entity = workplaceDB.findWorkplaceByName(workplaceName);

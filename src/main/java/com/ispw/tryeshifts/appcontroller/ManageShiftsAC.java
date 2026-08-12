@@ -59,7 +59,7 @@ public class ManageShiftsAC {
         if(beans == null){throw new NullPointerException("Bean passed null");}
         String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
         String wpName = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
-
+        if(userEmail == null || wpName == null){throw new BaseException("User or Workplace passed null");}
         // ATTENZIONE: Se sei nella "settimana prossima", calculateWeekId(0) ti darà la settimana SBAGLIATA.
         // Sarebbe meglio passare il weekId corrente direttamente dalla GUI come parametro.
         String currentWeekId = beans.isEmpty() ?

@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.UserInfo;
 
+import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
@@ -12,8 +13,15 @@ public class UserDAODemo implements UserDAO{
 
 
     public void save(UserInfo user) throws DuplicateEntityException {
-        if(user != null) db.getUsers().put(user.getEmail(), user);
-        else throw new DuplicateEntityException("User", user.getEmail());
+        if(user == null){throw new IllegalArgumentException("User not logged in");}
+
+        if(db.getUsers().containsKey(user.getEmail())){
+            throw new DuplicateEntityException("User", user.getEmail());
+        }
+
+        db.getUsers().put(user.getEmail(), user);
+//        if(user != null) db.getUsers().put(user.getEmail(), user);
+//        else throw new DuplicateEntityException("User", user.getEmail());
     }
 
 
