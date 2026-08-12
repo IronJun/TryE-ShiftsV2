@@ -23,6 +23,10 @@ public class HomeCLI {
 
     public static void start(){
         UserBean user = SessionContext.getInstance().getLoggeduser();
+        if(user == null){
+            LOGGER.severe("User not logged in");
+            return;
+        }
         boolean exit = false;
         while(!exit){
             LOGGER.info("\n--- HOME ---\n");
