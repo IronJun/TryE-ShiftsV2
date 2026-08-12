@@ -23,12 +23,17 @@ public class WorkersGC {
     @FXML private ListView<UserBean> pendingWorkersList;
     @FXML private Label titleLabel;
     @FXML private Label titlePending;
+    @FXML private Label errorlbl;
     private WorkplaceBean currentWorkplace;
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
-        String emailUser = SessionContext.getInstance().getLoggeduser().getEmail();
-
+        UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
+        if(loggedUser == null){
+            ErrorViewManager.showError(errorlbl,"loggeduser is null\n");
+            return;
+        }
+        String emailUser = loggedUser.getEmail();
         boolean isOwner = currentWorkplace.getOwnerEmail().equals(emailUser);
         titlePending.setVisible(isOwner);
         titlePending.setManaged(isOwner);
@@ -108,9 +113,15 @@ public class WorkersGC {
     private void handleResponse(String userEmail, boolean accept) {
         try{
             ManageMembersAC ac = new ManageMembersAC();
-            String currentWp = SessionContext.getInstance().getLoggedWorkplace().getWorkplaceName();
+            WorkplaceBean currentWp = SessionContext.getInstance().getLoggedWorkplace();
+
+            if(currentWp == null){
+                ErrorViewManager.showError(errorlbl,"Workplace is null\n");
+            }
+
+            String wpName = currentWp.getWorkplaceName();
             // Chiamiamo l'applicativo per aggiornare il DB
-            ac.acceptWorker(userEmail, currentWp, accept);
+            ac.acceptWorker(userEmail, wpName, accept);
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
         }catch(EntityNotFoundException _){

@@ -54,6 +54,8 @@
                         </VBox>
                     </children>
                 </HBox>
+                <Label fx:id ="errorlbl" textFill="#4B4488" visible="false" managed="false"/>
+
             </children>
         </VBox>
     </center>

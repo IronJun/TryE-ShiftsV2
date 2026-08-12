@@ -77,6 +77,7 @@ public class HomeCLI {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null){
             LOGGER.severe("User not logged in");
+            return;
         }
         try {
             // 1. Carichiamo la lista originale una sola volta
