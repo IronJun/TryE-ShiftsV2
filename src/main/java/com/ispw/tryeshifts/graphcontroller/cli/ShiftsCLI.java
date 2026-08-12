@@ -284,36 +284,43 @@ public class ShiftsCLI {
             for (String day : days) {
                 String content = buildCellContent(day, slot, activeDays, ctx);
                 // Split dei nomi se separati da virgola
-                List<String> names = content.equals("-") || content.equals("  CLOSED  ")
-                        ? Collections.singletonList(content)
-                        : Arrays.asList(content.split(","));
+                List<String> names = parseCellNames(content);
                 cellData.put(day, names);
                 maxRowsInSlot = Math.max(maxRowsInSlot, names.size());
             }
-
+            printSlotRows(slot,maxRowsInSlot,cellData);
             // 2. Stampiamo tante righe fisiche quante sono i nomi (maxRowsInSlot)
-            for (int r = 0; r < maxRowsInSlot; r++) {
-                StringBuilder line = new StringBuilder();
 
-                // Solo sulla prima riga del blocco stampiamo l'orario, altrimenti spazi vuoti
-                if (r == 0) {
-                    line.append(String.format(SpaceSlot, slot));
-                } else {
-                    line.append(String.format(SpaceSlot, ""));
-                }
+        }
+    }
+    private static List<String> parseCellNames(String content){
+        if(content.equals("-") || content.equals("  CLOSED  ")){
+            return Collections.singletonList(content);
+        }
+        return Arrays.asList(content.split(","));
+    }
+    private static void printSlotRows(String slot, int maxRowsInSlot, Map<String, List<String>> cellData) {
+        for (int r = 0; r < maxRowsInSlot; r++) {
+            StringBuilder line = new StringBuilder();
 
-                for (String day : days) {
-                    List<String> namesInCell = cellData.get(day);
-                    String nameToPrint = (r < namesInCell.size()) ? namesInCell.get(r) : "";
-                    line.append(String.format("| %-20s", nameToPrint));
-                }
-                msg =line + "\n";
-                LOGGER.info(msg);
+            // Solo sulla prima riga del blocco stampiamo l'orario, altrimenti spazi vuoti
+            if (r == 0) {
+                line.append(String.format(SpaceSlot, slot));
+            } else {
+                line.append(String.format(SpaceSlot, ""));
             }
-            msg = "-".repeat(15 + (days.length * 22)) + "\n";
-            // Una linea di separazione opzionale tra una fascia oraria e l'altra
+
+            for (String day : days) {
+                List<String> namesInCell = cellData.get(day);
+                String nameToPrint = (r < namesInCell.size()) ? namesInCell.get(r) : "";
+                line.append(String.format("| %-20s", nameToPrint));
+            }
+            msg =line + "\n";
             LOGGER.info(msg);
         }
+        msg = "-".repeat(15 + (days.length * 22)) + "\n";
+        // Una linea di separazione opzionale tra una fascia oraria e l'altra
+        LOGGER.info(msg);
     }
     private static void printDashboardHeader(String status) {
         // Creiamo la riga di stato
