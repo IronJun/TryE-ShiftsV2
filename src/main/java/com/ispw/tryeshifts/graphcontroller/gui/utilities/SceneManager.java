@@ -12,22 +12,25 @@ import java.util.logging.Logger;
 
 
 // Singleton initialization
-public enum SceneManager {
-    INSTANCE;
+public class SceneManager {
     private static final Logger LOGGER = Logger.getLogger(SceneManager.class.getName());
 
-
+    private static SceneManager instance;
     private Stage primaryStage;
 
 
     //Costrutture
-    SceneManager() {
+    private SceneManager() {
     }
 
 
     // singleton method
     public static SceneManager getInstance() {
-        return INSTANCE;
+
+        if(instance == null) {
+            instance = new SceneManager();
+        }
+        return instance;
     }
 
     // Metodo per inizializzare lo Stage principale
@@ -39,20 +42,6 @@ public enum SceneManager {
         }
     }
 
-    // Metodo per ottenere lo Stage (utile per chiudere l'applicazione o Stage multipli)
-
-
-
-    // Metodo principale per caricare un FXML e cambiare la scena
-    /**
-     * Carica il file FXML specificato e imposta la radice come nuova scena
-     * sullo Stage principale.
-     *
-     * @param fxmlFileName Il nome del file FXML (es. "signup-view.fxml")
-     * @param title        Il titolo della finestra
-     * @param width        Larghezza della scena (opzionale)
-     * @param height       Altezza della scena (opzionale)
-     */
     public void switchScene(String fxmlFileName, String title, double width, double height) {
         if (primaryStage == null) {
             throw new IllegalStateException("Primary Stage non è stato inizializzato. Chiamare setPrimaryStage() prima.");
