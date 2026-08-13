@@ -1,6 +1,5 @@
 package com.ispw.tryeshifts.graphcontroller.gui.utilities;
 
-import com.ispw.tryeshifts.SceneManager;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputControl;

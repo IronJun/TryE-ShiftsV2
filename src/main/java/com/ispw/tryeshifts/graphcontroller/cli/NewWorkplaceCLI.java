@@ -90,12 +90,13 @@ public class NewWorkplaceCLI {
 
                 String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH, endM, endH,slots);
                 slots.add(formattedShift);
-                LOGGER.info("✅ correctly added shift: "+formattedShift);
+                msg = "✅ correctly added shift: "+formattedShift;
+                LOGGER.info(msg);
             }catch(IllegalArgumentException e){
                 LOGGER.warning("\nHour error: " +e.getMessage());
             }catch(BaseException e){
                 LOGGER.warning("\nShit error: " +e.getMessage());
-            }catch(Exception e){
+            }catch(Exception _){
                 LOGGER.warning("\nError fetching, retry");
             }
             // Formattiamo noi la stringa per essere sicuri del separatore " - "

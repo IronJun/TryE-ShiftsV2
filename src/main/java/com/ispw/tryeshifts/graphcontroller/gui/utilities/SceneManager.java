@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities;
 
 
 import javafx.application.Platform;
@@ -31,7 +31,7 @@ public enum SceneManager {
     }
 
     // Metodo per inizializzare lo Stage principale
-    void setPrimaryStage(Stage stage) {
+    public void setPrimaryStage(Stage stage) {
         if(this.primaryStage == null){
             this.primaryStage = stage;
         }else{
@@ -89,7 +89,7 @@ public enum SceneManager {
         }
     }
 
-    // Aggiungi questo metodo nella classe SceneManager
+    // Method for the modal Scene just for the newWorkplace in this case
     public Object showModalDialog(String fxmlFileName, String title) {
         try {
             // Caricamento FXML (usa il tuo percorso standard)

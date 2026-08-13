@@ -1,6 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
-import com.ispw.tryeshifts.SceneManager;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.session.SessionContext;

@@ -34,5 +34,7 @@ module com.ispw.tryeshifts {
     opens com.ispw.tryeshifts.session to javafx.base;
     exports com.ispw.tryeshifts.config;
     opens com.ispw.tryeshifts.config to javafx.fxml;
+    exports com.ispw.tryeshifts.graphcontroller.gui.utilities;
+    opens com.ispw.tryeshifts.graphcontroller.gui.utilities to javafx.fxml;
 
 }

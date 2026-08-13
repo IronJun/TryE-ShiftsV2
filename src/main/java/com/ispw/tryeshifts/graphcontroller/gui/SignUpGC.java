@@ -1,6 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
-import com.ispw.tryeshifts.SceneManager;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.*;
