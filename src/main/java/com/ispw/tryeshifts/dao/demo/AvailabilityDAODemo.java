@@ -1,5 +1,7 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.demo;
 
+import com.ispw.tryeshifts.dao.AvailabilityDAO;
+import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
@@ -9,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AvailabilityDAODemo implements AvailabilityDAO{
+public class AvailabilityDAODemo implements AvailabilityDAO {
     private final InMemory db = InMemory.getInstance();
 
     public void saveAvailability(Availability availability)throws DuplicateEntityException {

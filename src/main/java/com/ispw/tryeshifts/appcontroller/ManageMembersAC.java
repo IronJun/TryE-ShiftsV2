@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageMembersAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getDAOFactory().getWorkplaceDAO();
+    private static final UserDAO userRepo = AppConfig.getDAOFactory().getUserDAO();
+    private static final MembershipDAO membershipRepo = AppConfig.getDAOFactory().getMembershipDAO();
 
     public List<UserBean> getActiveMembers(String wpName) throws BaseException{
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);

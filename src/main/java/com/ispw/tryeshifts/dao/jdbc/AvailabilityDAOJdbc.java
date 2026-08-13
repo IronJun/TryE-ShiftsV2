@@ -1,5 +1,7 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.jdbc;
 
+import com.ispw.tryeshifts.dao.AvailabilityDAO;
+import com.ispw.tryeshifts.dao.DBconnection;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
@@ -13,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AvailabilityDAOJdbc implements AvailabilityDAO{
+public class AvailabilityDAOJdbc implements AvailabilityDAO {
     private static final String USER_EMAIL = "user_email";
     private static final String DAY_NAME = "day_name";
     private static final String WORKPLACE_STR_NAME = "workplace_name";

@@ -1,5 +1,7 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.jdbc;
 
+import com.ispw.tryeshifts.dao.DBconnection;
+import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;

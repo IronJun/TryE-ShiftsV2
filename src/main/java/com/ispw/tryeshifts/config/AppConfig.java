@@ -1,8 +1,20 @@
 package com.ispw.tryeshifts.config;
 
 import com.ispw.tryeshifts.dao.*;
+import com.ispw.tryeshifts.dao.csv.UserDAOCsv;
+import com.ispw.tryeshifts.dao.demo.AvailabilityDAODemo;
+import com.ispw.tryeshifts.dao.demo.MembershipDAODemo;
+import com.ispw.tryeshifts.dao.demo.UserDAODemo;
+import com.ispw.tryeshifts.dao.demo.WorkplaceDAODemo;
+import com.ispw.tryeshifts.dao.jdbc.AvailabilityDAOJdbc;
+import com.ispw.tryeshifts.dao.jdbc.MembershipDAOJdbc;
+import com.ispw.tryeshifts.dao.jdbc.UserDAOJdbc;
+import com.ispw.tryeshifts.dao.jdbc.WorkplaceDAOJdbc;
+import com.ispw.tryeshifts.factory.DAOFactory;
+import com.ispw.tryeshifts.factory.DemoDAOFactory;
+import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
-
+/*
 public class AppConfig {
     private static UserDAO userRepo = null;
     private static WorkplaceDAO workplaceRepo = null;
@@ -58,5 +70,26 @@ public class AppConfig {
             }
         }
         return membershipRepo;
+    }
+}
+*/
+
+public class AppConfig {
+    private static final boolean IS_DEMO_MODE = false;
+    private static DAOFactory daoFactory;
+
+    private AppConfig() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static DAOFactory getDAOFactory() {
+        if(daoFactory == null) {
+            if(IS_DEMO_MODE){
+                daoFactory = new DemoDAOFactory();
+            }else{
+                daoFactory = new JdbcDAOFactory();
+            }
+        }
+        return daoFactory;
     }
 }

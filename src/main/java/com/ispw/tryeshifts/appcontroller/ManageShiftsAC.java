@@ -21,8 +21,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getDAOFactory().getWorkplaceDAO();
+    private static final AvailabilityDAO availabilityRepo = AppConfig.getDAOFactory().getAvailabilityDAO();
 
     private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 

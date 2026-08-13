@@ -1,5 +1,7 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.jdbc;
 
+import com.ispw.tryeshifts.dao.DBconnection;
+import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.excpetion.*;
 import java.sql.Connection;
@@ -8,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-public class UserDAOJdbc implements UserDAO{
+public class UserDAOJdbc implements UserDAO {
 
     public UserInfo findByEmail(String email) throws DataFetchException {
         // Selezioniamo solo i campi che servono al tuo costruttore

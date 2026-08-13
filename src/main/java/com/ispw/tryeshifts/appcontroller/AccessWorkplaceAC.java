@@ -16,8 +16,8 @@ public class AccessWorkplaceAC {
         throw new IllegalStateException("Utility class");
     }
     public static WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
-        MembershipDAO membershipDB = AppConfig.getMembershipRepository();
-        WorkplaceDAO workplaceDB = AppConfig.getWorkplaceRepository();
+        MembershipDAO membershipDB = AppConfig.getDAOFactory().getMembershipDAO();
+        WorkplaceDAO workplaceDB = AppConfig.getDAOFactory().getWorkplaceDAO();
 
         if(user == null){throw new BaseException("User not logged in");}
 

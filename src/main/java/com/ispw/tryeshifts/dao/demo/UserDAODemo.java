@@ -1,12 +1,14 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.demo;
 
+import com.ispw.tryeshifts.dao.InMemory;
+import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
 
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 
-public class UserDAODemo implements UserDAO{
+public class UserDAODemo implements UserDAO {
 
     private final InMemory db = InMemory.getInstance();
 

@@ -11,9 +11,9 @@ import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.*;
 
 public class CreateWorkplaceAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getDAOFactory().getWorkplaceDAO();
+    private static final UserDAO userRepo = AppConfig.getDAOFactory().getUserDAO();
+    private static final MembershipDAO membershipRepo = AppConfig.getDAOFactory().getMembershipDAO();
 
     private CreateWorkplaceAC() {
         //utility class should not be istantiated

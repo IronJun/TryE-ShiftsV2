@@ -1,5 +1,6 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.csv;
 
+import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 
@@ -7,7 +8,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAOCsv implements UserDAO{
+public class UserDAOCsv implements UserDAO {
     private static final String FILE_PATH = "persistency/users.csv";
     public void save(UserInfo user) throws DataFetchException{
         try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_PATH,true)))){

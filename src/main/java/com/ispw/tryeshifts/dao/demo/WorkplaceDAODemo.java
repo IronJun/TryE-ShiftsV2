@@ -1,5 +1,7 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.dao.demo;
 
+import com.ispw.tryeshifts.dao.InMemory;
+import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Workplace;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
