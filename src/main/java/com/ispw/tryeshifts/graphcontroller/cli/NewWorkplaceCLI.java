@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
+import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
@@ -9,6 +10,7 @@ import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -70,17 +72,37 @@ public class NewWorkplaceCLI {
         List<String> slots = new ArrayList<>();
         boolean adding = true;
 
-        LOGGER.info("Select the shifts of the workplace with the following format : HH:mm - HH:mm.");
+        LOGGER.info("\nSelect the shifts of the workplace with the following format : HH:mm - HH:mm.");
         while (adding) {
-            String start = CLIReader.readString("Ora inizio (HH:mm): ");
-            String end = CLIReader.readString("Ora fine (HH:mm): ");
+            String start = CLIReader.readString("\nOra inizio (HH:mm): ");
+            String end = CLIReader.readString("\nOra fine (HH:mm): ");
+            try{
+                String[] startParts = start.trim().split(":");
+                String[] endParts = end.trim().split(":");
+                if(startParts.length != 2 || endParts.length != 2){
+                    LOGGER.warning("\nInvalid time format. Be sure to use HH:mm (es: 08:30)");
+                    continue;
+                }
+                String startH = startParts[0];
+                String startM = startParts[1];
+                String endH = endParts[0];
+                String endM = endParts[1];
 
+                String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH, endM, endH,slots);
+                slots.add(formattedShift);
+                LOGGER.info("✅ correctly added shift: "+formattedShift);
+            }catch(IllegalArgumentException e){
+                LOGGER.warning("\nHour error: " +e.getMessage());
+            }catch(BaseException e){
+                LOGGER.warning("\nShit error: " +e.getMessage());
+            }catch(Exception e){
+                LOGGER.warning("\nError fetching, retry");
+            }
             // Formattiamo noi la stringa per essere sicuri del separatore " - "
-            slots.add(start + " - " + end);
-
-            String cont = CLIReader.readString("Do you want to add more shifts? (y/n): ");
+            String cont = CLIReader.readString("\nDo you want to add more shifts? (y/n): ");
             if (!cont.equalsIgnoreCase("y")) adding = false;
         }
+        Collections.sort(slots);
         return slots;
     }
 }
