@@ -290,9 +290,9 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     private void insertWorkplaceDays(Connection dbc,int workplaceId, Workplace wp) throws SQLException {
         String insertDay = "INSERT INTO workplace_days (workplace_id, day_name) VALUES (?, ?)";
         try (PreparedStatement pstmt = dbc.prepareStatement(insertDay)) {
+            pstmt.setInt(1, workplaceId);
             for (String day : wp.getSelectedDays()) {
                 if(day == null || day.isEmpty()) continue;
-                pstmt.setInt(1, workplaceId);
                 pstmt.setString(2, day);
                 pstmt.addBatch();
             }
@@ -303,8 +303,9 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         // La colonna corretta è shift_name
         String insertShift = "INSERT INTO workplace_shifts (workplace_id, shift_name) VALUES (?, ?)";
         try (PreparedStatement pstmt = dbc.prepareStatement(insertShift)) {
+            pstmt.setInt(1, workplaceId);
             for (String shift : wp.getShifts()) {
-                pstmt.setInt(1, workplaceId);
+
                 pstmt.setString(2, shift); // Passa la stringa intera (es. "08:00-14:00")
                 pstmt.addBatch();
             }
