@@ -1,9 +1,9 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-public class BossShiftsStrat implements ShiftsUIStrat{
+public class BossShiftsStrat implements ShiftsUIStrat {
 
     public void customizeUI(Label label, Button saveBtn, Button publicBtn,String status) {
         label.setText("Gestione turni - Stato attuale: " + status);

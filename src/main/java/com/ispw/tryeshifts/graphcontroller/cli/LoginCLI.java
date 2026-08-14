@@ -6,8 +6,10 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 
 public class LoginCLI{
@@ -56,10 +58,10 @@ public class LoginCLI{
         while (!memValidation) {
             String mem = CLIReader.readString("Do you want to remember credentials? Y/n: ").toUpperCase();
             if (mem.equals("Y")) {
-                SessionContext.getInstance().saveUserToPreferences(user.getEmail());
+                PreferencesManager.saveUserToPreferences(user.getEmail());
                 memValidation = true;
             } else if (mem.equals("N")) {
-                SessionContext.getInstance().clearPreferences();
+                PreferencesManager.clearPreferences();
                 memValidation = true;
             } else {
                 LOGGER.warning("Insert 'Y' or 'N'\n");

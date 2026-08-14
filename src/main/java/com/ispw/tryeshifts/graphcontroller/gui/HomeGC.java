@@ -7,6 +7,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -311,8 +312,8 @@ public class HomeGC {
     }
 
     public void onLogoutClicked() {
-        if(SessionContext.getInstance().logoutConfirmation()){
-            SessionContext.getInstance().clearPreferences();
+        if(SceneManager.getInstance().logoutConfirmation()){
+            PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         }
 

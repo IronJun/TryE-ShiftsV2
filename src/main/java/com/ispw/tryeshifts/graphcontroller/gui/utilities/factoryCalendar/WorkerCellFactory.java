@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
 
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Map;
 
-public class WorkerCellFactory implements ShiftCellProvider{
+public class WorkerCellFactory implements ShiftCellProvider {
     private final Map<String,Boolean> selectionMap;
     private final boolean isLocked;
     private static final String SELECTED = "SELECTED";

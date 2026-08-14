@@ -6,6 +6,7 @@ import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -22,7 +23,7 @@ public class JavaFXLauncher extends Application {
         SceneManager manager = SceneManager.getInstance();
         manager.setPrimaryStage(primaryStage);
 
-        String savedEmail = SessionContext.getInstance().getSavedEmail();
+        String savedEmail = PreferencesManager.getSavedEmail();
         if(savedEmail != null){
             try {
                 UserBean user = LoginAC.autoLogin(savedEmail);

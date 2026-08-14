@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public class OwnerCellFactory implements ShiftCellProvider{
+public class OwnerCellFactory implements ShiftCellProvider {
     public VBox createCell(String cellKey, List<String> candidates,boolean isDayActive){
         VBox cell = new VBox(3);
         cell.setAlignment(Pos.TOP_CENTER);

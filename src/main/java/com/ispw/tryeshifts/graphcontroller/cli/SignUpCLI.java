@@ -6,6 +6,7 @@ import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
 
@@ -20,7 +21,7 @@ public class SignUpCLI {
     public static void start() {
         // 1. L'AUTO-LOGIN va fatto SOLO QUI (una volta all'avvio)
         try {
-            String savedEmail = SessionContext.getInstance().getSavedEmail();
+            String savedEmail = PreferencesManager.getSavedEmail();
             if (savedEmail != null) {
                 UserBean user = LoginAC.autoLogin(savedEmail);
                 SessionContext.getInstance().setLoggeduser(user);
@@ -29,7 +30,7 @@ public class SignUpCLI {
             }
         } catch (BaseException e) {
             LOGGER.warning("Auto-login failed: " + e.getMessage());
-            SessionContext.getInstance().clearPreferences();
+            PreferencesManager.clearPreferences();
         }
 
         // 2. Loop principale di navigazione

@@ -9,6 +9,7 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.effect.BoxBlur;
@@ -171,8 +172,8 @@ public class SettingsGC {
         }
     }
     public void onLogoutClicked() {
-        if(SessionContext.getInstance().logoutConfirmation()){
-            SessionContext.getInstance().clearPreferences();
+        if(SceneManager.getInstance().logoutConfirmation()){
+            PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         }
     }

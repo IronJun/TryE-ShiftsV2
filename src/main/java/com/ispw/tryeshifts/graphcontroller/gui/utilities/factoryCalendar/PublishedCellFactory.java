@@ -1,5 +1,6 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
 
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.ColorManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -7,7 +8,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Map;
 
-public class PublishedCellFactory implements ShiftCellProvider{
+public class PublishedCellFactory implements ShiftCellProvider {
     private final Map<String, List<String>> finalAssignments; // Mappa: cellKey -> Nome Lavoratore
 
     // Il costruttore riceve già i dati pronti dall'AC

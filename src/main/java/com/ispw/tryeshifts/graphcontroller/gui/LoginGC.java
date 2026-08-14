@@ -8,6 +8,7 @@ import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -40,8 +41,8 @@ public class LoginGC {
 
             SessionContext.getInstance().setLoggeduser(loggedUser);
 
-            if(rememberMeCheckBox.isSelected()) SessionContext.getInstance().saveUserToPreferences(email);
-            else SessionContext.getInstance().clearPreferences();
+            if(rememberMeCheckBox.isSelected()) PreferencesManager.saveUserToPreferences(email);
+            else PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
 
         } catch (EntityNotFoundException | InvalidCredentialException e) {

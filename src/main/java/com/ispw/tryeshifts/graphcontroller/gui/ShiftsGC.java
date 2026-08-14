@@ -4,12 +4,20 @@ import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar.OwnerCellFactory;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar.PublishedCellFactory;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar.ShiftCellProvider;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar.WorkerCellFactory;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI.BossShiftsStrat;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI.ShiftsUIStrat;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI.WorkerShiftsStrat;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -59,7 +67,6 @@ public class ShiftsGC {
         }
         try{
             TableContext context = fetchTableContext(); // Recuperiamo i dati freschi
-
 
             ShiftsUIStrat strat;
             if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
@@ -365,8 +372,8 @@ public class ShiftsGC {
     }
 
     public void onLogoutClicked() {
-        if(SessionContext.getInstance().logoutConfirmation()){
-            SessionContext.getInstance().clearPreferences();
+        if(SceneManager.getInstance().logoutConfirmation()){
+            PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
             msg = "Logout effettuato";
             LOGGER.log(Level.FINE, msg);

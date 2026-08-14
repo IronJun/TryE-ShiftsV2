@@ -8,6 +8,7 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -138,8 +139,8 @@ public class WorkersGC {
     }
 
     public void onLogoutClicked() {
-        if(SessionContext.getInstance().logoutConfirmation()){
-            SessionContext.getInstance().clearPreferences();
+        if(SceneManager.getInstance().logoutConfirmation()){
+            PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
         }
     }
