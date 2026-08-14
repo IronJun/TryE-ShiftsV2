@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar;
 
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ColorManager;
 import javafx.geometry.Pos;

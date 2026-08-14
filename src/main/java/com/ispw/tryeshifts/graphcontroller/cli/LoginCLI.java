@@ -9,7 +9,6 @@ import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 
 public class LoginCLI{

@@ -39,9 +39,9 @@ module com.ispw.tryeshifts {
     exports com.ispw.tryeshifts.dao.demo;
     exports com.ispw.tryeshifts.dao.jdbc;
     exports com.ispw.tryeshifts.dao.csv;
-    exports com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI;
-    opens com.ispw.tryeshifts.graphcontroller.gui.utilities.stratGUI to javafx.fxml;
-    exports com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
-    opens com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar to javafx.fxml;
+    exports com.ispw.tryeshifts.graphcontroller.gui.utilities.stratgui;
+    opens com.ispw.tryeshifts.graphcontroller.gui.utilities.stratgui to javafx.fxml;
+    exports com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar;
+    opens com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar to javafx.fxml;
 
 }

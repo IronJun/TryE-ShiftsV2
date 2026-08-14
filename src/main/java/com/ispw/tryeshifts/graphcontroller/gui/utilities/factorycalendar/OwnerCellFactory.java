@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.gui.utilities.factoryCalendar;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
