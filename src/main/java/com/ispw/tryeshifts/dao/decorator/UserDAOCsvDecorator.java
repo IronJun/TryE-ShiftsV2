@@ -6,11 +6,9 @@ import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.DataFormatException;
 
 public class UserDAOCsvDecorator implements UserDAO {
     private static final String FILE_PATH = "persistency/users.csv";

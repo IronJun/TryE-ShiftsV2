@@ -5,7 +5,6 @@ import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.demo.AvailabilityDAODemo;
-import com.ispw.tryeshifts.dao.jdbc.AvailabilityDAOJdbc;
 import com.ispw.tryeshifts.dao.jdbc.MembershipDAOJdbc;
 import com.ispw.tryeshifts.dao.jdbc.UserDAOJdbc;
 import com.ispw.tryeshifts.dao.jdbc.WorkplaceDAOJdbc;
