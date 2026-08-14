@@ -9,7 +9,7 @@ import com.ispw.tryeshifts.excpetion.*;
 
 
 public class LoginAC {
-    private static UserDAO userRepo = AppConfig.getDAOFactory().getUserDAO();
+    private static UserDAO userRepo = AppConfig.getUserRepository();
 
     private LoginAC(){
         throw new IllegalStateException("Utility class");

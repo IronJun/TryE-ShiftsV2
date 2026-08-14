@@ -18,7 +18,7 @@ public class SignupAC {
 
     public static void registerUser(UserBean userbean) throws BaseException {
 
-        UserDAO userRepo = AppConfig.getDAOFactory().getUserDAO();
+        UserDAO userRepo = AppConfig.getUserRepository();
 
         if (isDataInvalid(userbean)) {
             throw new IncompleteDataException("Tutti i campi sono obbligatori");

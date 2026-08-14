@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchWorkplacesAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getDAOFactory().getWorkplaceDAO();
+    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
     private SearchWorkplacesAC(){
         throw new IllegalStateException("Utility class");
