@@ -10,13 +10,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SignupAC {
-    private static final Logger LOGGER = Logger.getLogger(SignupAC.class.getName());
+    private final Logger LOGGER = Logger.getLogger(SignupAC.class.getName());
 
-    private SignupAC(){
-        throw new IllegalStateException("Utility class");
-    }
 
-    public static void registerUser(UserBean userbean) throws BaseException {
+    public void registerUser(UserBean userbean) throws BaseException {
 
         UserDAO userRepo = AppConfig.getUserRepository();
 
@@ -51,12 +48,12 @@ public class SignupAC {
 
     }
 
-    private static boolean isDataInvalid(UserBean bean) {
+    private boolean isDataInvalid(UserBean bean) {
         return bean.getEmail().isEmpty() || bean.getName().isEmpty() ||
                 bean.getPassword().isEmpty() || bean.getSurname().isEmpty();
     }
 
-    private static boolean pwdNotMatch(String pwd, String pwd2) {
+    private boolean pwdNotMatch(String pwd, String pwd2) {
         return !pwd.equals(pwd2);
     }
 

@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.*;
+import com.ispw.tryeshifts.graphcontroller.gui.ShiftCellHandling;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -17,11 +18,15 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 public class HomeCLI {
-    private static final Logger LOGGER = Logger.getLogger(HomeCLI.class.getName());
-    private static String msg;
-    private HomeCLI(){}
+    private  final Logger LOGGER = Logger.getLogger(HomeCLI.class.getName());
+    private final NewWorkplaceCLI newWorkplaceCLI = new NewWorkplaceCLI();
+    private final SettingsCLI settingsCLI = new SettingsCLI();
+    private final ShiftsCLI shiftsCLI = new ShiftsCLI();
+    private final WorkersCLI workersCLI = new WorkersCLI();
+    private  String msg;
+    public  HomeCLI(){}
 
-    public static void start(){
+    public  void start(){
         UserBean user = SessionContext.getInstance().getLoggeduser();
         if(user == null){
             LOGGER.severe("User not logged in");
@@ -47,7 +52,7 @@ public class HomeCLI {
                     showWorkplacesList(false);
                     break;
                 case "2":
-                    NewWorkplaceCLI.start();
+                    newWorkplaceCLI.start();
                     break;
                 case "3":
                     showWorkplacesList(true);
@@ -56,7 +61,7 @@ public class HomeCLI {
                     showMyWorkingDays();
                     break;
                 case "5":
-                    SettingsCLI.accountSettings(user);
+                    settingsCLI.accountSettings(user);
                     break;
                 case "0":
                     LOGGER.info("Closing application... Goodbye!");
@@ -73,7 +78,7 @@ public class HomeCLI {
 
     }
 
-    private static void showWorkplacesList(boolean isPersonal) {
+    private  void showWorkplacesList(boolean isPersonal) {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null){
             LOGGER.severe("User not logged in");
@@ -82,10 +87,11 @@ public class HomeCLI {
         try {
             // 1. Carichiamo la lista originale una sola volta
             List<WorkplaceBean> allWorkplaces;
+            SearchWorkplacesAC searchWorkplacesAC = new SearchWorkplacesAC();
             if (isPersonal) {
-                allWorkplaces = SearchWorkplacesAC.getWorkplacesByEmail(loggedUser.getEmail());
+                allWorkplaces = searchWorkplacesAC.getWorkplacesByEmail(loggedUser.getEmail());
             } else {
-                allWorkplaces = SearchWorkplacesAC.getAllWorkplaces();
+                allWorkplaces = searchWorkplacesAC.getAllWorkplaces();
             }
 
             if (allWorkplaces.isEmpty()) {
@@ -99,7 +105,7 @@ public class HomeCLI {
         }
     }
 
-    private static void workplacePrint(List<WorkplaceBean> allWorkplaces, boolean isPersonal) {
+    private  void workplacePrint(List<WorkplaceBean> allWorkplaces, boolean isPersonal) {
         List<WorkplaceBean> currentList = new ArrayList<>(allWorkplaces);
 
         while (true) {
@@ -140,7 +146,7 @@ public class HomeCLI {
             }
         }
     }
-    private static void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
+    private  void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
         if(wb == null){
             LOGGER.warning("Workplace details are null!");
             return;
@@ -157,14 +163,14 @@ public class HomeCLI {
             handleWorkplaceSelection(wb);
         }
     }
-    private static void handleWorkplaceSelection(WorkplaceBean wp){
+    private  void handleWorkplaceSelection(WorkplaceBean wp){
         if(wp==null){
             LOGGER.warning("Workplace selection empty!");
             return;
         }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         try{
-            WorkplaceBean accessedWp = AccessWorkplaceAC.canAccess(loggedUser,wp.getWorkplaceName());
+            WorkplaceBean accessedWp = new AccessWorkplaceAC().canAccess(loggedUser,wp.getWorkplaceName());
             SessionContext.getInstance().setLoggedWorkplace(accessedWp);
             boolean exit= false;
             while(!exit) {
@@ -181,16 +187,16 @@ public class HomeCLI {
                 int choice = CLIReader.readInt("Select an option: ");
                 switch (choice) {
                     case 1:
-                        ShiftsCLI.shiftsDashboard(accessedWp);
+                        shiftsCLI.shiftsDashboard(accessedWp);
                         break;
                     case 2:
-                        WorkersCLI.activeWorkers(accessedWp);
+                        workersCLI.activeWorkers(accessedWp);
                         break;
                     case 3:
-                        WorkersCLI.pendingWorkers(accessedWp);
+                        workersCLI.pendingWorkers(accessedWp);
                         break;
                     case 4:
-                        SettingsCLI.workplaceSettings(accessedWp);
+                        settingsCLI.workplaceSettings(accessedWp);
                         break;
                     case 0:
                         exit = true;
@@ -208,10 +214,10 @@ public class HomeCLI {
             LOGGER.severe("Error accessing workplace: " + e.getMessage() + "\n");
         }
     }
-    private static void executeJoinRequest(UserBean user, String wpName) {
+    private  void executeJoinRequest(UserBean user, String wpName) {
         try {
             // Supponendo che requestJoin sia in WorkplaceAC o simile
-            ManageMembersAC.requestJoin(user, wpName);
+            new ManageMembersAC().requestJoin(user, wpName);
             LOGGER.info("Join request sent successfully! Wait for Boss approval.\n");
         } catch (ValidationException e) {
             LOGGER.warning("Information: " + e.getMessage() + "\n");
@@ -219,25 +225,26 @@ public class HomeCLI {
             LOGGER.severe("Error during join request: " + e.getMessage() + "\n");
         }
     }
-    private static void showMyWorkingDays() {
+    private  void showMyWorkingDays() {
+        ManageShiftsAC ac= new  ManageShiftsAC();
         UserBean user = SessionContext.getInstance().getLoggeduser();
         if(user == null){
             LOGGER.severe("User is null!\n");
             return;
         }
         int offset = 0; // Settimana corrente
-        String weekId = ManageShiftsAC.calculateWeekId(offset);
+        String weekId = ac.calculateWeekId(offset);
         String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
         try {
             // Chiamata al tuo metodo dell'Applicativo
             // Supponendo sia in PublishShiftsAC
-            Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(user.getEmail(), weekId);
+            Map<String, Object> data = ac.getHomeScheduleData(user.getEmail(), weekId);
 
             // Estraiamo i dati dalla mappa "Object"
             Map<String, String> assignments = (Map<String, String>) data.get("assignments");
             TreeSet<String> slots = (TreeSet<String>) data.get("slots");
-            msg = "\n--- IL TUO CALENDARIO SETTIMANALE (" + ManageShiftsAC.getWeekRangeString(offset) + ") ---";
+            msg = "\n--- IL TUO CALENDARIO SETTIMANALE (" + ac.getWeekRangeString(offset) + ") ---";
             LOGGER.info(msg);
 
             if (slots.isEmpty()) {
@@ -275,7 +282,7 @@ public class HomeCLI {
             LOGGER.severe("Errore nel recupero del calendario: " + e.getMessage());
         }
     }
-    private static void logout() {
+    private  void logout() {
         LOGGER.info("Logging out...\n");
         // 1. Puliamo il SessionContext
         SessionContext.getInstance().setLoggeduser(null);

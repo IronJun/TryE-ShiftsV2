@@ -37,7 +37,7 @@ public class LoginGC {
 
         try{
             UserBean inputBean = new UserBean(email, password);
-            UserBean loggedUser = LoginAC.loginUser(inputBean);
+            UserBean loggedUser = new LoginAC().loginUser(inputBean);
 
             SessionContext.getInstance().setLoggeduser(loggedUser);
 

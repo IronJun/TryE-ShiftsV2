@@ -10,13 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchWorkplacesAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
-    private SearchWorkplacesAC(){
-        throw new IllegalStateException("Utility class");
-    }
-
-    public static List<WorkplaceBean> getAllWorkplaces()throws BaseException{
+    public List<WorkplaceBean> getAllWorkplaces()throws BaseException{
 
         List<Workplace> workplaceEntities = workplaceRepo.findAllWorkplaces();
 
@@ -36,7 +32,7 @@ public class SearchWorkplacesAC {
 
         return resultBeans;
     }
-    public static List<WorkplaceBean> searchByName(String query) throws BaseException {
+    public List<WorkplaceBean> searchByName(String query) throws BaseException {
 
         if (query == null || query.isEmpty()) {
             return new ArrayList<>();
@@ -54,7 +50,7 @@ public class SearchWorkplacesAC {
         return result;
 
     }
-    public static List<WorkplaceBean> getWorkplacesByEmail(String email)throws BaseException{
+    public List<WorkplaceBean> getWorkplacesByEmail(String email)throws BaseException{
         List<Workplace> workplaceEntities = workplaceRepo.findWorkplacesbyEmail(email);
         if (workplaceEntities == null || workplaceEntities.isEmpty()) {
             return new ArrayList<>();

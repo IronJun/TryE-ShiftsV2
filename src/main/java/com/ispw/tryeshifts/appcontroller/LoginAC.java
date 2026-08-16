@@ -9,12 +9,9 @@ import com.ispw.tryeshifts.excpetion.*;
 
 
 public class LoginAC {
-    private static UserDAO userRepo = AppConfig.getUserRepository();
+    private final UserDAO userRepo = AppConfig.getUserRepository();
 
-    private LoginAC(){
-        throw new IllegalStateException("Utility class");
-    }
-    public static UserBean loginUser(UserBean userBean) throws BaseException{
+    public  UserBean loginUser(UserBean userBean) throws BaseException{
         UserInfo savedUser;
         savedUser=userRepo.findByEmail(userBean.getEmail());
         if(savedUser == null){throw new InvalidCredentialException("Email non registrata. Riprova.");}
@@ -30,7 +27,7 @@ public class LoginAC {
 
         return userBean;
     }
-    public static UserBean autoLogin(String email)throws BaseException{
+    public  UserBean autoLogin(String email)throws BaseException{
         UserInfo user = userRepo.findByEmail(email);
         if(user == null){throw new EntityNotFoundException("User",email);}
         UserBean loggedUser = new UserBean();

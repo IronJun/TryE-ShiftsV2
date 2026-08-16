@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageMembersAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
+    private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private final UserDAO userRepo = AppConfig.getUserRepository();
+    private final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
 
     public List<UserBean> getActiveMembers(String wpName) throws BaseException{
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);
@@ -55,10 +55,9 @@ public class ManageMembersAC {
             }
     }
 
-    public static void requestJoin(UserBean userBean, String workplaceName) throws BaseException {
+    public void requestJoin(UserBean userBean, String workplaceName) throws BaseException {
         UserInfo user = userRepo.findByEmail(userBean.getEmail());
         Workplace wp = workplaceRepo.findWorkplaceByName(workplaceName);
-
         if(user == null){throw new EntityNotFoundException("User",userBean.getEmail());}
 
         if(membershipRepo.isUserMemberOf(userBean.getEmail(),workplaceName)){

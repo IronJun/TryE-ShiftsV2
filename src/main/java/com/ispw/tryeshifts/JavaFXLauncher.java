@@ -26,7 +26,7 @@ public class JavaFXLauncher extends Application {
         String savedEmail = PreferencesManager.getSavedEmail();
         if(savedEmail != null){
             try {
-                UserBean user = LoginAC.autoLogin(savedEmail);
+                UserBean user = new LoginAC().autoLogin(savedEmail);
                 SessionContext.getInstance().setLoggeduser(user);
                 manager.switchScene("Home.fxml", "E-Shifts - Home", 900, 600);
                 return;

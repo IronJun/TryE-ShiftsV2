@@ -26,6 +26,8 @@ public class WorkersGC {
     @FXML private Label titlePending;
     @FXML private Label errorlbl;
     private WorkplaceBean currentWorkplace;
+    private final ManageMembersAC ac = new ManageMembersAC();
+
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
@@ -50,7 +52,6 @@ public class WorkersGC {
 
     private void loadLists(){
         try{
-            ManageMembersAC ac = new ManageMembersAC();
             String wpName = currentWorkplace.getWorkplaceName();
             //gestione membri attivi
 
@@ -113,7 +114,6 @@ public class WorkersGC {
 
     private void handleResponse(String userEmail, boolean accept) {
         try{
-            ManageMembersAC ac = new ManageMembersAC();
             WorkplaceBean currentWp = SessionContext.getInstance().getLoggedWorkplace();
 
             if(currentWp == null){

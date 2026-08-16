@@ -122,7 +122,7 @@ public class SettingsGC {
         String endH = endHourCombo.getValue();
         String endM = endMinuteCombo.getValue();
         try{
-            String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
+            String formattedShift =new ManageShiftsAC().addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
             shiftsListView.getItems().add(formattedShift);
             Collections.sort(shiftsListView.getItems());
         }catch (InvalidCredentialException _){

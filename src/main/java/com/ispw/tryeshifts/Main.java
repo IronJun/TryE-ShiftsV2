@@ -22,7 +22,8 @@ public class Main {
                 Application.launch(JavaFXLauncher.class, args);
                 break;
             case 2:
-                SignUpCLI.start();
+                SignUpCLI signup = new SignUpCLI();
+                signup.start();
                 break;
             default:
                 LOGGER.severe("Scelta non valida. Uscita...");

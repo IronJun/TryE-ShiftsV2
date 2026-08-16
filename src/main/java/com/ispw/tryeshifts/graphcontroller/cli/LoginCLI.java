@@ -12,13 +12,13 @@ import java.util.logging.Logger;
 
 
 public class LoginCLI{
-    private static final Logger LOGGER = Logger.getLogger(LoginCLI.class.getName());
+    private  final Logger LOGGER = Logger.getLogger(LoginCLI.class.getName());
+    private final HomeCLI homeCLI = new HomeCLI();
+    public LoginCLI(){
 
-    private LoginCLI(){
-        throw new IllegalStateException("Utility class");
     }
 
-    public static void start() throws BaseException {
+    public  void start() throws BaseException {
         LOGGER.info("\n--- LOGIN E-SHIFTS ---\n");
         LOGGER.info("Inserisci le tue credenziali per accedere al sistema.\n");
 
@@ -34,14 +34,14 @@ public class LoginCLI{
                     return;
                 }
                 UserBean inputUser = new UserBean(email, password);
-                UserBean loggedUser = LoginAC.loginUser(inputUser);
+                UserBean loggedUser = new LoginAC().loginUser(inputUser);
 
                 SessionContext.getInstance().setLoggeduser(loggedUser);
 
                 handleRememberMe(inputUser);
 
                 LOGGER.info("Login completed correctly!! \n");
-                HomeCLI.start();
+                homeCLI.start();
                 return;
 
             } catch (InvalidCredentialException e) {
@@ -52,7 +52,7 @@ public class LoginCLI{
         }
     }
 
-    private static void handleRememberMe(UserBean user){
+    private  void handleRememberMe(UserBean user){
         boolean memValidation = false;
         while (!memValidation) {
             String mem = CLIReader.readString("Do you want to remember credentials? Y/n: ").toUpperCase();

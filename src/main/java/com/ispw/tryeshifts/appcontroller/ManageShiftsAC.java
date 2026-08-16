@@ -21,10 +21,10 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ManageShiftsAC {
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private static final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
+    private  final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private  final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
-    private static final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
+    private  final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
 
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
         if (workplace == null || user == null || weekId == null) {
@@ -68,7 +68,7 @@ public class ManageShiftsAC {
         // ATTENZIONE: Se sei nella "settimana prossima", calculateWeekId(0) ti darà la settimana SBAGLIATA.
         // Sarebbe meglio passare il weekId corrente direttamente dalla GUI come parametro.
         String currentWeekId = beans.isEmpty() ?
-                ManageShiftsAC.calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
+                calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
                 beans.get(0).getWeekId();
 
         // 1. CANCELLAZIONE (fuori dal try-catch principale se vuoi che sia ignorabile)
@@ -109,7 +109,7 @@ public class ManageShiftsAC {
         workplaceRepo.updateWeekStatus(workplaceName,weekId,status);
     }
 
-    public static Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws BaseException {
+    public  Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws BaseException {
         if (userEmail == null || weekId == null) {
             throw new NullPointerException("Parametri di ricerca mancanti");
         }
@@ -142,7 +142,7 @@ public class ManageShiftsAC {
         return result;
     }
 
-    public static String calculateWeekId(int weekOffset) {
+    public  String calculateWeekId(int weekOffset) {
         LocalDate targetDate = LocalDate.now(ZoneId.systemDefault()).plusWeeks(weekOffset);
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
@@ -150,7 +150,7 @@ public class ManageShiftsAC {
         return year + "_" + String.format("%02d", weekNum);
     }
 
-    public static String getWeekRangeString(int offset) {
+    public  String getWeekRangeString(int offset) {
         LocalDate start = LocalDate.now(ZoneId.systemDefault()).plusWeeks(offset).with(DayOfWeek.MONDAY);
         LocalDate end = start.plusDays(6);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
@@ -159,7 +159,7 @@ public class ManageShiftsAC {
 
 
 
-    public static String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
+    public  String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
         int startTotalMinutes = Integer.parseInt(startH) * 60 + Integer.parseInt(startM);
         int endTotalMinutes = Integer.parseInt(endH) * 60 + Integer.parseInt(endM);
 
@@ -188,7 +188,7 @@ public class ManageShiftsAC {
         return fullShift;
     }
 
-    private static int parseToMinutes(String time) {
+    private  int parseToMinutes(String time) {
         String[] hm = time.trim().split(":");
 
         if (hm.length < 2) {

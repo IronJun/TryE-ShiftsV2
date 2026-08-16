@@ -14,9 +14,9 @@ import com.ispw.tryeshifts.excpetion.DataFetchException;
 import java.util.logging.Logger;
 
 public class SettingsAC {
-    private static final Logger LOGGER = Logger.getLogger(SettingsAC.class.getName());
-    private static final UserDAO userRepo = AppConfig.getUserRepository();
-    private static final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private final Logger LOGGER = Logger.getLogger(SettingsAC.class.getName());
+    private final UserDAO userRepo = AppConfig.getUserRepository();
+    private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
 
     public void updateUserProfile(UserBean user) throws BaseException {

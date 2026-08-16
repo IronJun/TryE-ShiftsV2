@@ -16,28 +16,30 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ShiftsCLI {
-    private static final Logger LOGGER = Logger.getLogger(ShiftsCLI.class.getName());
-    private static String msg;
+    private  final Logger LOGGER = Logger.getLogger(ShiftsCLI.class.getName());
+    private  String msg;
     private static final String PUBLISHED_STATUS = "PUBLISHED";
     private static final String LOCKED_STATUS = "LOCKED";
     private static final String OPEN_STATUS = "OPEN";
     private static final String SELECTED_STATUS = "SELECTED";
-    private static int weekOffset ;
-    private static String currentWeekId;
+    private  int weekOffset ;
+    private  String currentWeekId;
     private static final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     static String SpaceSlot = "%-15s";
+    private final ManageShiftsAC ac = new ManageShiftsAC();
+    private final PublishShiftsAC pubAc = new PublishShiftsAC();
 
-    private ShiftsCLI(){}
 
-    public static void shiftsDashboard(WorkplaceBean wp) {
+    public ShiftsCLI(){}
+
+    public  void shiftsDashboard(WorkplaceBean wp) {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean back = false;
         weekOffset = 0;
 
         while (!back) {
             try {
-                currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
-                ManageShiftsAC ac = new ManageShiftsAC();
+                currentWeekId = ac.calculateWeekId(weekOffset);
                 String status = ac.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
 
                 // 1. Visualizzazione
@@ -56,7 +58,7 @@ public class ShiftsCLI {
         }
     }
 
-    private static void printUI(WorkplaceBean wp, String status) {
+    private  void printUI(WorkplaceBean wp, String status) {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
 
@@ -74,7 +76,7 @@ public class ShiftsCLI {
 
     }
 
-    private static void printOwnerMenu(String status) {
+    private  void printOwnerMenu(String status) {
         if (status.equals(OPEN_STATUS)) {
             LOGGER.info("1. Blocca disponibilità (Chiudi prenotazioni)\n");
         } else if (status.equals(LOCKED_STATUS)) {
@@ -83,14 +85,14 @@ public class ShiftsCLI {
         LOGGER.info("2. Modifica Turni manualmente\n");
     }
 
-    private static void printWorkerMenu(boolean isLocked) {
+    private  void printWorkerMenu(boolean isLocked) {
         if (!isLocked) {
             LOGGER.info("1. Inserisci/Modifica le tue disponibilità\n");
         } else {
             LOGGER.info("[SETTIMANA BLOCCATA - Disponibilità non modificabili]\n");
         }
     }
-    private static void handleAction(String choice, WorkplaceBean wp, String status, UserBean user) {
+    private  void handleAction(String choice, WorkplaceBean wp, String status, UserBean user) {
         switch (choice) {
             case "1":
                 executePrimaryAction(wp, status, user);
@@ -109,7 +111,7 @@ public class ShiftsCLI {
         }
     }
 
-    private static void executePrimaryAction(WorkplaceBean wp, String status, UserBean user) {
+    private  void executePrimaryAction(WorkplaceBean wp, String status, UserBean user) {
         boolean isOwner = user.getEmail().equals(wp.getOwnerEmail());
 
         if (!isOwner) {
@@ -126,7 +128,7 @@ public class ShiftsCLI {
     }
 
 
-    private static void giveAvailability() {
+    private  void giveAvailability() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         UserBean user = SessionContext.getInstance().getLoggeduser();
 
@@ -154,7 +156,7 @@ public class ShiftsCLI {
         }
     }
 
-    private static String promptDaySelection(List<String> activeDays) {
+    private  String promptDaySelection(List<String> activeDays) {
         LOGGER.info("Select the days (1-7) and 0 to annul and exit.\n: ");
         int dayChoice = CLIReader.readInt("> ");
         if (dayChoice <= 0 || dayChoice > 7) return null;
@@ -167,7 +169,7 @@ public class ShiftsCLI {
         }
         return selectedDay;
     }
-    private static String promptSlotSelection(List<String> slots) {
+    private  String promptSlotSelection(List<String> slots) {
             for (int i = 0; i < slots.size(); i++) {
                 msg = (i + 1) + ". " + slots.get(i) + "\n";
                 LOGGER.info(msg);
@@ -176,9 +178,8 @@ public class ShiftsCLI {
             if (slotChoice <= 0 || slotChoice > slots.size()) return null;
             return slots.get(slotChoice - 1);
         }
-    private static void processAndSave(UserBean user, WorkplaceBean wp,
+    private  void processAndSave(UserBean user, WorkplaceBean wp,
                                        String selectedDay, String fullSlot) throws BaseException {
-        ManageShiftsAC ac = new ManageShiftsAC();
         Map<String, List<String>> currentData = ac.getShiftData(user, wp,currentWeekId);
         String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
 
@@ -201,7 +202,7 @@ public class ShiftsCLI {
         ac.saveAvailabilities(beansToSave);
     }
 
-    private static List<AvailabilityBean> convertMapToBeans(Map<String, List<String>> currentData,
+    private  List<AvailabilityBean> convertMapToBeans(Map<String, List<String>> currentData,
                                                             UserBean user, WorkplaceBean wp,
                                                             String currentSelectionKey) {
         List<AvailabilityBean> beans = new ArrayList<>();
@@ -217,25 +218,22 @@ public class ShiftsCLI {
         }
         return beans;
     }
-    private static void lockshifts(WorkplaceBean wp){
+    private  void lockshifts(WorkplaceBean wp){
         try {
-        ManageShiftsAC ac = new ManageShiftsAC();
         // Cambiamo lo stato da OPEN a LOCKED
         ac.updateWeekStatusShifts(wp.getWorkplaceName(), currentWeekId, LOCKED_STATUS);
         LOGGER.info("✅ Settimana bloccata con successo! I lavoratori non possono più inserire dati.");
     } catch (BaseException e) {
         LOGGER.severe("Errore durante il blocco: " + e.getMessage());
     }}
-    private static void printWorkerTable(WorkplaceBean wp) {
+    private  void printWorkerTable(WorkplaceBean wp) {
         try {
-            ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
-            PublishShiftsAC publishAC = new PublishShiftsAC();
             UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
 
             // 1. Recupero Dati
-            Map<String, List<String>> assignments = publishAC.getAssignmentsForWeek(wp, currentWeekId);
-            Map<String, List<String>> shifts = manageShiftsAC.getShiftData(loggedUser, wp,currentWeekId);
-            String status = manageShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
+            Map<String, List<String>> assignments = pubAc.getAssignmentsForWeek(wp, currentWeekId);
+            Map<String, List<String>> shifts = ac.getShiftData(loggedUser, wp,currentWeekId);
+            String status = ac.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
             boolean isOwner = loggedUser.getEmail().equals(wp.getOwnerEmail());
 
             // 2. Stampa Intestazione
@@ -256,7 +254,7 @@ public class ShiftsCLI {
             Map<String, List<String>> assignments,
             UserBean user
     ) {}
-    private static String buildCellContent(String day, String slot, List<String> activeDays, TableContext ctx) {
+    private  String buildCellContent(String day, String slot, List<String> activeDays, TableContext ctx) {
 
         // Verifichiamo se il giorno è attivo (usando stream per ridurre i cicli for)
         boolean isDayActive = activeDays.stream().anyMatch(d -> d.equalsIgnoreCase(day));
@@ -268,7 +266,7 @@ public class ShiftsCLI {
         String searchKey = KeyGenerator.buildShiftKey(currentWeekId, day, slot);
         return getCellText(ctx.status, ctx.isOwner, searchKey, ctx.shifts, ctx.assignments, ctx.user);
     }
-    private static void printGrid(WorkplaceBean wp, String status, boolean isOwner,
+    private  void printGrid(WorkplaceBean wp, String status, boolean isOwner,
                                   Map<String, List<String>> shifts,
                                   Map<String, List<String>> assignments, UserBean user) {
 
@@ -293,13 +291,13 @@ public class ShiftsCLI {
 
         }
     }
-    private static List<String> parseCellNames(String content){
+    private  List<String> parseCellNames(String content){
         if(content.equals("-") || content.equals("  CLOSED  ")){
             return Collections.singletonList(content);
         }
         return Arrays.asList(content.split(","));
     }
-    private static void printSlotRows(String slot, int maxRowsInSlot, Map<String, List<String>> cellData) {
+    private  void printSlotRows(String slot, int maxRowsInSlot, Map<String, List<String>> cellData) {
         for (int r = 0; r < maxRowsInSlot; r++) {
             StringBuilder line = new StringBuilder();
 
@@ -322,10 +320,10 @@ public class ShiftsCLI {
         // Una linea di separazione opzionale tra una fascia oraria e l'altra
         LOGGER.info(msg);
     }
-    private static void printDashboardHeader(String status) {
+    private  void printDashboardHeader(String status) {
         // Creiamo la riga di stato
         String statusLine = String.format("STATUS: %s | WEEK: %s",
-                status, ManageShiftsAC.getWeekRangeString(weekOffset));
+                status, ac.getWeekRangeString(weekOffset));
         msg = statusLine+"\n";
         LOGGER.info(msg);
 
@@ -338,17 +336,16 @@ public class ShiftsCLI {
         msg = "-".repeat(header.length())+"\n";
         LOGGER.info(msg);
     }
-    private static void publishShifts(WorkplaceBean wp){
+    private  void publishShifts(WorkplaceBean wp){
         try {
             LOGGER.info("\n--- PUBBLICAZIONE TURNI DEFINITIVI ---");
             LOGGER.info("\nStai per rendere i turni visibili a tutti i lavoratori.");
             String conferma = CLIReader.readString("Confermi la pubblicazione per la settimana " + currentWeekId + "? (y/n): ");
 
             if (conferma.equalsIgnoreCase("y")) {
-                PublishShiftsAC ac = new PublishShiftsAC();
 
                 // Chiamata al tuo Applicativo
-                ac.publish(wp, currentWeekId);
+                pubAc.publish(wp, currentWeekId);
 
                 LOGGER.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
             } else {
@@ -358,11 +355,11 @@ public class ShiftsCLI {
             LOGGER.severe("❌ Errore durante la pubblicazione: " + e.getMessage());
         }
     }
-    private static void modifyShifts(){
+    private  void modifyShifts(){
         LOGGER.info("Modifica dei turni manuale non ancora implementata");
     }
 
-    private static String getCellText(String status, boolean isOwner, String key,
+    private  String getCellText(String status, boolean isOwner, String key,
                                       Map<String, List<String>> shifts,
                                       Map<String, List<String>> assignments, UserBean user) {
         List<String> rawList;

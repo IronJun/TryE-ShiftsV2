@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class WorkersCLI {
-    private static final Logger LOGGER = Logger.getLogger(WorkersCLI.class.getName());
-    private static String msg;
-    private WorkersCLI(){
-        throw new IllegalStateException("Utility class");
+    private final Logger LOGGER = Logger.getLogger(WorkersCLI.class.getName());
+    private final ManageMembersAC ac =  new ManageMembersAC();
+    private  String msg;
+    public WorkersCLI(){
     }
-    public static void activeWorkers(WorkplaceBean wp){
+    public  void activeWorkers(WorkplaceBean wp){
         try {
             LOGGER.info("\n--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
-            ManageMembersAC ac = new ManageMembersAC();
             List<UserBean> active = ac.getActiveMembers(wp.getWorkplaceName());
             if(active.isEmpty()){
                 LOGGER.info("No active members yet.");
@@ -35,9 +34,8 @@ public class WorkersCLI {
             LOGGER.severe("Errore: " + e.getMessage());
         }
     }
-    public static void pendingWorkers(WorkplaceBean wp){
+    public  void pendingWorkers(WorkplaceBean wp){
         try{
-            ManageMembersAC ac = new ManageMembersAC();
             List<UserBean> pending = ac.getPendingRequests(wp.getWorkplaceName());
             if (pending.isEmpty()) {
                 LOGGER.info("\nNo pending requests.");

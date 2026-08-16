@@ -7,15 +7,16 @@ import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import java.util.logging.Logger;
 
-import static com.ispw.tryeshifts.graphcontroller.cli.NewWorkplaceCLI.defineTimeSlots;
-import static com.ispw.tryeshifts.graphcontroller.cli.NewWorkplaceCLI.selectOperatingDays;
 
 public class SettingsCLI {
-    private static final Logger LOGGER = Logger.getLogger(SettingsCLI.class.getName());
-    private SettingsCLI(){
-        throw new IllegalStateException("Utility class");
+    private final Logger LOGGER = Logger.getLogger(SettingsCLI.class.getName());
+    private final NewWorkplaceCLI newWorkplaceCLI = new NewWorkplaceCLI();
+    private final SettingsAC ac = new SettingsAC();
+
+    public SettingsCLI(){
+
     }
-    public static void accountSettings(UserBean user){
+    public  void accountSettings(UserBean user){
         boolean back = false;
 
         while (!back) {
@@ -53,7 +54,7 @@ public class SettingsCLI {
         }
     }
 
-    public static void workplaceSettings(WorkplaceBean wp){
+    public  void workplaceSettings(WorkplaceBean wp){
         boolean back = false;
         String oldname = wp.getWorkplaceName();
 
@@ -77,10 +78,10 @@ public class SettingsCLI {
                     wp.setAddress(CLIReader.readString("Nuovo indirizzo: "));
                     break;
                 case "3":
-                    wp.setSelectedDays(selectOperatingDays());
+                    wp.setSelectedDays(newWorkplaceCLI.selectOperatingDays());
                     break;
                 case "4":
-                    wp.setShiftsBean(defineTimeSlots());
+                    wp.setShiftsBean(newWorkplaceCLI.defineTimeSlots());
                     break;
                 case "0":
                     back = true;
@@ -90,7 +91,6 @@ public class SettingsCLI {
             }
 
             try {
-                SettingsAC ac = new SettingsAC();
                 ac.updateWorkplace(wp, oldname);
 
                 oldname = wp.getWorkplaceName();
@@ -105,10 +105,9 @@ public class SettingsCLI {
         }
     }
 
-    private static void updateUser(UserBean user) {
+    private  void updateUser(UserBean user) {
         try {
             // Usa l'App Controller che gestisce il profilo (es. LoginAC o ProfileAC)
-            SettingsAC ac = new SettingsAC();
             ac.updateUserProfile(user);
             LOGGER.info("✅ Profilo aggiornato correttamente!");
         } catch (BaseException e) {

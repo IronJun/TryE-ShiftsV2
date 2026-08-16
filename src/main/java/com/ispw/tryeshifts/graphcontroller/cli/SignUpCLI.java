@@ -12,20 +12,20 @@ import java.util.logging.Logger;
 
 
 public class SignUpCLI {
-
-
-    private static final Logger LOGGER = Logger.getLogger(SignUpCLI.class.getName());
-    private SignUpCLI(){
+    private final Logger LOGGER = Logger.getLogger(SignUpCLI.class.getName());
+    private final HomeCLI homeCLI = new HomeCLI() ;
+    private final LoginCLI loginCLI = new LoginCLI();
+    public  SignUpCLI(){
         throw new IllegalStateException("Utility class");
     }
-    public static void start() {
+    public  void start() {
         // 1. L'AUTO-LOGIN va fatto SOLO QUI (una volta all'avvio)
         try {
             String savedEmail = PreferencesManager.getSavedEmail();
             if (savedEmail != null) {
-                UserBean user = LoginAC.autoLogin(savedEmail);
+                UserBean user = new LoginAC().autoLogin(savedEmail);
                 SessionContext.getInstance().setLoggeduser(user);
-                HomeCLI.start();
+                homeCLI.start();
                 // Se l'utente fa Logout dalla Home, il codice prosegue sotto nel loop.
             }
         } catch (BaseException e) {
@@ -38,7 +38,7 @@ public class SignUpCLI {
             preRegistration();
         }
     }
-    private static void preRegistration(){
+    private  void preRegistration(){
         boolean accVal = false;
         String acc = "";
         while (!accVal) {
@@ -53,7 +53,7 @@ public class SignUpCLI {
 
         if (acc.equals("Y")) {
             try {
-                LoginCLI.start();
+                loginCLI.start();
             } catch (BaseException e) {
                 LOGGER.severe("ERRORE: " + e.getMessage());
             }
@@ -61,7 +61,7 @@ public class SignUpCLI {
             performRegistration();
         }
     }
-    private static void performRegistration() {
+    private  void performRegistration() {
         boolean passwordValid = false;
         String pwd = "";
         String pwdRepeat = "";
@@ -85,7 +85,7 @@ public class SignUpCLI {
                 }
             }
             UserBean user = new UserBean(email, pwd, name, surname, pwdRepeat);
-            SignupAC.registerUser(user);
+            new SignupAC().registerUser(user);
 
             LOGGER.info("\n✅ Registrazione avvenuta con successo! Ora puoi effettuare il login.\n");
 
@@ -96,7 +96,7 @@ public class SignUpCLI {
             LOGGER.severe("❌ Errore durante la registrazione: " + e.getMessage() + "\n");
         }
     }
-    private static String emailRegister(){
+    private  String emailRegister(){
         boolean emailValid = false;
         String email = "";
         while (!emailValid) {
@@ -109,7 +109,7 @@ public class SignUpCLI {
         return email;
     }
 
-    private static String nameRegister(){
+    private  String nameRegister(){
         boolean nameValid = false;
         String name = "";
         while (!nameValid) {

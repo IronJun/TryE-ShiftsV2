@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class ShiftsGC {
     private UserBean loggeduser;
     private WorkplaceBean selectedWorkplace;
-    private static final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
+    private final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
     private String msg;
     private int weekOffset = 0;
     private String currentWeekId;
@@ -50,15 +50,17 @@ public class ShiftsGC {
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private String shiftsMode= "Forzata" ;
+    private final ManageShiftsAC manageAC = new ManageShiftsAC();
+    private final PublishShiftsAC pubAc = new PublishShiftsAC();
 
     public void initialize()  {
         ErrorViewManager.setupAutoHide(errorlbl);
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         this.weekOffset = 0;
-        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+        this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
-            lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
+            lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
         }
 
         if (info != null) {
@@ -179,8 +181,6 @@ public class ShiftsGC {
             WorkplaceBean wp
     ) {}
     private TableContext fetchTableContext() throws BaseException {
-        ManageShiftsAC manageAC = new ManageShiftsAC();
-        PublishShiftsAC publishAC = new PublishShiftsAC();
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
@@ -192,7 +192,7 @@ public class ShiftsGC {
                 manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
                 user.getEmail().equals(wp.getOwnerEmail()),
                 manageAC.getShiftData(user, wp,currentWeekId),
-                publishAC.getAssignmentsForWeek(wp, currentWeekId),
+                pubAc.getAssignmentsForWeek(wp, currentWeekId),
                 user,
                 wp);
     }
@@ -284,8 +284,7 @@ public class ShiftsGC {
 
         }
         try {
-            ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
-            manageShiftsAC.saveAvailabilities(availabilityBeans);
+            manageAC.saveAvailabilities(availabilityBeans);
 
             // Messaggio di successo
             SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
@@ -320,8 +319,6 @@ public class ShiftsGC {
     }
 
     public void onPublic() {
-        ManageShiftsAC managShiftsAC = new ManageShiftsAC();
-        PublishShiftsAC publishAC = new PublishShiftsAC();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
 
         if(wp == null){
@@ -329,14 +326,14 @@ public class ShiftsGC {
             return;
         }
         try{
-            String currentStatus = managShiftsAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
+            String currentStatus = manageAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
 
             if("OPEN".equals(currentStatus)){
-                managShiftsAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,LOCKED_STATUS);
+                manageAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,LOCKED_STATUS);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
             }
             else if(LOCKED_STATUS.equals(currentStatus)){
-                publishAC.publish(wp, this.currentWeekId);
+                pubAc.publish(wp, this.currentWeekId);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();
@@ -397,10 +394,10 @@ public class ShiftsGC {
     }
 
     private void updateView() {
-        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+        this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         // Aggiorna la label per far capire all'utente dove si trova
         selectedCellsMap.clear();
-        lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
+        lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
         // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
         buildDynamicTable();
     }

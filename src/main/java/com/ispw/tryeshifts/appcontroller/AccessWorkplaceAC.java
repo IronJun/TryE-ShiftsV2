@@ -12,10 +12,7 @@ import com.ispw.tryeshifts.excpetion.*;
 
 public class AccessWorkplaceAC {
 
-    private AccessWorkplaceAC(){
-        throw new IllegalStateException("Utility class");
-    }
-    public static WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
+    public  WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
         MembershipDAO membershipDB = AppConfig.getMembershipRepository();
         WorkplaceDAO workplaceDB = AppConfig.getWorkplaceRepository();
 

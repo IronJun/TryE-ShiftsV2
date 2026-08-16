@@ -85,7 +85,7 @@ public class NewWorkplaceGC {
         // 2. Creazione del Bean (trasporto dati verso la logica applicativa)
         try {
             WorkplaceBean wpBean = new WorkplaceBean(nameField.getText(), addressField.getText(), days, shifts, email);
-            CreateWorkplaceAC.createWorkplace(wpBean);
+            new CreateWorkplaceAC().createWorkplace(wpBean);
             SceneManager.getInstance().showInfoAlert("Successo", "Workplace creato con successo!");
             closeWindow();
         }catch(DuplicateEntityException e){
@@ -124,7 +124,7 @@ public class NewWorkplaceGC {
         String endH = endHourCombo.getValue();
         String endM = endMinuteCombo.getValue();
         try{
-            String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
+            String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
             shiftsListView.getItems().add(formattedShift);
             Collections.sort(shiftsListView.getItems());
         }catch(IllegalArgumentException _){

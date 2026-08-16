@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class NewWorkplaceCLI {
-    private static final Logger LOGGER = Logger.getLogger(NewWorkplaceCLI.class.getName());
-    private static String msg;
-    private NewWorkplaceCLI(){
-        throw new IllegalStateException("Utility class");
+    private  final Logger LOGGER = Logger.getLogger(NewWorkplaceCLI.class.getName());
+    private  String msg;
+    public NewWorkplaceCLI(){
+
     }
-    public static void start(){
+    public void start(){
             LOGGER.info("\n--- CREAZIONE NUOVO WORKPLACE ---\n");
 
             // 1. Dati base
@@ -37,7 +37,7 @@ public class NewWorkplaceCLI {
             try {
                 WorkplaceBean newWp = new WorkplaceBean(name,address,selectedDays,slots,SessionContext.getInstance().getLoggeduser().getEmail());
                 // Chiamata all'AC (usa il metodo che hai già per JavaFX)
-                CreateWorkplaceAC.createWorkplace(newWp);
+                new CreateWorkplaceAC().createWorkplace(newWp);
                 msg = "\n✅ Workplace '" + name + "' creato con successo!\n";
                 LOGGER.info(msg);
             } catch (DuplicateEntityException e) {
@@ -50,7 +50,7 @@ public class NewWorkplaceCLI {
         }
 
 
-    public static List<String> selectOperatingDays() {
+    public  List<String> selectOperatingDays() {
         List<String> selected = new ArrayList<>();
         String[] allDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
@@ -68,7 +68,7 @@ public class NewWorkplaceCLI {
         }
         return selected;
     }
-    public static List<String> defineTimeSlots() {
+    public  List<String> defineTimeSlots() {
         List<String> slots = new ArrayList<>();
         boolean adding = true;
 
@@ -88,7 +88,7 @@ public class NewWorkplaceCLI {
                 String endH = endParts[0];
                 String endM = endParts[1];
 
-                String formattedShift = ManageShiftsAC.addShiftstoWorkaplce(startM,startH, endM, endH,slots);
+                String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM,startH, endM, endH,slots);
                 slots.add(formattedShift);
                 msg = "✅ correctly added shift: "+formattedShift;
                 LOGGER.info(msg);

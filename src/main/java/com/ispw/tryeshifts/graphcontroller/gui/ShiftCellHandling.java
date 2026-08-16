@@ -13,6 +13,8 @@ public class ShiftCellHandling extends ListCell<String> {
     private final Label timeLabel = new Label();
     private final Button btnDelete = new Button("X");
     private final Pane spacer = new Pane();
+
+
     public ShiftCellHandling(){
         // Configuriamo il layout una volta sola nel costruttore
         container.setSpacing(10);

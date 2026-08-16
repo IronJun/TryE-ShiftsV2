@@ -42,6 +42,9 @@ public class HomeGC {
     private int weekOffset = 0;
     private String currentWeekId;
     private String msg="";
+    private final AccessWorkplaceAC accessWorkplaceAC = new AccessWorkplaceAC();
+    private final ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
+    private final SearchWorkplacesAC searchWorkplacesAC = new SearchWorkplacesAC();
 
     public void initialize() {
         ErrorViewManager.setupAutoHide(errorlbl);
@@ -57,9 +60,9 @@ public class HomeGC {
             }
         });
         this.weekOffset = 0;
-        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
+        this.currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
-            lblWeekDisplay.setText("Settimana: "+ ManageShiftsAC.getWeekRangeString(weekOffset));
+            lblWeekDisplay.setText("Settimana: "+ manageShiftsAC.getWeekRangeString(weekOffset));
         }
         if (this.loggedUser != null) {
             refreshWorkplaceList();
@@ -78,7 +81,7 @@ public class HomeGC {
 
     public void handleGlobalSearchSelection(String workplaceName) {
         try{
-            WorkplaceBean fullWp = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
+            WorkplaceBean fullWp = accessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(fullWp);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         }catch(UserNotMemberException _) {
@@ -101,8 +104,7 @@ public class HomeGC {
         alert.showAndWait().ifPresent(response -> {
             if(response == ButtonType.OK){
                 try{
-                    ManageMembersAC ac = new ManageMembersAC();
-                    ac.requestJoin(this.loggedUser,workplaceName);
+                    new ManageMembersAC().requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
                     ErrorViewManager.screenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
@@ -116,7 +118,7 @@ public class HomeGC {
 
     public void handleWorkplaceSelection(String workplaceName) {
         try {
-            WorkplaceBean wpBean = AccessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
+            WorkplaceBean wpBean = accessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         }catch (UserNotMemberException _) {
@@ -135,9 +137,9 @@ public class HomeGC {
         try {
             List<WorkplaceBean> result;
             if (query == null || query.isEmpty()) {
-                result = SearchWorkplacesAC.getAllWorkplaces();
+                result = searchWorkplacesAC.getAllWorkplaces();
             } else {
-                result = SearchWorkplacesAC.searchByName(query);
+                result = searchWorkplacesAC.searchByName(query);
             }
             msg = "Risultati trovati: " + result.size();
             LOGGER.info(msg); // DEBUG
@@ -164,7 +166,7 @@ public class HomeGC {
         grid.getColumnConstraints().clear();
         grid.getRowConstraints().clear();
         try {
-            Map<String, Object> data = ManageShiftsAC.getHomeScheduleData(userEmail, weekId);
+            Map<String, Object> data = manageShiftsAC.getHomeScheduleData(userEmail, weekId);
             Map<String, String> assignments = (Map<String, String>) data.get("assignments");
             TreeSet<String> slots = (TreeSet<String>) data.get("slots");
 
@@ -246,7 +248,7 @@ public class HomeGC {
     private void refreshWorkplaceList() {
         vboxWorkplaceLegend.getChildren().clear();
         try {
-            List<WorkplaceBean> workplaces = SearchWorkplacesAC.getWorkplacesByEmail(this.loggedUser.getEmail());
+            List<WorkplaceBean> workplaces = searchWorkplacesAC.getWorkplacesByEmail(this.loggedUser.getEmail());
             if (workplaces == null || workplaces.isEmpty()) {
                 vboxWorkplaceLegend.getChildren().add(new Label("No workplaces joined yet."));
                 return;
@@ -367,8 +369,8 @@ public class HomeGC {
     }
 
     private void updateUI() {
-        this.currentWeekId = ManageShiftsAC.calculateWeekId(weekOffset);
-        lblWeekDisplay.setText(ManageShiftsAC.getWeekRangeString(weekOffset));
+        this.currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
+        lblWeekDisplay.setText(manageShiftsAC.getWeekRangeString(weekOffset));
         buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), this.currentWeekId);
     }
 }
