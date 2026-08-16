@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class ShiftsGC {
     private UserBean loggeduser;
     private WorkplaceBean selectedWorkplace;
-    private final Logger LOGGER = Logger.getLogger(ShiftsGC.class.getName());
+    private final Logger logger = Logger.getLogger(ShiftsGC.class.getName());
     private String msg;
     private int weekOffset = 0;
     private String currentWeekId;
@@ -80,7 +80,7 @@ public class ShiftsGC {
             lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
             buildDynamicTable();
         }catch(BaseException e){
-            LOGGER.log(Level.SEVERE, "Errore durante l'inizializzazione della UI", e);
+            logger.log(Level.SEVERE, "Errore durante l'inizializzazione della UI", e);
         }
 
     }
@@ -91,7 +91,7 @@ public class ShiftsGC {
         // Qui potrai caricare i turni specifici di questo workplace
         buildDynamicTable();
         msg = "DEBUG UI: Workplace selezionato: " + wp.getWorkplaceName();
-        LOGGER.log(Level.FINE,msg);
+        logger.log(Level.FINE,msg);
     }
 
     private void buildDynamicTable() {
@@ -114,7 +114,7 @@ public class ShiftsGC {
 
         } catch (BaseException e) {
             msg = TECHNICAL_ERROR + ": " + e.getMessage();
-            LOGGER.severe(msg);
+            logger.severe(msg);
         }
     }
 
@@ -245,7 +245,7 @@ public class ShiftsGC {
             // SE QUESTO NON STAMPA, LA CHIAVE cellKey NON MATCHATA CON ctx.shifts
             if (isSelected) {
                 msg ="!!! MATCH TROVATO per chiave: " + cellKey;
-                LOGGER.info(msg);
+                logger.info(msg);
             }
         }
     }
@@ -256,14 +256,14 @@ public class ShiftsGC {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         msg = "DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size();
-        LOGGER.log(Level.FINE, msg);
+        logger.log(Level.FINE, msg);
         // 2. Creiamo una lista di AvailabilityBean
         List<AvailabilityBean> availabilityBeans = new ArrayList<>();
 
         // Scorriamo la mappa delle celle selezionate
         for (Map.Entry<String, Boolean> entry : selectedCellsMap.entrySet()) {
             msg = "DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue();
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
                 String[] parts = key.split("_");
@@ -278,7 +278,7 @@ public class ShiftsGC {
                 }
             }
             msg ="DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size();
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
 
             // 3. Chiamiamo il Controller Applicativo
 
@@ -302,7 +302,7 @@ public class ShiftsGC {
 
             // LOG DI CONTROLLO FINALE
             msg = "DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
             AvailabilityBean bean = new AvailabilityBean(
                     loggedUser.getEmail(),
                     wp.getWorkplaceName(),
@@ -314,7 +314,7 @@ public class ShiftsGC {
             availabilityBeans.add(bean);
         } else {
             msg = "DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
         }
     }
 
@@ -347,7 +347,7 @@ public class ShiftsGC {
         if(wp!=null){
             SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
         }else{
-           LOGGER.info("Seleziona un workplace");
+           logger.info("Seleziona un workplace");
         }
     }
 
@@ -364,7 +364,7 @@ public class ShiftsGC {
         }else{
 
             msg = "Seleziona un workplace";
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
         }
     }
 
@@ -373,7 +373,7 @@ public class ShiftsGC {
             PreferencesManager.clearPreferences();
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
             msg = "Logout effettuato";
-            LOGGER.log(Level.FINE, msg);
+            logger.log(Level.FINE, msg);
         }
     }
     @FXML
