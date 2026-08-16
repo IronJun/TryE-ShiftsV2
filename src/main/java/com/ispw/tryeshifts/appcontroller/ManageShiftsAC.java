@@ -24,7 +24,7 @@ public class ManageShiftsAC {
     private  final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
     private  final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
 
-    private  final Logger LOGGER = Logger.getLogger(ManageShiftsAC.class.getName());
+    private  final Logger logger = Logger.getLogger(ManageShiftsAC.class.getName());
 
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
         if (workplace == null || user == null || weekId == null) {
@@ -75,7 +75,7 @@ public class ManageShiftsAC {
         try {
             availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
         } catch(EntityNotFoundException _) {
-            LOGGER.info("Nessuna disponibilità precedente da rimuovere, procedo al salvataggio.");
+            logger.info("Nessuna disponibilità precedente da rimuovere, procedo al salvataggio.");
         }
 
         // 2. SALVATAGGIO (deve essere garantito)
@@ -92,7 +92,7 @@ public class ManageShiftsAC {
                 availabilityRepo.saveAvailability(entity);
             }
         } catch(DataFetchException _) {
-            LOGGER.severe( "Errore di persistenza durante il salvataggio");
+            logger.severe( "Errore di persistenza durante il salvataggio");
              // Rilancia per far sapere alla GUI che è fallito
         }
     }

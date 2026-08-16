@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SignupAC {
-    private final Logger LOGGER = Logger.getLogger(SignupAC.class.getName());
+    private final Logger logger = Logger.getLogger(SignupAC.class.getName());
 
 
     public void registerUser(UserBean userbean) throws BaseException {
@@ -41,7 +41,7 @@ public class SignupAC {
             userentity.setPasswordHash(hashedPass);
             userRepo.save(userentity);
         }catch(DataFetchException e){
-            LOGGER.log(Level.SEVERE, "Errore di persistenza durante la registrazione\n", e);
+            logger.log(Level.SEVERE, "Errore di persistenza durante la registrazione\n", e);
         }
 
 

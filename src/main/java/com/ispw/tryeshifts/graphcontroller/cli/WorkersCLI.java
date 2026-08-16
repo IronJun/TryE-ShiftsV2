@@ -10,42 +10,40 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class WorkersCLI {
-    private final Logger LOGGER = Logger.getLogger(WorkersCLI.class.getName());
+    private final Logger logger = Logger.getLogger(WorkersCLI.class.getName());
     private final ManageMembersAC ac =  new ManageMembersAC();
     private  String msg;
-    public WorkersCLI(){
-    }
     public  void activeWorkers(WorkplaceBean wp){
         try {
-            LOGGER.info("\n--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
+            logger.info("\n--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
             List<UserBean> active = ac.getActiveMembers(wp.getWorkplaceName());
             if(active.isEmpty()){
-                LOGGER.info("No active members yet.");
+                logger.info("No active members yet.");
             }else{
                 msg = String.format("%n %-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL");
-                LOGGER.info(msg);
+                logger.info(msg);
                 for(UserBean ub : active){
                     msg = String.format("%n %-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail());
-                    LOGGER.info(msg);
+                    logger.info(msg);
                 }
             }
             CLIReader.readString("\nPress Enter to continue...");
         }catch (BaseException e){
-            LOGGER.severe("Errore: " + e.getMessage());
+            logger.severe("Errore: " + e.getMessage());
         }
     }
     public  void pendingWorkers(WorkplaceBean wp){
         try{
             List<UserBean> pending = ac.getPendingRequests(wp.getWorkplaceName());
             if (pending.isEmpty()) {
-                LOGGER.info("\nNo pending requests.");
+                logger.info("\nNo pending requests.");
                 return;
             }
-            LOGGER.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---\n");
+            logger.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---\n");
             for (int i = 0; i < pending.size(); i++) {
                 UserBean u = pending.get(i);
                 msg = String.format("%d. %s %s (%s)", (i + 1), u.getName(), u.getSurname(), u.getEmail());
-                LOGGER.info(msg);
+                logger.info(msg);
             }
 
             int choice = CLIReader.readInt("\nSelect the number of the user to handle (0 to annul): ");
@@ -55,10 +53,10 @@ public class WorkersCLI {
 
                 boolean accept = action.equals("y");
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
-                LOGGER.info(accept ? "\n✅ User Accepted!" : "❌ User not accepted.");
+                logger.info(accept ? "\n✅ User Accepted!" : "❌ User not accepted.");
             }
         } catch (BaseException e) {
-            LOGGER.severe("Errore: " + e.getMessage());
+            logger.severe("Errore: " + e.getMessage());
         }
     }
 }

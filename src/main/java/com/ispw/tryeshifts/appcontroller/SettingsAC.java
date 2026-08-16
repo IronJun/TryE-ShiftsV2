@@ -14,7 +14,7 @@ import com.ispw.tryeshifts.excpetion.DataFetchException;
 import java.util.logging.Logger;
 
 public class SettingsAC {
-    private final Logger LOGGER = Logger.getLogger(SettingsAC.class.getName());
+    private final Logger logger = Logger.getLogger(SettingsAC.class.getName());
     private final UserDAO userRepo = AppConfig.getUserRepository();
     private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
 
@@ -30,7 +30,7 @@ public class SettingsAC {
                 String hashedPass = SecurityUtils.hashPassword(user.getPassword());
                 existingUser.setPasswordHash(hashedPass);
             }catch (DataFetchException _){
-                LOGGER.info("errore nell'hashing di password0");
+                logger.info("errore nell'hashing di password0");
             }
         }
 

@@ -12,19 +12,17 @@ import java.util.logging.Logger;
 
 
 public class LoginCLI{
-    private  final Logger LOGGER = Logger.getLogger(LoginCLI.class.getName());
+    private  final Logger logger = Logger.getLogger(LoginCLI.class.getName());
     private final HomeCLI homeCLI = new HomeCLI();
-    public LoginCLI(){
 
-    }
 
     public  void start() throws BaseException {
-        LOGGER.info("\n--- LOGIN E-SHIFTS ---\n");
-        LOGGER.info("Inserisci le tue credenziali per accedere al sistema.\n");
+        logger.info("\n--- LOGIN E-SHIFTS ---\n");
+        logger.info("Inserisci le tue credenziali per accedere al sistema.\n");
 
         while(true) {
             try {
-                LOGGER.info("Press Q to SignUP if you don't have an account at any moment\n");
+                logger.info("Press Q to SignUP if you don't have an account at any moment\n");
                 String email = CLIReader.readString("Email: ");
                 if(email.equalsIgnoreCase("Q")){
                     return;
@@ -40,14 +38,14 @@ public class LoginCLI{
 
                 handleRememberMe(inputUser);
 
-                LOGGER.info("Login completed correctly!! \n");
+                logger.info("Login completed correctly!! \n");
                 homeCLI.start();
                 return;
 
             } catch (InvalidCredentialException e) {
-                LOGGER.severe("ERRORE: " + e.getMessage() +"\n");
+                logger.severe("ERRORE: " + e.getMessage() +"\n");
             }catch (BaseException e){
-                LOGGER.severe("ERRORE: " + e.getMessage() +"\n");
+                logger.severe("ERRORE: " + e.getMessage() +"\n");
             }
         }
     }
@@ -63,7 +61,7 @@ public class LoginCLI{
                 PreferencesManager.clearPreferences();
                 memValidation = true;
             } else {
-                LOGGER.warning("Insert 'Y' or 'N'\n");
+                logger.warning("Insert 'Y' or 'N'\n");
             }
         }
     }

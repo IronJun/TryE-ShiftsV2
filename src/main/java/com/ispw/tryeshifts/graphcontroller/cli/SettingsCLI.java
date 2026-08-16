@@ -9,23 +9,20 @@ import java.util.logging.Logger;
 
 
 public class SettingsCLI {
-    private final Logger LOGGER = Logger.getLogger(SettingsCLI.class.getName());
+    private final Logger logger = Logger.getLogger(SettingsCLI.class.getName());
     private final NewWorkplaceCLI newWorkplaceCLI = new NewWorkplaceCLI();
     private final SettingsAC ac = new SettingsAC();
 
-    public SettingsCLI(){
-
-    }
     public  void accountSettings(UserBean user){
         boolean back = false;
 
         while (!back) {
-            LOGGER.info("\n--- USER SETTINGS ---");
-            LOGGER.info("\nEmail: " + user.getEmail() + " (Non modificabile)");
-            LOGGER.info("\n1. NAME: " + user.getName());
-            LOGGER.info("\n2. SURNAME: " + user.getSurname());
-            LOGGER.info("\n3. Password: ********");
-            LOGGER.info("\n0. Torna indietro");
+            logger.info("\n--- USER SETTINGS ---");
+            logger.info("\nEmail: " + user.getEmail() + " (Non modificabile)");
+            logger.info("\n1. NAME: " + user.getName());
+            logger.info("\n2. SURNAME: " + user.getSurname());
+            logger.info("\n3. Password: ********");
+            logger.info("\n0. Torna indietro");
 
             String choice = CLIReader.readString("\nSeleziona il numero del campo da modificare: ");
 
@@ -49,7 +46,7 @@ public class SettingsCLI {
                     back = true;
                     break;
                 default:
-                    LOGGER.warning("Scelta non valida.");
+                    logger.warning("Scelta non valida.");
             }
         }
     }
@@ -61,12 +58,12 @@ public class SettingsCLI {
         while (!back) {
 
 
-            LOGGER.info("\n--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
-            LOGGER.info("1. Nome: " + wp.getWorkplaceName());
-            LOGGER.info("2. Indirizzo: " + wp.getAddress());
-            LOGGER.info("3. Giorni Operativi: " + wp.getSelectedDays());
-            LOGGER.info("4. Fasce Orarie: " + wp.getShiftsBean());
-            LOGGER.info("0. Torna indietro");
+            logger.info("\n--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
+            logger.info("1. Nome: " + wp.getWorkplaceName());
+            logger.info("2. Indirizzo: " + wp.getAddress());
+            logger.info("3. Giorni Operativi: " + wp.getSelectedDays());
+            logger.info("4. Fasce Orarie: " + wp.getShiftsBean());
+            logger.info("0. Torna indietro");
 
             String choice = CLIReader.readString("\nCosa vuoi modificare?: ");
 
@@ -87,7 +84,7 @@ public class SettingsCLI {
                     back = true;
                     continue; // Salta il salvataggio se vuoi solo uscire
                 default:
-                    LOGGER.warning("Scelta non valida.");
+                    logger.warning("Scelta non valida.");
             }
 
             try {
@@ -95,12 +92,12 @@ public class SettingsCLI {
 
                 oldname = wp.getWorkplaceName();
 
-                LOGGER.info("\n✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
+                logger.info("\n✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
                 String answer = CLIReader.readString("").toUpperCase();
                 if (!answer.equals("Y")) back = true;
 
             } catch (BaseException e) {
-                LOGGER.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
+                logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
             }
         }
     }
@@ -109,9 +106,9 @@ public class SettingsCLI {
         try {
             // Usa l'App Controller che gestisce il profilo (es. LoginAC o ProfileAC)
             ac.updateUserProfile(user);
-            LOGGER.info("✅ Profilo aggiornato correttamente!");
+            logger.info("✅ Profilo aggiornato correttamente!");
         } catch (BaseException e) {
-            LOGGER.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
+            logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
         }
     }
 }

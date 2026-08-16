@@ -15,13 +15,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class NewWorkplaceCLI {
-    private  final Logger LOGGER = Logger.getLogger(NewWorkplaceCLI.class.getName());
+    private  final Logger logger = Logger.getLogger(NewWorkplaceCLI.class.getName());
     private  String msg;
-    public NewWorkplaceCLI(){
 
-    }
     public void start(){
-            LOGGER.info("\n--- CREAZIONE NUOVO WORKPLACE ---\n");
+            logger.info("\n--- CREAZIONE NUOVO WORKPLACE ---\n");
 
             // 1. Dati base
             String name = CLIReader.readString("Nome del Workplace: ");
@@ -39,13 +37,13 @@ public class NewWorkplaceCLI {
                 // Chiamata all'AC (usa il metodo che hai già per JavaFX)
                 new CreateWorkplaceAC().createWorkplace(newWp);
                 msg = "\n✅ Workplace '" + name + "' creato con successo!\n";
-                LOGGER.info(msg);
+                logger.info(msg);
             } catch (DuplicateEntityException e) {
-                LOGGER.severe("\n Workplace already existing " + e.getMessage() + "\n");
+                logger.severe("\n Workplace already existing " + e.getMessage() + "\n");
             } catch(DataFetchException e){
-                LOGGER.severe("\n Error fetching workplaces: " + e.getMessage() + "\n");
+                logger.severe("\n Error fetching workplaces: " + e.getMessage() + "\n");
             } catch (BaseException e) {
-                LOGGER.severe("Generic error: " + e.getMessage() + "\n");
+                logger.severe("Generic error: " + e.getMessage() + "\n");
             }
         }
 
@@ -54,10 +52,10 @@ public class NewWorkplaceCLI {
         List<String> selected = new ArrayList<>();
         String[] allDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-        LOGGER.info("Select when the workplace is opened by numbers and separated by ',' example: 1,2,3):");
+        logger.info("Select when the workplace is opened by numbers and separated by ',' example: 1,2,3):");
         for (int i = 0; i < allDays.length; i++) {
             msg = (i + 1) + ". " + allDays[i] + "\n";
-            LOGGER.info(msg);
+            logger.info(msg);
         }
 
         String input = CLIReader.readString("> ");
@@ -72,7 +70,7 @@ public class NewWorkplaceCLI {
         List<String> slots = new ArrayList<>();
         boolean adding = true;
 
-        LOGGER.info("\nSelect the shifts of the workplace with the following format : HH:mm - HH:mm.");
+        logger.info("\nSelect the shifts of the workplace with the following format : HH:mm - HH:mm.");
         while (adding) {
             String start = CLIReader.readString("\nOra inizio (HH:mm): ");
             String end = CLIReader.readString("\nOra fine (HH:mm): ");
@@ -80,7 +78,7 @@ public class NewWorkplaceCLI {
                 String[] startParts = start.trim().split(":");
                 String[] endParts = end.trim().split(":");
                 if(startParts.length != 2 || endParts.length != 2){
-                    LOGGER.warning("\nInvalid time format. Be sure to use HH:mm (es: 08:30)");
+                    logger.warning("\nInvalid time format. Be sure to use HH:mm (es: 08:30)");
                     continue;
                 }
                 String startH = startParts[0];
@@ -91,13 +89,13 @@ public class NewWorkplaceCLI {
                 String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM,startH, endM, endH,slots);
                 slots.add(formattedShift);
                 msg = "✅ correctly added shift: "+formattedShift;
-                LOGGER.info(msg);
+                logger.info(msg);
             }catch(IllegalArgumentException e){
-                LOGGER.warning("\nHour error: " +e.getMessage());
+                logger.warning("\nHour error: " +e.getMessage());
             }catch(BaseException e){
-                LOGGER.warning("\nShit error: " +e.getMessage());
+                logger.warning("\nShit error: " +e.getMessage());
             }catch(Exception _){
-                LOGGER.warning("\nError fetching, retry");
+                logger.warning("\nError fetching, retry");
             }
             // Formattiamo noi la stringa per essere sicuri del separatore " - "
             String cont = CLIReader.readString("\nDo you want to add more shifts? (y/n): ");
