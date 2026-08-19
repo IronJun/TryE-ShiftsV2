@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
+import com.ispw.tryeshifts.dao.NotificationDAO;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.MembershipDAO;
@@ -20,6 +21,7 @@ public class ManageMembersAC {
     private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
     private final UserDAO userRepo = AppConfig.getUserRepository();
     private final MembershipDAO membershipRepo = AppConfig.getMembershipRepository();
+    private final NotificationDAO notificationRepo = AppConfig.getNotificationRepository();
 
     public List<UserBean> getActiveMembers(String wpName) throws BaseException{
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);
@@ -49,6 +51,8 @@ public class ManageMembersAC {
             if (accept) {
                 m.setAccepted(true);
                 membershipRepo.updateMembership(m);
+                String message = "You have been accepted to: "+ workplaceName;
+                notificationRepo.saveNotification(m.getUser().getEmail(),message,"ACCEPTED");
             } else {
                 // Se rifiuta, eliminiamo semplicemente la richiesta/membership
                 membershipRepo.removeMembership(m);

@@ -17,6 +17,7 @@ module com.ispw.tryeshifts {
     requires java.xml.crypto;
     requires com.fasterxml.jackson.databind;
     requires java.prefs;
+    requires java.management;
 
     opens com.ispw.tryeshifts to javafx.fxml;
     opens com.ispw.tryeshifts.view  to javafx.fxml;
@@ -41,6 +42,7 @@ module com.ispw.tryeshifts {
     exports com.ispw.tryeshifts.graphcontroller.gui.utilities.stratgui;
     opens com.ispw.tryeshifts.graphcontroller.gui.utilities.stratgui to javafx.fxml;
     exports com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar;
-    opens com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar to javafx.fxml;
+
+    opens com.ispw.tryeshifts.graphcontroller.gui.component to javafx.fxml;
 
 }

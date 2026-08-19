@@ -1,9 +1,6 @@
 package com.ispw.tryeshifts.config;
 
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
-import com.ispw.tryeshifts.dao.MembershipDAO;
-import com.ispw.tryeshifts.dao.UserDAO;
-import com.ispw.tryeshifts.dao.WorkplaceDAO;
+import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.dao.decorator.UserDAOCsvDecorator;
 import com.ispw.tryeshifts.factory.DAOFactory;
 import com.ispw.tryeshifts.factory.DemoDAOFactory;
@@ -11,14 +8,15 @@ import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
 
 public class AppConfig {
-    private static final boolean IS_DEMO_MODE = false;
-    private static final boolean SAVE_USER_TO_CSV = true;
+    private static final boolean IS_DEMO_MODE = true;
+    private static final boolean SAVE_USER_TO_CSV = false;
 
     private static DAOFactory daoFactory;
     private static UserDAO userDAO;
     private static MembershipDAO membershipDAO;
     private static WorkplaceDAO workplaceDAO;
     private static AvailabilityDAO availabilityDAO;
+    private static NotificationDAO notificationDAO;
 
     private AppConfig() {
         throw new IllegalStateException("Utility class");
@@ -66,4 +64,10 @@ public class AppConfig {
         return availabilityDAO;
     }
 
+    public static NotificationDAO getNotificationRepository() {
+        if(notificationDAO == null){
+            notificationDAO = getDAOFactory().getNotificationDAO();
+        }
+        return notificationDAO;
+    }
 }

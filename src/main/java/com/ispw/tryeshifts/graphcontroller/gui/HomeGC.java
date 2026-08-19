@@ -1,5 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.*;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -7,7 +9,6 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
-import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -36,9 +37,9 @@ public class HomeGC {
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
     @FXML private VBox vboxWorkplaceLegend;
     @FXML private TextField searchField;
-    @FXML private Label errorlbl;
     private final Map<String, String> workplaceColors = new HashMap<>();
     @FXML Label lblWeekDisplay;
+    @FXML private NavbarGC navbarController;
     private int weekOffset = 0;
     private String currentWeekId;
     private String msg="";
@@ -46,10 +47,13 @@ public class HomeGC {
     private final ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
     private final SearchWorkplacesAC searchWorkplacesAC = new SearchWorkplacesAC();
 
+
     public void initialize() {
-        ErrorViewManager.setupAutoHide(errorlbl);
         this.loggedUser = SessionContext.getInstance().getLoggeduser();
         // Aggiungiamo un listener: ogni volta che il testo cambia, cerchiamo
+        if(navbarController != null){
+            navbarController.setActivePage(NavPage.HOME);
+        }
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleSearch(newValue);
         });
@@ -313,35 +317,6 @@ public class HomeGC {
 
     }
 
-    public void onLogoutClicked() {
-        if(SceneManager.getInstance().logoutConfirmation()){
-            PreferencesManager.clearPreferences();
-            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        }
-
-    }
-
-    public void onShiftsclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if (wp != null) {
-            handleWorkplaceSelection(wp.getWorkplaceName());
-        } else {
-            ErrorViewManager.showError(errorlbl,"Select a workplace to see its shifts, or create a new one");
-        }
-    }
-
-    public void onWorkersclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
-        }else{
-            ErrorViewManager.showError(errorlbl,"Select a workplace to see its workers");
-        }
-    }
-
-    public void onSettingsclicked() {
-        SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
-    }
 
     public void refreshAllData() {
         if (this.loggedUser != null) {
@@ -373,4 +348,6 @@ public class HomeGC {
         lblWeekDisplay.setText(manageShiftsAC.getWeekRangeString(weekOffset));
         buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), this.currentWeekId);
     }
+
+
 }

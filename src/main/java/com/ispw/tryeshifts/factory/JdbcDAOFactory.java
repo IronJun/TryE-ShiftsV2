@@ -1,13 +1,7 @@
 package com.ispw.tryeshifts.factory;
 
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
-import com.ispw.tryeshifts.dao.MembershipDAO;
-import com.ispw.tryeshifts.dao.UserDAO;
-import com.ispw.tryeshifts.dao.WorkplaceDAO;
-import com.ispw.tryeshifts.dao.jdbc.AvailabilityDAOJdbc;
-import com.ispw.tryeshifts.dao.jdbc.MembershipDAOJdbc;
-import com.ispw.tryeshifts.dao.jdbc.UserDAOJdbc;
-import com.ispw.tryeshifts.dao.jdbc.WorkplaceDAOJdbc;
+import com.ispw.tryeshifts.dao.*;
+import com.ispw.tryeshifts.dao.jdbc.*;
 
 public class JdbcDAOFactory implements DAOFactory{
     @Override
@@ -28,5 +22,10 @@ public class JdbcDAOFactory implements DAOFactory{
     @Override
     public MembershipDAO getMembershipDAO() {
         return new MembershipDAOJdbc();
+    }
+
+    @Override
+    public NotificationDAO getNotificationDAO() {
+        return new NotificationDAOJdbc();
     }
 }

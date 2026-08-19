@@ -1,5 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -8,7 +10,6 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
-import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,12 +26,16 @@ public class WorkersGC {
     @FXML private Label titleLabel;
     @FXML private Label titlePending;
     @FXML private Label errorlbl;
+    @FXML private NavbarGC navbarController;
     private WorkplaceBean currentWorkplace;
     private final ManageMembersAC ac = new ManageMembersAC();
 
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
+        if(navbarController != null){
+            navbarController.setActivePage(NavPage.WORKERS);
+        }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null){
             ErrorViewManager.showError(errorlbl,"loggeduser is null\n");
@@ -134,21 +139,5 @@ public class WorkersGC {
 
     }
 
-    public void goToHome() {
-    SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
-    }
 
-    public void onLogoutClicked() {
-        if(SceneManager.getInstance().logoutConfirmation()){
-            PreferencesManager.clearPreferences();
-            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        }
-    }
-    public void goToShifts(){
-        SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
-    }
-
-    public void onSettingclicked() {
-        SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
-    }
 }

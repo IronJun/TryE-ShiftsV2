@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
@@ -17,7 +18,6 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
-import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -46,6 +46,7 @@ public class ShiftsGC {
     @FXML private Label lblMode;
     @FXML private Label lblWeekDisplay;
     @FXML private Label errorlbl;
+    @FXML private NavbarGC navbarController;
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
@@ -55,6 +56,9 @@ public class ShiftsGC {
 
     public void initialize()  {
         ErrorViewManager.setupAutoHide(errorlbl);
+        if(navbarController != null){
+            navbarController.setActivePage(NavPage.SHIFTS);
+        }
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
         this.weekOffset = 0;
@@ -172,6 +176,9 @@ public class ShiftsGC {
             }
         }
     }
+
+
+
     private record TableContext(
             String status,
             boolean isOwner,
@@ -330,7 +337,7 @@ public class ShiftsGC {
 
             if("OPEN".equals(currentStatus)){
                 manageAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,LOCKED_STATUS);
-                SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati.");
+                SceneManager.getInstance().showInfoAlert("Locking", "The Shifts are now locked");
             }
             else if(LOCKED_STATUS.equals(currentStatus)){
                 pubAc.publish(wp, this.currentWeekId);
@@ -342,40 +349,6 @@ public class ShiftsGC {
         }
     }
 
-    public void onWorkersclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
-        }else{
-           logger.info("Seleziona un workplace");
-        }
-    }
-
-    public void goToHome() {
-
-        SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
-
-    }
-
-    public void onSettingsclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Settings.fxml", "Gestione Membri", 900, 600);
-        }else{
-
-            msg = "Seleziona un workplace";
-            logger.log(Level.FINE, msg);
-        }
-    }
-
-    public void onLogoutClicked() {
-        if(SceneManager.getInstance().logoutConfirmation()){
-            PreferencesManager.clearPreferences();
-            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-            msg = "Logout effettuato";
-            logger.log(Level.FINE, msg);
-        }
-    }
     @FXML
     private void handleNextWeek() {
         if(weekOffset<1){

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC">
+    <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="20.0" style="-fx-background-color: #4B4488;">
+        <padding>
+            <Insets left="20.0" right="20.0" />
+        </padding>
+        <Label text="E-Shifts" textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <HBox alignment="CENTER" spacing="10.0">
+            <Button fx:id="btnHome" text="Home" onAction="#onHomeClicked"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+            <Button fx:id="btnShifts" text="Shifts" onAction="#onShiftsClicked"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+            <Button fx:id="btnSettings" text="Settings" onAction="#onSettingsClicked"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+            <Button fx:id="btnWorkers" text="Workers" onAction="#onWorkersClicked"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+        </HBox>
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <HBox alignment="CENTER" spacing="20.0">
+            <StackPane onMouseClicked="#onNotificationBellClicked" style="-fx-cursor: hand;">
+                <Label text="🔔" style="-fx-font-size: 20;" textFill="WHITE"/>
+                <Label fx:id="lblBadgeCount" text="1" visible="false" StackPane.alignment="TOP_RIGHT"
+                       style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5 1 5; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+            </StackPane>
+
+            <Button fx:id="btnLogout" onAction="#onLogoutClicked" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@assets/logoutIcon.png" backgroundLoading="true" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </HBox>
+    <HBox alignment="CENTER" style="-fx-background-color: transparent; -fx-min-height: 30;">
+        <padding>
+            <Insets top="5.0" bottom="5.0" />
+        </padding>
+        <Label fx:id="errorlbl" visible="false" managed="false"
+               style="-fx-font-size: 14; -fx-text-fill: red; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>

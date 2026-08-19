@@ -1,13 +1,11 @@
 package com.ispw.tryeshifts.factory;
 
-import com.ispw.tryeshifts.dao.AvailabilityDAO;
-import com.ispw.tryeshifts.dao.MembershipDAO;
-import com.ispw.tryeshifts.dao.UserDAO;
-import com.ispw.tryeshifts.dao.WorkplaceDAO;
+import com.ispw.tryeshifts.dao.*;
 
 public interface DAOFactory {
     UserDAO getUserDAO();
     WorkplaceDAO getWorkplaceDAO();
     AvailabilityDAO getAvailabilityDAO();
     MembershipDAO getMembershipDAO();
+    NotificationDAO getNotificationDAO();
 }

@@ -1,5 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
@@ -9,7 +11,6 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
-import com.ispw.tryeshifts.utils.PreferencesManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.effect.BoxBlur;
@@ -42,7 +43,7 @@ public class SettingsGC {
     @FXML private PasswordField confirmPasswordField;
     @FXML private VBox overlayPane;
     @FXML private Label overlayMessage;
-
+    @FXML private NavbarGC navbarController;
     private final List<CheckBox> dayCheckBoxes = new ArrayList<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
@@ -50,6 +51,9 @@ public class SettingsGC {
     public void initialize(){
         ErrorViewManager.setupAutoHide(errorlbl2);
         ErrorViewManager.setupAutoHide(errorlabel);
+        if(navbarController != null){
+            navbarController.setActivePage(NavPage.SETTINGS);
+        }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(loggedUser == null || wp == null){
@@ -155,31 +159,7 @@ public class SettingsGC {
             SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
         }
     }
-    public void onShiftsClicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Shifts.fxml", "Gestione Membri", 900, 600);
-        }else{
-            ErrorViewManager.showError(errorlbl2,"Per vedere i turni torna alla home e seleziona un workpalce");
-        }
-    }
-    public void onWorkersclicked() {
-        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(wp!=null){
-            SceneManager.getInstance().switchScene("Workers.fxml", "Gestione Membri", 900, 600);
-        }else{
-            ErrorViewManager.showError(errorlbl2,"Torna alla Home e seleziona un workplace per vederne i dipendenti");
-        }
-    }
-    public void onLogoutClicked() {
-        if(SceneManager.getInstance().logoutConfirmation()){
-            PreferencesManager.clearPreferences();
-            SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        }
-    }
-    public void onHomeclicked() {
-        SceneManager.getInstance().switchScene("Home.fxml", "Home", 900, 600);
-    }
+
     public void saveProfileChanges() {
         try{
             String newPwd = newPasswordField.getText();
@@ -233,4 +213,5 @@ public class SettingsGC {
             overlayPane.setMouseTransparent(true); // Permette di cliccare di nuovo il form
         }
     }
+
 }
