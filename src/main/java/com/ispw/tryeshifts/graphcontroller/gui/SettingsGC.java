@@ -56,28 +56,17 @@ public class SettingsGC {
         }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        if(loggedUser == null || wp == null){
+        if(loggedUser == null){
             ErrorViewManager.showError(overlayMessage, "Workplace or User is null!\n");
             return;
         }
         shiftsListView.setCellFactory(lv -> new ShiftCellHandling());
         if (wp==null) {
-            // Stato 1: Nessun workplace selezionato
-            overlayPane.setVisible(true);
-            overlayPane.setManaged(true); // Se hai aggiunto managed
-            ErrorViewManager.showError(overlayMessage,"No Workplace Selected!\n");
-            applyBlur(true);
+            showLeftPaneRestriction("No Workplace Selected");
         } else if (!loggedUser.getEmail().equals(wp.getOwnerEmail())) {
-            // Stato 2: Selezionato ma non sei l'owner
-            overlayPane.setVisible(true);
-            overlayPane.setManaged(true);
-            ErrorViewManager.showError(overlayMessage,"You are not the owner of the workplace\n");
-            applyBlur(true);
+            showLeftPaneRestriction("You are not the owner of the workplace");
         } else {
-            overlayPane.setVisible(false);
-            overlayPane.setManaged(false);
-            ErrorViewManager.hideError(overlayMessage);
-            applyBlur(false);
+            hideLeftPaneRestriction();
             initworkplaceSettings(wp);
             initTimeCombos();
         }
@@ -199,19 +188,30 @@ public class SettingsGC {
             SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2","Impossibile aggiornare il profilo");
         }
     }
-    private void applyBlur(boolean blur) {
-        if (blur) {
-            BoxBlur boxBlur = new BoxBlur(10, 10, 3);
-            leftPane.setEffect(boxBlur);
-            leftPane.setDisable(true); // Impedisce anche l'uso del tab per navigare i campi
-            overlayPane.setVisible(true);
-            overlayPane.setMouseTransparent(false); // Impedisce i click sotto
-        } else {
-            leftPane.setEffect(null);
-            leftPane.setDisable(false);
-            overlayPane.setVisible(false);
-            overlayPane.setMouseTransparent(true); // Permette di cliccare di nuovo il form
-        }
+    private void showLeftPaneRestriction(String message) {
+        overlayPane.setVisible(true);
+        overlayPane.setManaged(true);
+
+        overlayMessage.setVisible(true);
+        overlayMessage.setManaged(true);
+        overlayMessage.setText(message);
+
+        BoxBlur boxBlur = new BoxBlur(10, 10, 3);
+        leftPane.setEffect(boxBlur);
+        leftPane.setDisable(true);
+        overlayPane.setMouseTransparent(false);
+    }
+
+    private void hideLeftPaneRestriction() {
+        overlayPane.setVisible(false);
+        overlayPane.setManaged(false);
+
+        overlayMessage.setVisible(false);
+        overlayMessage.setManaged(false);
+
+        leftPane.setEffect(null);
+        leftPane.setDisable(false);
+        overlayPane.setMouseTransparent(true);
     }
 
 }

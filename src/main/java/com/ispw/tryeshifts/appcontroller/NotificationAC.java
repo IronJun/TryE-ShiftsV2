@@ -9,17 +9,17 @@ import javafx.concurrent.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public class NotificationAC {
     private final NotificationDAO notificationDAO = AppConfig.getNotificationRepository();
 
-    public void loadUserNotificationsAsync(String email, Consumer<List<NotificationBean>> onSuccess, Consumer<Throwable> onError) throws BaseException{
-        Task<List<NotificationBean>> task = new Task<>(){
-            @Override
-            protected List<NotificationBean> call() throws Exception{
-                List<NotificationBean> notificationBeans = new ArrayList<>();
 
+
+    public CompletableFuture<List<NotificationBean>> getUserNotificationsAsync(String email) throws BaseException{
+        return CompletableFuture.supplyAsync(()->{
+            try{
+                List<NotificationBean> notificationBeans = new ArrayList<>();
                 List<Notification> notfications = notificationDAO.findByUserEmail(email);
                 if(notfications != null) {
                     for (Notification n : notfications) {
@@ -29,18 +29,16 @@ public class NotificationAC {
                                 n.isRead(),
                                 n.getTimestamp()
                         ));
-                        }
                     }
+                }
                 return notificationBeans;
+            }catch(BaseException e){
+                throw new RuntimeException("Errore nel recuper delle notifiche",e);
             }
-        };
-        task.setOnSucceeded(e-> onSuccess.accept(task.getValue()));
-        task.setOnFailed(e->onError.accept(task.getException()));
-
-        new Thread(task).start();
-
+        });
     }
 
+    //method that would be used if i wanted a user to send a notification manually
     public void sendNotificationsAsync(String email, String message, String type) throws BaseException{
         Task<Void> task = new Task<>(){
             @Override
@@ -51,9 +49,12 @@ public class NotificationAC {
         };
         new Thread(task).start();
      }
-
+     public int getNotificationNumberforUserEmail(String email) throws BaseException{
+        return notificationDAO.countNotificationByUserEmail(email);
+     }
 
     public void markAllAsRead(String email) throws BaseException {
         notificationDAO.markAllAsread(email);
+        notificationDAO.deleteNotification(email);
     }
 }

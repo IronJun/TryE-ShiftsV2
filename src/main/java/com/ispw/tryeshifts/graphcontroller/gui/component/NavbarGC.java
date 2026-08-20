@@ -2,7 +2,6 @@ package com.ispw.tryeshifts.graphcontroller.gui.component;
 
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.NotificationService;
 import com.ispw.tryeshifts.appcontroller.NotificationAC;
-import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
@@ -10,13 +9,13 @@ import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.utils.PreferencesManager;
-import com.mysql.cj.x.protobuf.Mysqlx;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import java.util.List;
+import javafx.application.Platform;
+
 
 public class NavbarGC {
     @FXML private Button btnHome;
@@ -82,8 +81,9 @@ public class NavbarGC {
         ErrorViewManager.hideError(errorlbl);
         if(SessionContext.getInstance().getLoggedWorkplace() == null){
             ErrorViewManager.showError(errorlbl,"Error, select a workplace to se its workers list.");
+        }else {
+            SceneManager.getInstance().switchScene("Workers.fxml", "Workers", 900, 600);
         }
-        SceneManager.getInstance().switchScene("Workers.fxml","Workers", 900,600);
     }
 
     public void onLogoutClicked() {
@@ -107,18 +107,23 @@ public class NavbarGC {
             return;
         }
         NotificationAC notificationAC = new NotificationAC();
+        String email = loggedUser.getEmail();
         Node sourceNode = (Node) event.getSource();
+        notificationAC.getUserNotificationsAsync(loggedUser.getEmail())
+                .thenAcceptAsync(notification -> {
+                    NotificationService.showNotificationPopup(sourceNode,notification, () -> {
+                        try{
+                            notificationAC.markAllAsRead(email);
+                        }catch(BaseException e){
+                            ErrorViewManager.showError(errorlbl,e.getMessage());
+                        }
+                    });
+                }, Platform::runLater)
+                .exceptionally(ex->{
+                    Platform.runLater(()-> ErrorViewManager.showError(errorlbl,ex.getMessage()));
+                    return null;
+                });
 
-        notificationAC.loadUserNotificationsAsync(loggedUser.getEmail(),
-                notifications-> NotificationService.showNotificationPopup(sourceNode,notifications, ()->{
-                    try{
-                        notificationAC.markAllAsRead(loggedUser.getEmail());
-                    }catch(BaseException _){
-                        ErrorViewManager.showError(errorlbl,"Error during the notification update");
-                    }
-                }),
-                    error-> ErrorViewManager.showError(errorlbl, "Error during the notification load")
-                );
 
 
     }

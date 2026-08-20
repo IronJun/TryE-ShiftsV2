@@ -10,4 +10,6 @@ public interface NotificationDAO {
     void markAllAsread(String email) throws BaseException;
     void saveNotification(String email, String message, String type) throws BaseException;
     void deleteNotification(String email) throws BaseException;
-}
+    int countNotificationByUserEmail(String email) throws BaseException ;
+
+    }

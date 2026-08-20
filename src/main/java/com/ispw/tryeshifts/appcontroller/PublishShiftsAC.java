@@ -36,9 +36,7 @@ public class PublishShiftsAC {
         String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
         String type = "SHIFTS";
         for(String email: workersEmail){
-            if(!membershipRepo.findMembership(email,wp.getWorkplaceName()).getRole().equalsIgnoreCase("OWNER") ) {
-                notificationRepo.saveNotification(email, message, type);
-            }
+            notificationRepo.saveNotification(email, message, type);
         }
         workplaceRepo.savePublishedShifts(wp.getWorkplaceName(), weekId, availabilities);
         workplaceRepo.updateWeekStatus(wp.getWorkplaceName(), weekId, "PUBLISHED");

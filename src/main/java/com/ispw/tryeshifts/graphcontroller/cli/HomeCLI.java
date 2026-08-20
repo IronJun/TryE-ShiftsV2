@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.*;
+import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -22,58 +23,67 @@ public class HomeCLI {
     private final SettingsCLI settingsCLI = new SettingsCLI();
     private final ShiftsCLI shiftsCLI = new ShiftsCLI();
     private final WorkersCLI workersCLI = new WorkersCLI();
+    private final NotificationCLI notificationCLI = new NotificationCLI();
     private  String msg;
 
     public  void start(){
         UserBean user = SessionContext.getInstance().getLoggeduser();
+        NotificationAC notification = new NotificationAC();
         if(user == null){
             logger.severe("User not logged in");
             return;
         }
-        boolean exit = false;
-        while(!exit){
-            logger.info("\n--- HOME ---\n");
-            logger.info("Welcome! "+user.getName()+" "+user.getSurname()+"\n");
-            logger.info("---------------------------------------\n");
-            logger.info("Insert one of the options: \n");
-            logger.info("1. Watch the Workplace List to search and join one\n");
-            logger.info("2. Create a new Workplace \n");
-            logger.info("3. Watch your Workplace List\n");
-            logger.info("4. See your Working days of the week\n");
-            logger.info("5. Manage your Account\n");
-            logger.info("Q. Logout\n"); // Nuova opzione
-            logger.info("0. To close the application \n");
+        try {
+            boolean exit = false;
+            while (!exit) {
+                logger.info("\n--- HOME ---\n");
+                logger.info("Welcome! " + user.getName() + " " + user.getSurname() + "\n");
+                logger.info("---------------------------------------\n");
+                logger.info("Insert one of the options: \n");
+                logger.info("1. Watch the Workplace List to search and join one\n");
+                logger.info("2. Create a new Workplace \n");
+                logger.info("3. Watch your Workplace List\n");
+                logger.info("4. See your Working days of the week\n");
+                logger.info("5. Manage your Account\n");
+                logger.info("6. Watch your notification(" + notification.getNotificationNumberforUserEmail(user.getEmail()) + ")\n");
+                logger.info("Q. Logout\n"); // Nuova opzione
+                logger.info("0. To close the application \n");
 
-            String choice = CLIReader.readString("Select an option: ").toUpperCase();
-            switch(choice){
-                case "1":
-                    showWorkplacesList(false);
-                    break;
-                case "2":
-                    newWorkplaceCLI.start();
-                    break;
-                case "3":
-                    showWorkplacesList(true);
-                    break;
-                case "4":
-                    showMyWorkingDays();
-                    break;
-                case "5":
-                    settingsCLI.accountSettings(user);
-                    break;
-                case "0":
-                    logger.info("Closing application... Goodbye!");
-                    System.exit(0);
-                    break;
-                case "Q":
-                    logout();
-                    exit = true;
-                    break;
-                default:
-                    logger.warning("Invalid option!");
+                String choice = CLIReader.readString("Select an option: ").toUpperCase();
+                switch (choice) {
+                    case "1":
+                        showWorkplacesList(false);
+                        break;
+                    case "2":
+                        newWorkplaceCLI.start();
+                        break;
+                    case "3":
+                        showWorkplacesList(true);
+                        break;
+                    case "4":
+                        showMyWorkingDays();
+                        break;
+                    case "5":
+                        settingsCLI.accountSettings(user);
+                        break;
+                    case "6":
+                        notificationCLI.start();
+                        break;
+                    case "0":
+                        logger.info("Closing application... Goodbye!");
+                        System.exit(0);
+                        break;
+                    case "Q":
+                        logout();
+                        exit = true;
+                        break;
+                    default:
+                        logger.warning("Invalid option!");
+                }
             }
+        }catch (BaseException e){
+            logger.severe(e.getMessage());
         }
-
     }
 
     private  void showWorkplacesList(boolean isPersonal) {

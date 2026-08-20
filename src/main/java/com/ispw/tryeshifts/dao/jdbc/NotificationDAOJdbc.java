@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationDAOJdbc implements NotificationDAO {
-    private static final List<Notification> notifications = new ArrayList<>();
 
     @Override
     public List<Notification> findByUserEmail(String email) throws BaseException {
@@ -22,7 +21,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
         if(email == null|| email.isEmpty()){
             return result;
         }
-        String query = "SELECT dest_user, message, type, is_read,timestamp FROM notifications WHERE dest_user = ?";
+        String query = "SELECT dest_user, message, type, is_read,timestamp FROM notification WHERE dest_user = ?";
         try(Connection conn = DBconnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
@@ -48,10 +47,11 @@ public class NotificationDAOJdbc implements NotificationDAO {
         if(email == null|| email.isEmpty()){
             throw new DataFetchException("Email address cannot be empty");
         }
-        String query = "UPDATE notifications SET is_read = ? WHERE dest_user = ?";
+        String query = "UPDATE notification SET is_read = ? WHERE dest_user = ?";
         try(Connection conn = DBconnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
-            pstmt.setString(1,email);
+            pstmt.setBoolean(1, true);
+            pstmt.setString(2,email);
             pstmt.executeUpdate();
         }catch (SQLException e){
             throw new BaseException("Error while trying to update notifications by email"+e.getMessage());
@@ -95,6 +95,27 @@ public class NotificationDAOJdbc implements NotificationDAO {
         } catch (SQLException e) {
             throw new BaseException("Errore JDBC durante la cancellazione delle notifiche: " + e.getMessage());
         }
+    }
+
+    public int countNotificationByUserEmail(String email) throws BaseException {
+        String query = "SELECT COUNT(*) AS total FROM notification Where dest_user = ?";
+        int count = 0;
+
+        try(Connection conn = DBconnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+            pstmt.setString(1,email);
+            try(ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    count = rs.getInt("total");
+
+                }
+            }catch (SQLException e){
+                throw new BaseException("Error while trying to count notifications by email"+e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new BaseException("general error");
+        }
+        return count;
     }
 }
 
