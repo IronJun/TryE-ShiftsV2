@@ -104,6 +104,7 @@ public class NavbarGC {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null) {
             ErrorViewManager.showError(errorlbl, "Error, logged user is null");
+            return;
         }
         NotificationAC notificationAC = new NotificationAC();
         Node sourceNode = (Node) event.getSource();

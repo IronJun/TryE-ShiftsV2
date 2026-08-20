@@ -33,6 +33,10 @@ public class WorkersGC {
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
+        if(this.currentWorkplace == null) {
+            ErrorViewManager.showError(errorlbl, "Error, Wokrplace Selected is null");
+            return;
+        }
         if(navbarController != null){
             navbarController.setActivePage(NavPage.WORKERS);
         }else{
