@@ -1,7 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.*;
-import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -36,6 +35,7 @@ public class HomeCLI {
         try {
             boolean exit = false;
             while (!exit) {
+                int notifCount = notification.getNotificationNumberforUserEmail(user.getEmail());
                 logger.info("\n--- HOME ---\n");
                 logger.info("Welcome! " + user.getName() + " " + user.getSurname() + "\n");
                 logger.info("---------------------------------------\n");
@@ -45,7 +45,7 @@ public class HomeCLI {
                 logger.info("3. Watch your Workplace List\n");
                 logger.info("4. See your Working days of the week\n");
                 logger.info("5. Manage your Account\n");
-                logger.info("6. Watch your notification(" + notification.getNotificationNumberforUserEmail(user.getEmail()) + ")\n");
+                logger.info("6. Watch your notification(" + notifCount + ")\n");
                 logger.info("Q. Logout\n"); // Nuova opzione
                 logger.info("0. To close the application \n");
 

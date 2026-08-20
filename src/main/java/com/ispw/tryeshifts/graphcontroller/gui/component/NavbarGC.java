@@ -111,19 +111,18 @@ public class NavbarGC {
         Node sourceNode = (Node) event.getSource();
         notificationAC.getUserNotificationsAsync(loggedUser.getEmail())
                 .thenAcceptAsync(notification -> {
-                    NotificationService.showNotificationPopup(sourceNode,notification, () -> {
-                        try{
+                    NotificationService.showNotificationPopup(sourceNode, notification, () -> {
+                        try {
                             notificationAC.markAllAsRead(email);
-                        }catch(BaseException e){
-                            ErrorViewManager.showError(errorlbl,e.getMessage());
+                        } catch (BaseException e) {
+                            ErrorViewManager.showError(errorlbl, e.getMessage());
                         }
                     });
                 }, Platform::runLater)
-                .exceptionally(ex->{
-                    Platform.runLater(()-> ErrorViewManager.showError(errorlbl,ex.getMessage()));
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> ErrorViewManager.showError(errorlbl, ex.getMessage()));
                     return null;
                 });
-
 
 
     }

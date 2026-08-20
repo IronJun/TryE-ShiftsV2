@@ -10,13 +10,14 @@ import javafx.concurrent.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class NotificationAC {
     private final NotificationDAO notificationDAO = AppConfig.getNotificationRepository();
 
 
 
-    public CompletableFuture<List<NotificationBean>> getUserNotificationsAsync(String email) throws BaseException{
+    public CompletableFuture<List<NotificationBean>> getUserNotificationsAsync(String email) {
         return CompletableFuture.supplyAsync(()->{
             try{
                 List<NotificationBean> notificationBeans = new ArrayList<>();
@@ -33,7 +34,7 @@ public class NotificationAC {
                 }
                 return notificationBeans;
             }catch(BaseException e){
-                throw new RuntimeException("Errore nel recuper delle notifiche",e);
+                throw new CompletionException(e);
             }
         });
     }

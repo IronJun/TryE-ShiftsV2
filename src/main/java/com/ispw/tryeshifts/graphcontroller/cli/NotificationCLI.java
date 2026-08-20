@@ -13,11 +13,13 @@ public class NotificationCLI {
     private static final Logger logger = Logger.getLogger(NotificationCLI.class.getName());
     private final NotificationAC notificationAC= new NotificationAC();
 
-
     public void start() {
         boolean back = false;
         String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
-
+        if(userEmail == null){
+            logger.info("User email is null");
+            return;
+        }
         while (!back) {
             printHeader();
             logger.info("\nloading notifications...\n");
@@ -53,11 +55,12 @@ public class NotificationCLI {
             logger.info("No notifications found.");
             return;
         }
+        String msg;
 
         for (int i = 0; i < notifications.size(); i++) {
             NotificationBean n = notifications.get(i);
-            logger.info(""+
-                    (i + 1)+" "+ n.getTimestamp()+" "+ n.getMessage());
+            msg = ""+ (i + 1)+" "+ n.getTimestamp()+" "+ n.getMessage();
+            logger.info(msg);
         }
     }
 
@@ -74,6 +77,10 @@ public class NotificationCLI {
             case "m":
                 try {
                     notificationAC.markAllAsRead(SessionContext.getInstance().getLoggeduser().getEmail());
+                    if(SessionContext.getInstance().getLoggeduser().getEmail()==null){
+                        logger.warning("User email is null");
+                        return false;
+                    }
                     logger.info("\n[SUCCESS] All notifications marked as read.");
                 }catch(BaseException e){
                     logger.severe("[ERROR] Unable to set all notifications marked as read."+e.getMessage());

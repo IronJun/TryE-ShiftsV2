@@ -22,26 +22,33 @@ public class NotificationDAOJdbc implements NotificationDAO {
             return result;
         }
         String query = "SELECT dest_user, message, type, is_read,timestamp FROM notification WHERE dest_user = ?";
-        try(Connection conn = DBconnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, email);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Notification n = new Notification(
-                            rs.getString("dest_user"),
-                            rs.getString("message"),
-                            rs.getString("type"),
-                            rs.getBoolean("is_read"),
-                            rs.getString("timestamp")
-                    );
-                    result.add(n);
-                }
-            }
+        try(Connection conn = DBconnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(query)) {
+            notificationSetup(email,pstmt,"dest_user","message","type","is_read","timestamp",result);
         }catch (SQLException e){
             throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
         }
         return result;
     }
+
+    private void notificationSetup(String email, PreparedStatement pstmt,String user,String message, String type, String is_read, String timestamp, List<Notification> result) throws BaseException, SQLException {
+
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Notification n = new Notification(
+                            rs.getString(user),
+                            rs.getString(message),
+                            rs.getString(type),
+                            rs.getBoolean(is_read),
+                            rs.getString(timestamp)
+                    );
+                    result.add(n);
+                }
+            }catch (SQLException e){
+                throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
+            }
+    }
+
     @Override
     public void markAllAsread(String email) throws BaseException {
         if(email == null|| email.isEmpty()){
@@ -112,7 +119,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
             }catch (SQLException e){
                 throw new BaseException("Error while trying to count notifications by email"+e.getMessage());
             }
-        } catch (SQLException e) {
+        } catch (SQLException _) {
             throw new BaseException("general error");
         }
         return count;
