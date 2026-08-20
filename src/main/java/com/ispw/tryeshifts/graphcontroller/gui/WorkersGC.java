@@ -35,6 +35,8 @@ public class WorkersGC {
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
         if(navbarController != null){
             navbarController.setActivePage(NavPage.WORKERS);
+        }else{
+            ErrorViewManager.showError(errorlbl,"Error: No active Navbar");
         }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null){
@@ -43,6 +45,7 @@ public class WorkersGC {
         }
         String emailUser = loggedUser.getEmail();
         boolean isOwner = currentWorkplace.getOwnerEmail().equals(emailUser);
+
         titlePending.setVisible(isOwner);
         titlePending.setManaged(isOwner);
         pendingWorkersList.setVisible(isOwner);

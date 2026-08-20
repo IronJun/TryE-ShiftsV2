@@ -3,14 +3,14 @@ package com.ispw.tryeshifts.entity;
 public class Notification {
     private String destUser;
     private String message;
-    private String Type;
+    private String type;
     private boolean isRead;
     private String timestamp;
 
     public Notification(String destUser, String message, String type, boolean isRead, String timestamp) {
         this.destUser = destUser;
         this.message = message;
-        this.Type = type;
+        this.type = type;
         this.isRead = isRead;
         this.timestamp = timestamp;
     }
@@ -30,11 +30,11 @@ public class Notification {
     }
 
     public String getType() {
-        return Type;
+        return type;
     }
 
     public void setType(String type) {
-        this.Type = type;
+        this.type = type;
     }
 
     public boolean isRead() {

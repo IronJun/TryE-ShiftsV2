@@ -1,6 +1,5 @@
 package com.ispw.tryeshifts.appcontroller;
 
-import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.*;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.Manifest;
 
 public class PublishShiftsAC {
     private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
@@ -28,7 +26,6 @@ public class PublishShiftsAC {
         Map<String, List<String>> availabilities = availabilityRepo.getAvailabilitiesByWeek(wp.getWorkplaceName(),weekId);
 
         if(availabilities.isEmpty()){throw new ValidationException("No availabilities found for week " + weekId,"grid");}
-        //List<UserBean> workers = ManageMembersAC.getActiveMembers(wp.getWorkplaceName());
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wp.getWorkplaceName());
         List<String> workersEmail = new ArrayList<>();
         for(Membership membership : memberships){
@@ -39,7 +36,7 @@ public class PublishShiftsAC {
         String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
         String type = "SHIFTS";
         for(String email: workersEmail){
-            if(membershipRepo.findMembership(email,wp.getWorkplaceName()).getRole() != "OWNER") {
+            if(!membershipRepo.findMembership(email,wp.getWorkplaceName()).getRole().equalsIgnoreCase("OWNER") ) {
                 notificationRepo.saveNotification(email, message, type);
             }
         }

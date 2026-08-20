@@ -64,7 +64,7 @@ public class NavbarGC {
         SceneManager.getInstance().switchScene("Home.fxml","Home", 900,600);
     }
 
-    public void onShiftsClicked() {;
+    public void onShiftsClicked() {
         ErrorViewManager.hideError(errorlbl);
         if (SessionContext.getInstance().getLoggedWorkplace() == null) {
             ErrorViewManager.showError(errorlbl,"Per vedere i turni torna alla home e seleziona un workpalce");
@@ -103,8 +103,8 @@ public class NavbarGC {
         }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null) {
-            //handle exception
-        };
+            ErrorViewManager.showError(errorlbl, "Error, logged user is null");
+        }
         NotificationAC notificationAC = new NotificationAC();
         Node sourceNode = (Node) event.getSource();
 

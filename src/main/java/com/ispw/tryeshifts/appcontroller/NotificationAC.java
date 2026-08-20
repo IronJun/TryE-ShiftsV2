@@ -1,10 +1,8 @@
 package com.ispw.tryeshifts.appcontroller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.dao.NotificationDAO;
-import com.ispw.tryeshifts.dao.jdbc.NotificationDAOJdbc;
 import com.ispw.tryeshifts.entity.Notification;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import javafx.concurrent.Task;
@@ -21,22 +19,18 @@ public class NotificationAC {
             @Override
             protected List<NotificationBean> call() throws Exception{
                 List<NotificationBean> notificationBeans = new ArrayList<>();
-                try {
-                    List<Notification> notfications = notificationDAO.findByUserEmail(email);
-                    if(notfications != null) {
-                        for (Notification n : notfications) {
-                            notificationBeans.add(new NotificationBean(
-                                    n.getMessage(),
-                                    n.getType(),
-                                    n.isRead(),
-                                    n.getTimestamp()
-                            ));
+
+                List<Notification> notfications = notificationDAO.findByUserEmail(email);
+                if(notfications != null) {
+                    for (Notification n : notfications) {
+                        notificationBeans.add(new NotificationBean(
+                                n.getMessage(),
+                                n.getType(),
+                                n.isRead(),
+                                n.getTimestamp()
+                        ));
                         }
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    throw e;
-                }
                 return notificationBeans;
             }
         };

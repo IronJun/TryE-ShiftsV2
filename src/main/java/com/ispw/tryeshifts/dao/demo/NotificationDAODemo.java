@@ -10,16 +10,6 @@ import java.util.List;
 public class NotificationDAODemo implements NotificationDAO {
     private static final List<Notification>  notifications = new ArrayList<>();
 
-    // BLOCCO DI TEST: Aggiunge una notifica fittizia all'avvio per verificare il click
-    static {
-        try {
-            // Sostituisci con l'email esatta con cui fai il login nell'app per il test
-            notifications.add(new Notification("tuamail@example.com", "I turni della settimana sono usciti!", "SHIFTS", false, "Proprio Ora"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     @Override
     public List<Notification> findByUserEmail(String email) throws BaseException {
