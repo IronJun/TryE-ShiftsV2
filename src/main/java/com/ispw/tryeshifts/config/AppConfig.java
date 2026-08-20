@@ -8,7 +8,7 @@ import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
 
 public class AppConfig {
-    private static final boolean IS_DEMO_MODE = true;
+    private static final boolean IS_DEMO_MODE = false;
     private static final boolean SAVE_USER_TO_CSV = false;
 
     private static DAOFactory daoFactory;
