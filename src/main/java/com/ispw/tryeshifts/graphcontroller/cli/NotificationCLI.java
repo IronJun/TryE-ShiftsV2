@@ -16,7 +16,7 @@ public class NotificationCLI {
     public void start() {
         boolean back = false;
         String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
-        if(userEmail == null){
+        if(userEmail == null|| SessionContext.getInstance().getLoggeduser() == null){
             logger.info("User email is null");
             return;
         }
@@ -77,7 +77,7 @@ public class NotificationCLI {
             case "m":
                 try {
                     notificationAC.markAllAsRead(SessionContext.getInstance().getLoggeduser().getEmail());
-                    if(SessionContext.getInstance().getLoggeduser().getEmail()==null){
+                    if(SessionContext.getInstance().getLoggeduser()==null){
                         logger.warning("User email is null");
                         return false;
                     }

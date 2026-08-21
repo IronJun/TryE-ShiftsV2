@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-public class HomeCLI {
+public class  HomeCLI {
     private  final Logger logger = Logger.getLogger(HomeCLI.class.getName());
     private final NewWorkplaceCLI newWorkplaceCLI = new NewWorkplaceCLI();
     private final SettingsCLI settingsCLI = new SettingsCLI();
@@ -45,7 +45,7 @@ public class HomeCLI {
                 logger.info("3. Watch your Workplace List\n");
                 logger.info("4. See your Working days of the week\n");
                 logger.info("5. Manage your Account\n");
-                logger.info("6. Watch your notification(" + notifCount + ")\n");
+                logger.info(()->"6. Watch your notification(" + notifCount + ")\n");
                 logger.info("Q. Logout\n"); // Nuova opzione
                 logger.info("0. To close the application \n");
 

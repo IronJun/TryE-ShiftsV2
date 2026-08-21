@@ -114,8 +114,8 @@ public class NavbarGC {
                     NotificationService.showNotificationPopup(sourceNode, notification, () -> {
                         try {
                             notificationAC.markAllAsRead(email);
-                        } catch (BaseException e) {
-                            ErrorViewManager.showError(errorlbl, e.getMessage());
+                        } catch (BaseException _) {
+                            ErrorViewManager.showError(errorlbl,"Error marking all as read");
                         }
                     });
                 }, Platform::runLater)

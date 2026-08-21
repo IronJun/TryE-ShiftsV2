@@ -22,31 +22,32 @@ public class NotificationDAOJdbc implements NotificationDAO {
             return result;
         }
         String query = "SELECT dest_user, message, type, is_read,timestamp FROM notification WHERE dest_user = ?";
-        try(Connection conn = DBconnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(query)) {
-            notificationSetup(email,pstmt,"dest_user","message","type","is_read","timestamp",result);
+        try(Connection conn = DBconnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query)) {
+            return executeNotificationQuery(email,pstmt);
         }catch (SQLException e){
             throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
         }
-        return result;
     }
 
-    private void notificationSetup(String email, PreparedStatement pstmt,String user,String message, String type, String is_read, String timestamp, List<Notification> result) throws BaseException, SQLException {
-
+    private List<Notification> executeNotificationQuery(String email, PreparedStatement pstmt) throws BaseException, SQLException {
+            List<Notification> result = new ArrayList<>();
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Notification n = new Notification(
-                            rs.getString(user),
-                            rs.getString(message),
-                            rs.getString(type),
-                            rs.getBoolean(is_read),
-                            rs.getString(timestamp)
+                            rs.getString("dest_user"),
+                            rs.getString("message"),
+                            rs.getString("type"),
+                            rs.getBoolean("is_read"),
+                            rs.getString("timestamp")
                     );
                     result.add(n);
                 }
             }catch (SQLException e){
                 throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
             }
+            return result;
     }
 
     @Override
@@ -110,17 +111,23 @@ public class NotificationDAOJdbc implements NotificationDAO {
 
         try(Connection conn = DBconnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)){
-            pstmt.setString(1,email);
-            try(ResultSet rs = pstmt.executeQuery()){
-                if(rs.next()){
-                    count = rs.getInt("total");
-
-                }
-            }catch (SQLException e){
-                throw new BaseException("Error while trying to count notifications by email"+e.getMessage());
-            }
+            count = queryNotifications(email,pstmt);
         } catch (SQLException _) {
             throw new BaseException("general error");
+        }
+        return count;
+    }
+
+    private int queryNotifications(String email, PreparedStatement pstmt) throws BaseException, SQLException {
+        pstmt.setString(1, email);
+        int count = 0;
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt("total");
+
+            }
+        } catch (SQLException e) {
+            throw new BaseException("Error while trying to count notifications by email" + e.getMessage());
         }
         return count;
     }
