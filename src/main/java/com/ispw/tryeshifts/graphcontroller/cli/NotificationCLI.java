@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.NotificationBean;
+import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -15,8 +16,13 @@ public class NotificationCLI {
 
     public void start() {
         boolean back = false;
-        String userEmail = SessionContext.getInstance().getLoggeduser().getEmail();
-        if(userEmail == null|| SessionContext.getInstance().getLoggeduser() == null){
+        UserBean user = SessionContext.getInstance().getLoggeduser();
+        if (user == null) {
+            logger.info("User not logged in");
+            return;
+        }
+        String userEmail = user.getEmail();
+        if(userEmail == null){
             logger.info("User email is null");
             return;
         }
@@ -76,11 +82,12 @@ public class NotificationCLI {
         switch (choice) {
             case "m":
                 try {
-                    notificationAC.markAllAsRead(SessionContext.getInstance().getLoggeduser().getEmail());
-                    if(SessionContext.getInstance().getLoggeduser()==null){
-                        logger.warning("User email is null");
+                    UserBean user = SessionContext.getInstance().getLoggeduser();
+                    if(user == null){
+                        logger.info("User not logged in");
                         return false;
                     }
+                    notificationAC.markAllAsRead(user.getEmail());
                     logger.info("\n[SUCCESS] All notifications marked as read.");
                 }catch(BaseException e){
                     logger.severe("[ERROR] Unable to set all notifications marked as read."+e.getMessage());
