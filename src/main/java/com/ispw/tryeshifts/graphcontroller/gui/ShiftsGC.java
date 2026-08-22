@@ -395,17 +395,13 @@ public class ShiftsGC {
 
     private void handleRemoveWorker(String cellKey,String email){
         try{
-            System.out.println("DEBUG UI - Click su X: Chiave=" + cellKey + ", Email=" + email);
             String[] parts = cellKey.split("_");
             if(parts.length >= 4){
                 String day = parts[2];
                 String fullTime = parts[3];
-                System.out.println("DEBUG UI - Dati estratti: Giorno=" + day + ", Orario=" + fullTime);
                 ManageShiftsAC manageAC = new ManageShiftsAC();
                 manageAC.removeWorkerFromShift(email,selectedWorkplace.getWorkplaceName(),currentWeekId,day,fullTime);
                 buildDynamicTable();
-            }else{
-                System.out.println("DEBUG UI - Errore: La cellKey non ha abbastanza parti!");
             }
         }catch(BaseException _){
             ErrorViewManager.showError(errorlbl,"Impossibile eliminare la shift");

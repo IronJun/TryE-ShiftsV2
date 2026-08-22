@@ -181,7 +181,6 @@ public class ShiftsCLI {
                                        String selectedDay, String fullSlot) throws BaseException {
         Map<String, List<String>> currentData = ac.getShiftData(user, wp,currentWeekId);
 
-        String cleanSlot = fullSlot.replace(" ","");
         String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
 
         List<AvailabilityBean> beansToSave = convertMapToBeans(currentData, user, wp, searchKey);
@@ -366,10 +365,16 @@ public class ShiftsCLI {
     }
     private  void modifyShifts() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+        if(wp == null){
+            logger.info("error uploading the current workplace");
+            return;
+        }
         UserBean user = SessionContext.getInstance().getLoggeduser();
-        ManageShiftsAC ac = new ManageShiftsAC();
+        if(user == null){
+            logger.info("error uploading the current user");
+        }
 
-        System.out.println("\n--- RIMOZIONE MANUALE LAVORATORE ---");
+        logger.info("\n--- RIMOZIONE MANUALE LAVORATORE ---");
 
         // 1. Chiediamo al Boss il Giorno (sfruttando il tuo metodo esistente)
         String selectedDay = promptDaySelection(wp.getSelectedDays());
@@ -393,11 +398,11 @@ public class ShiftsCLI {
             }
 
             // 4. Mostriamo l'elenco numerato dei candidati
-            System.out.println("\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
+            logger.info("\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
             for (int i = 0; i < candidates.size(); i++) {
-                System.out.println("[" + (i + 1) + "] " + candidates.get(i));
+                logger.info("[" + (i + 1) + "] " + candidates.get(i));
             }
-            System.out.println("[0] Annulla");
+            logger.info("[0] Annulla");
 
             // 5. Acquisiamo la scelta del Boss
             int workerChoice = CLIReader.readInt("Seleziona il lavoratore da rimuovere: ");

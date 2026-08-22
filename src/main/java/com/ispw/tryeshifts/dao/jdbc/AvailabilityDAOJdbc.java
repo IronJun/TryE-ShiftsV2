@@ -164,6 +164,33 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
     @Override
     public void deleteSpecificAvailability(String email, String workplaceName, String weekId, String day, String fullTime) throws EntityNotFoundException, DataFetchException {
+        String cleanTime = fullTime.replace(" ","");
+        String [] timeParts = cleanTime.split("-");
 
+        if(timeParts.length < 2){
+            throw new DataFetchException("Shift format invalid: "+fullTime);
+        }
+
+        String startShift = timeParts[0];
+        String endShift = timeParts[1];
+        String query = "DELETE FROM availabilities" +"WHERE user_email = ?"+ "AND workplace_name = ?"+ "AND week_id = ?"+ "AND day_name = ?"+"AND start_shift = ?"+"AND end_shift = ?";
+
+        try(Connection conn = DBconnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query)){
+            pstmt.setString(1,email);
+            pstmt.setString(2,workplaceName);
+            pstmt.setString(3,weekId);
+            pstmt.setString(4,day);
+            pstmt.setString(5,startShift);
+            pstmt.setString(6,endShift);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if(rowsAffected == 0){
+                throw new EntityNotFoundException("No availability found to eliminate for: ", email);
+            }
+        }catch(SQLException e){
+            throw new DataFetchException("Impossibile eliminare le availability: "+e.getMessage());
+        }
     }
 }
