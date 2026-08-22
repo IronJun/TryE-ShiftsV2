@@ -19,10 +19,13 @@ import java.time.temporal.WeekFields;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class ManageShiftsAC {
     private  final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
     private  final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
+    private final  Pattern shiftSeparator = Pattern.compile(" - ");
+    private final Pattern timeSeparator = Pattern.compile(":");
 
     private  final Logger logger = Logger.getLogger(ManageShiftsAC.class.getName());
 
@@ -160,14 +163,15 @@ public class ManageShiftsAC {
 
 
     public  String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
-        int startTotalMinutes = Integer.parseInt(startH) * 60 + Integer.parseInt(startM);
-        int endTotalMinutes = Integer.parseInt(endH) * 60 + Integer.parseInt(endM);
+        int startTotalMinutes = parseToMinutes(startH+ timeSeparator +startM);
+        int endTotalMinutes = parseToMinutes(endH+ timeSeparator +endM);
 
         if (endTotalMinutes  <= startTotalMinutes) {
             throw new IllegalArgumentException("La fine deve essere dopo l'inizio");
         }
 
-        String fullShift = startH + ":" + startM + " - " + endH + ":" + endM;
+        String fullShift = startH + timeSeparator + startM + shiftSeparator + endH + timeSeparator + endM;
+
 
         for (String existing : existingShifts) {
             if (existing.equals(fullShift)) {
@@ -175,12 +179,12 @@ public class ManageShiftsAC {
             }
 
             // Logica Overlap
-            String[] parts = existing.split(" - ");
+            String[] parts = shiftSeparator.split(existing);
             if (parts.length < 2) continue;
             int existStart = parseToMinutes(parts[0]);
             int existEnd = parseToMinutes(parts[1]);
 
-            if ((startTotalMinutes < existEnd && existStart < startTotalMinutes + (endTotalMinutes - startTotalMinutes))&&(startTotalMinutes < existEnd && existStart < endTotalMinutes)) {
+            if (startTotalMinutes<existEnd && existStart<= endTotalMinutes) {
                     throw new IllegalArgumentException("not valid shift: overlapping other shifts");
             }
         }
@@ -189,7 +193,7 @@ public class ManageShiftsAC {
     }
 
     private  int parseToMinutes(String time) {
-        String[] hm = time.trim().split(":");
+        String[] hm = timeSeparator.split(time.trim());
 
         if (hm.length < 2) {
             throw new IllegalArgumentException("Formato orario errato: " + time);

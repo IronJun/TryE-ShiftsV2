@@ -54,10 +54,9 @@ public class ShiftsGC {
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private String shiftsMode= "Forzata" ;
-    private final ManageShiftsAC manageAC = new ManageShiftsAC();
-    private final PublishShiftsAC pubAc = new PublishShiftsAC();
 
     public void initialize()  {
+        ManageShiftsAC manageAC = new ManageShiftsAC();
         ErrorViewManager.setupAutoHide(errorlbl);
         if(navbarController != null){
             navbarController.setActivePage(NavPage.SHIFTS);
@@ -193,7 +192,8 @@ public class ShiftsGC {
     private TableContext fetchTableContext() throws BaseException {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-
+        ManageShiftsAC manageAC = new ManageShiftsAC();
+        PublishShiftsAC pubAc = new PublishShiftsAC();
         if(user == null || wp == null) {
             ErrorViewManager.showError(errorlbl,"user or workplace is null!");
             return null;
@@ -265,6 +265,7 @@ public class ShiftsGC {
         // 1. Recuperiamo i dati contestuali
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+        ManageShiftsAC manageAC = new ManageShiftsAC();
         msg = "DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size();
         logger.log(Level.FINE, msg);
         // 2. Creiamo una lista di AvailabilityBean
@@ -352,10 +353,9 @@ public class ShiftsGC {
                 String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
                 String type = "SHIFTS";
                 NotificationAC notificationAC = new NotificationAC();
-                List<CompletableFuture<Void>> futures = new ArrayList<>();
 
                 for(UserBean worker : workers ) {
-                    futures.add(notificationAC.sendNotificationsAsync(worker.getEmail(), message, type));
+                    notificationAC.sendNotificationsAsync(worker.getEmail(), message, type);
                 }
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
@@ -383,6 +383,7 @@ public class ShiftsGC {
     }
 
     private void updateView() {
+        ManageShiftsAC manageAC = new ManageShiftsAC();
         this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         // Aggiorna la label per far capire all'utente dove si trova
         selectedCellsMap.clear();

@@ -1,3 +1,5 @@
+package TestAP;
+
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.config.AppConfig;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PublishShiftsACTest {
-    private final String valid_week = "2026_10";
+    private final String validWeek = "2026_10";
 
     @BeforeEach
     void setup(){
@@ -42,8 +44,8 @@ public class PublishShiftsACTest {
             }
 
             // Usa .isEmpty() perché il DAO restituisce una Mappa, non null!
-            if(AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek("LocaleTest",valid_week).isEmpty()){
-                Availability fakeAvail = new Availability("worker@test.com","LocaleTest","Mon","08:00","12:00",valid_week);
+            if(AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek("LocaleTest", validWeek).isEmpty()){
+                Availability fakeAvail = new Availability("worker@test.com","LocaleTest","Mon","08:00","12:00", validWeek);
                 AppConfig.getAvailabilityRepository().saveAvailability(fakeAvail);
             }
 
@@ -58,7 +60,7 @@ public class PublishShiftsACTest {
     void testPublishNullParameter(){
         PublishShiftsAC controller = new PublishShiftsAC();
         NullPointerException npe = assertThrows(NullPointerException.class, ()->{
-            controller.publish(null,valid_week);
+            controller.publish(null, validWeek);
         });
         assertEquals("Workplace or weekId passed null",npe.getMessage());
     }
@@ -84,10 +86,10 @@ public class PublishShiftsACTest {
 
         try {
             System.out.println("DEBUG - Dati nel DAO: " +
-                    AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), valid_week));
-        } catch (Exception e) {}
+                    AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek));
+        } catch (Exception _) {}
         assertDoesNotThrow(()->{
-            controller.publish(validwpBean,valid_week);
+            controller.publish(validwpBean, validWeek);
         },"The publication should end well with valid data");
     }
 }

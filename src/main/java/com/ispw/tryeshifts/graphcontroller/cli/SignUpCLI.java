@@ -9,12 +9,14 @@ import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 
 public class SignUpCLI {
     private final Logger logger = Logger.getLogger(SignUpCLI.class.getName());
     private final HomeCLI homeCLI = new HomeCLI() ;
     private final LoginCLI loginCLI = new LoginCLI();
+    private final Pattern format = Pattern.compile("[a-zA-Z0-9_-]+");
     public  void start() {
         // 1. L'AUTO-LOGIN va fatto SOLO QUI (una volta all'avvio)
         try {
@@ -111,7 +113,7 @@ public class SignUpCLI {
         String name = "";
         while (!nameValid) {
             name = CLIReader.readString("Name: ");
-            nameValid = name != null && name.matches("[a-zA-ZÀ-ÿ\\s'-]+");
+            nameValid = name != null && format.matcher(name).matches();
             if (!nameValid) {
                 logger.warning("Nome non valido! Riprova.\n");
             }

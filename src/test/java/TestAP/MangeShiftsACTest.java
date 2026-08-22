@@ -1,3 +1,5 @@
+package TestAP;
+
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.config.AppConfig;
 import org.junit.jupiter.api.BeforeEach;
