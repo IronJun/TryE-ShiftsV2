@@ -40,15 +40,14 @@ public class NotificationAC {
     }
 
     //method that would be used if i wanted a user to send a notification manually
-    public void sendNotificationsAsync(String email, String message, String type) throws BaseException{
-        Task<Void> task = new Task<>(){
-            @Override
-            protected Void call() throws Exception{
-                notificationDAO.saveNotification(email, message, type);
-                return null;
+    public CompletableFuture<Void> sendNotificationsAsync(String email, String message, String type) {
+        return CompletableFuture.runAsync(() -> {
+            try{
+                notificationDAO.saveNotification(email,message,type);
+            }catch(BaseException e){
+                throw new CompletionException("Error during the saving of the notifications.", e);
             }
-        };
-        new Thread(task).start();
+        });
      }
      public int getNotificationNumberforUserEmail(String email) throws BaseException{
         return notificationDAO.countNotificationByUserEmail(email);

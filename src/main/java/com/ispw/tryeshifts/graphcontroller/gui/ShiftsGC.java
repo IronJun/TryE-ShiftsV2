@@ -1,5 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
+import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
@@ -25,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -332,6 +335,7 @@ public class ShiftsGC {
             ErrorViewManager.showError(errorlbl,"workplace is null\n");
             return;
         }
+        ManageShiftsAC manageAC = new ManageShiftsAC();
         try{
             String currentStatus = manageAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
 
@@ -340,7 +344,19 @@ public class ShiftsGC {
                 SceneManager.getInstance().showInfoAlert("Locking", "The Shifts are now locked");
             }
             else if(LOCKED_STATUS.equals(currentStatus)){
-                pubAc.publish(wp, this.currentWeekId);
+                PublishShiftsAC pubAC = new PublishShiftsAC();
+                pubAC.publish(wp, this.currentWeekId);
+                ManageMembersAC manageMembersAC = new ManageMembersAC();
+                List<UserBean> workers;
+                workers = manageMembersAC.getActiveMembers(wp.getWorkplaceName());
+                String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
+                String type = "SHIFTS";
+                NotificationAC notificationAC = new NotificationAC();
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+                for(UserBean worker : workers ) {
+                    futures.add(notificationAC.sendNotificationsAsync(worker.getEmail(), message, type));
+                }
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();

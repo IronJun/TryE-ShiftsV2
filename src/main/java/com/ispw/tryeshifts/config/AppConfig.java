@@ -8,8 +8,8 @@ import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
 
 public class AppConfig {
-    private static final boolean IS_DEMO_MODE = false;
-    private static final boolean SAVE_USER_TO_CSV = false;
+    private static boolean IS_DEMO_MODE = false;
+    private static boolean SAVE_USER_TO_CSV = false;
 
     private static DAOFactory daoFactory;
     private static UserDAO userDAO;
@@ -69,5 +69,16 @@ public class AppConfig {
             notificationDAO = getDAOFactory().getNotificationDAO();
         }
         return notificationDAO;
+    }
+
+    //Metodo per il setup dei test
+    public static void setTestMode(boolean demoMode, boolean csvMode){
+        IS_DEMO_MODE = demoMode;
+        SAVE_USER_TO_CSV = csvMode;
+
+        daoFactory = null;
+        userDAO = null;
+        membershipDAO = null;
+        workplaceDAO = null;
     }
 }

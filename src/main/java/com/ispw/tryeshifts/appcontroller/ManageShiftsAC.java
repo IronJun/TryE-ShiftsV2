@@ -57,7 +57,7 @@ public class ManageShiftsAC {
     }
 
     public void saveAvailabilities(List<AvailabilityBean> beans) throws BaseException {
-        if(beans == null){throw new NullPointerException("Bean passed null");}
+        if(beans == null){throw new IllegalArgumentException("Bean passed null");}
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
 

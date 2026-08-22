@@ -15,6 +15,7 @@ public class UserInfo{
 
     }
 
+
     public void setName(String name){
         this.nome = name;
     }
