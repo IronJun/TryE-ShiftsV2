@@ -398,9 +398,10 @@ public class ShiftsCLI {
             }
 
             // 4. Mostriamo l'elenco numerato dei candidati
-            logger.info("\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
+            logger.info(()-> "\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
             for (int i = 0; i < candidates.size(); i++) {
-                logger.info("[" + (i + 1) + "] " + candidates.get(i));
+                final int index = i;
+                logger.info(()->"[" + (index + 1) + "] " + candidates.get(index));
             }
             logger.info("[0] Annulla");
 
@@ -417,7 +418,7 @@ public class ShiftsCLI {
             // Usiamo LO STESSO IDENTICO METODO creato per JavaFX!
             ac.removeWorkerFromShift(workerEmail, wp.getWorkplaceName(), currentWeekId, selectedDay, fullSlot);
 
-            logger.info("✅ Worker '" + workerEmail + "' removed succesfully!\n");
+            logger.info(()->"✅ Worker '" + workerEmail + "' removed succesfully!\n");
 
         } catch (BaseException e) {
             logger.severe("Errore during the remtion: " + e.getMessage());
