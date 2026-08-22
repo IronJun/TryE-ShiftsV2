@@ -9,6 +9,8 @@ import com.ispw.tryeshifts.excpetion.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class NewWorkplaceGC {
     @FXML private ComboBox<String> endHourCombo;
     @FXML private ComboBox<String> endMinuteCombo;
     @FXML private Label errorLabel;
+
     private UserBean loggedUser;
 
     public void initialize() {
@@ -136,5 +139,7 @@ public class NewWorkplaceGC {
     public TextField getNameField() {
         return nameField; // Ritorna il campo del nome per permettere alla Home di trovare la finestra
     }
+
+
 
 }

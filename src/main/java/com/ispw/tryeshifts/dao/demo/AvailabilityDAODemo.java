@@ -3,6 +3,7 @@ package com.ispw.tryeshifts.dao.demo;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.entity.Availability;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
@@ -65,5 +66,15 @@ public class AvailabilityDAODemo implements AvailabilityDAO {
             }
         }
         return weekMap;
+    }
+
+    @Override
+    public void deleteSpecificAvailability(String email, String workplaceName, String weekId, String day, String fullTime) throws EntityNotFoundException, DataFetchException {
+        db.getAvailabilities().removeIf(a->
+                a.getUserEmail().equalsIgnoreCase(email) &&
+                        a.getWorkplaceName().equalsIgnoreCase(workplaceName) &&
+                        a.getWeekId().equals(weekId) &&
+                        a.getDay().equalsIgnoreCase(day) &&
+                        a.getFullShift().replace(" ", "").equals(fullTime.replace(" ", "")));
     }
 }

@@ -5,6 +5,7 @@ import com.ispw.tryeshifts.dao.DBconnection;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
+import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -159,5 +160,10 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         }
 
         return availabilitiesMap;
+    }
+
+    @Override
+    public void deleteSpecificAvailability(String email, String workplaceName, String weekId, String day, String fullTime) throws EntityNotFoundException, DataFetchException {
+
     }
 }

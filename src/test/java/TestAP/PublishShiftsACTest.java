@@ -82,12 +82,12 @@ public class PublishShiftsACTest {
         PublishShiftsAC controller = new PublishShiftsAC();
         WorkplaceBean validwpBean = new WorkplaceBean("LocaleTest","Via Roma 1",new ArrayList<>(),new ArrayList<>(),"boss@test.com");
 
-        System.out.println("DEBUG - Nome nel Bean: " + validwpBean.getWorkplaceName());
 
         try {
-            System.out.println("DEBUG - Dati nel DAO: " +
-                    AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek));
-        } catch (Exception _) {}
+            AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek);
+        } catch (Exception e) {
+            fail("Error during the uploading of availabilities: "+e.getMessage());
+        }
         assertDoesNotThrow(()->{
             controller.publish(validwpBean, validWeek);
         },"The publication should end well with valid data");

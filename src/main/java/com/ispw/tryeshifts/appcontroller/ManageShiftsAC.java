@@ -192,6 +192,17 @@ public class ManageShiftsAC {
         return fullShift;
     }
 
+    public void removeWorkerFromShift(String email, String workplaceName, String weekId, String day, String fullTime)throws BaseException {
+        if(email == null || workplaceName == null || weekId == null || day == null){
+            throw new NullPointerException("Missing parameter to remove someone from the shifts");
+        }
+        try{
+            availabilityRepo.deleteSpecificAvailability(email, workplaceName, weekId, day, fullTime);
+        }catch(Exception _){
+            throw new DataFetchException("Impossibile eliminare il turno dalla memoria");
+        }
+    }
+
     private  int parseToMinutes(String time) {
         String[] hm = timeSeparator.split(time.trim());
 

@@ -180,6 +180,8 @@ public class ShiftsCLI {
     private  void processAndSave(UserBean user, WorkplaceBean wp,
                                        String selectedDay, String fullSlot) throws BaseException {
         Map<String, List<String>> currentData = ac.getShiftData(user, wp,currentWeekId);
+
+        String cleanSlot = fullSlot.replace(" ","");
         String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
 
         List<AvailabilityBean> beansToSave = convertMapToBeans(currentData, user, wp, searchKey);
@@ -208,11 +210,19 @@ public class ShiftsCLI {
         for (Map.Entry<String, List<String>> entry : currentData.entrySet()) {
             String key = entry.getKey();
             if (entry.getValue().contains(SELECTED_STATUS) && !key.equals(currentSelectionKey)) {
-                String[] keyParts = key.split("_");
-                String[] timeParts = keyParts[1].split("-");
+                String cleanKey = key.replace(currentWeekId+ "_","");
 
-                beans.add(new AvailabilityBean(user.getEmail(), wp.getWorkplaceName(),
-                        keyParts[0], timeParts[0], timeParts[1], currentWeekId));
+                String[]dayAndSlot = cleanKey.split("_");
+                String day = dayAndSlot[0];
+                String[] timeParts = dayAndSlot[1].split("-");
+
+                beans.add(new AvailabilityBean(
+                        user.getEmail(),
+                        wp.getWorkplaceName(),
+                        day,
+                        timeParts[0].trim(),
+                        timeParts[1].trim(),
+                        currentWeekId));
             }
         }
         return beans;
@@ -354,10 +364,60 @@ public class ShiftsCLI {
             logger.severe("❌ Errore durante la pubblicazione: " + e.getMessage());
         }
     }
-    private  void modifyShifts(){
-        logger.info("Modifica dei turni manuale non ancora implementata");
-    }
+    private  void modifyShifts() {
+        WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+        UserBean user = SessionContext.getInstance().getLoggeduser();
+        ManageShiftsAC ac = new ManageShiftsAC();
 
+        System.out.println("\n--- RIMOZIONE MANUALE LAVORATORE ---");
+
+        // 1. Chiediamo al Boss il Giorno (sfruttando il tuo metodo esistente)
+        String selectedDay = promptDaySelection(wp.getSelectedDays());
+        if (selectedDay == null) return;
+
+        // 2. Chiediamo al Boss la Fascia Oraria
+        String fullSlot = promptSlotSelection(wp.getShiftsBean());
+        if (fullSlot == null) return;
+
+        try {
+            // 3. Recuperiamo la mappa dei turni per capire chi è prenotato in quella cella
+            Map<String, List<String>> currentData = ac.getShiftData(user, wp, currentWeekId);
+            String searchKey = KeyGenerator.buildShiftKey(currentWeekId, selectedDay, fullSlot);
+
+            // Estraiamo la lista delle email prenotate in quello slot
+            List<String> candidates = currentData.getOrDefault(searchKey, new ArrayList<>());
+
+            if (candidates.isEmpty()) {
+                logger.info("Nessun lavoratore prenotato per questo turno.\n");
+                return;
+            }
+
+            // 4. Mostriamo l'elenco numerato dei candidati
+            System.out.println("\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
+            for (int i = 0; i < candidates.size(); i++) {
+                System.out.println("[" + (i + 1) + "] " + candidates.get(i));
+            }
+            System.out.println("[0] Annulla");
+
+            // 5. Acquisiamo la scelta del Boss
+            int workerChoice = CLIReader.readInt("Seleziona il lavoratore da rimuovere: ");
+            if (workerChoice <= 0 || workerChoice > candidates.size()) {
+                logger.info("Operazione annullata.\n");
+                return;
+            }
+
+            // 6. Troviamo l'email esatta e invochiamo il Controller Applicativo
+            String workerEmail = candidates.get(workerChoice - 1);
+
+            // Usiamo LO STESSO IDENTICO METODO creato per JavaFX!
+            ac.removeWorkerFromShift(workerEmail, wp.getWorkplaceName(), currentWeekId, selectedDay, fullSlot);
+
+            logger.info("✅ Worker '" + workerEmail + "' removed succesfully!\n");
+
+        } catch (BaseException e) {
+            logger.severe("Errore during the remtion: " + e.getMessage());
+        }
+    }
     private  String getCellText(String status, boolean isOwner, String key,
                                       Map<String, List<String>> shifts,
                                       Map<String, List<String>> assignments, UserBean user) {

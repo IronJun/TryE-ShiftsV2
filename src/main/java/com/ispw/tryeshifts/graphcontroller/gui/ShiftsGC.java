@@ -152,7 +152,8 @@ public class ShiftsGC {
             return new PublishedCellFactory(ctx.assignments);
         }
         if (ctx.isOwner) {
-            return new OwnerCellFactory();
+            boolean isLocked = ctx.status.equals(LOCKED_STATUS);
+            return new OwnerCellFactory(isLocked,this::handleRemoveWorker);
         }
 
         boolean isLocked = ctx.status.equals(LOCKED_STATUS);
@@ -390,6 +391,25 @@ public class ShiftsGC {
         lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
         // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
         buildDynamicTable();
+    }
+
+    private void handleRemoveWorker(String cellKey,String email){
+        try{
+            System.out.println("DEBUG UI - Click su X: Chiave=" + cellKey + ", Email=" + email);
+            String[] parts = cellKey.split("_");
+            if(parts.length >= 4){
+                String day = parts[2];
+                String fullTime = parts[3];
+                System.out.println("DEBUG UI - Dati estratti: Giorno=" + day + ", Orario=" + fullTime);
+                ManageShiftsAC manageAC = new ManageShiftsAC();
+                manageAC.removeWorkerFromShift(email,selectedWorkplace.getWorkplaceName(),currentWeekId,day,fullTime);
+                buildDynamicTable();
+            }else{
+                System.out.println("DEBUG UI - Errore: La cellKey non ha abbastanza parti!");
+            }
+        }catch(BaseException _){
+            ErrorViewManager.showError(errorlbl,"Impossibile eliminare la shift");
+        }
     }
 
 }
