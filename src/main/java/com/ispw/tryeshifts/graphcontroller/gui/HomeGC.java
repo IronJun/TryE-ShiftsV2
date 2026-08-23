@@ -383,6 +383,7 @@ public class HomeGC {
             if (empty || wp == null) {
                 setText(null);
                 setGraphic(null);
+                return;
             }
             setGraphic(createWorkplaceCard(wp));
         }

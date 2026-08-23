@@ -11,14 +11,19 @@ import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
+
+import static javafx.scene.layout.Priority.ALWAYS;
 
 public class WorkersGC {
     @FXML private ListView<UserBean> activeWorkersList;
@@ -82,44 +87,46 @@ public class WorkersGC {
     }
 
     private void setupCells() {
-        // Cella per i membri attivi: mostra "Email (Ruolo)"
-        activeWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
-            @Override
-            protected void updateItem(UserBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getEmail() + " (" + item.getRole() + ")" + "        " + item.getName() +" "+ item.getSurname());
-                }
-            }
-        });
-
-        // Cella per i pendenti: mostra "Email" + Bottoni
-        pendingWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
-            @Override
-            protected void updateItem(UserBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    HBox container = new HBox(10);
-                    container.setAlignment(Pos.CENTER_LEFT);
-
-                    Label label = new Label(item.getEmail() + "      "+ item.getName() +" "+ item.getSurname());
-                    Button btnAcc = new Button("V");
-                    btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-                    Button btnRej = new Button("X");
-                    btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-
-                    btnAcc.setOnAction(e -> handleResponse(item.getEmail(), true));
-                    btnRej.setOnAction(e -> handleResponse(item.getEmail(), false));
-
-                    container.getChildren().addAll(label, btnAcc, btnRej);
-                    setGraphic(container);
-                }
-            }
-        });
+//        // Cella per i membri attivi: mostra "Email (Ruolo)"
+//        activeWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
+//            @Override
+//            protected void updateItem(UserBean item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (empty || item == null) {
+//                    setText(null);
+//                } else {
+//                    setText(item.getEmail() + " (" + item.getRole() + ")" + "        " + item.getName() +" "+ item.getSurname());
+//                }
+//            }
+//        });
+//
+//        // Cella per i pendenti: mostra "Email" + Bottoni
+//        pendingWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
+//            @Override
+//            protected void updateItem(UserBean item, boolean empty) {
+////                super.updateItem(item, empty);
+////                if (empty || item == null) {
+////                    setGraphic(null);
+////                } else {
+////                    HBox container = new HBox(10);
+////                    container.setAlignment(Pos.CENTER_LEFT);
+////
+////                    Label label = new Label(item.getEmail() + "      "+ item.getName() +" "+ item.getSurname());
+////                    Button btnAcc = new Button("V");
+////                    btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+////                    Button btnRej = new Button("X");
+////                    btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+////
+////                    btnAcc.setOnAction(e -> handleResponse(item.getEmail(), true));
+////                    btnRej.setOnAction(e -> handleResponse(item.getEmail(), false));
+////
+////                    container.getChildren().addAll(label, btnAcc, btnRej);
+////                    setGraphic(container);
+////                }
+////            }
+////        });
+        activeWorkersList.setCellFactory(lv -> new ActiveWorkerCell());
+        pendingWorkersList.setCellFactory(lv -> new PendingWorkerCell());
 
 
     }
@@ -146,5 +153,94 @@ public class WorkersGC {
 
     }
 
+    private class ActiveWorkerCell extends ListCell<UserBean> {
+        @Override
+        protected void updateItem(UserBean item, boolean empty) {
+            super.updateItem(item, empty);
+            if(empty || item == null){
+                setText(null);
+                setGraphic(null);
+                return;
+            }
+            setGraphic(createActiveWorkerCard(item));
+        }
+    }
+
+    private class PendingWorkerCell extends ListCell<UserBean> {
+        @Override
+        protected void updateItem(UserBean item, boolean empty) {
+            super.updateItem(item, empty);
+            if(empty || item == null){
+                setText(null);
+                setGraphic(null);
+                return;
+            }
+            setGraphic(createPendingWorkerCard(item));
+        }
+    }
+
+    private VBox createActiveWorkerCard(UserBean user) {
+        VBox card = new VBox(5);
+        card.setPadding(new Insets(10));
+        card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+        HBox topBox = new HBox();
+        topBox.setAlignment(Pos.CENTER_LEFT);
+
+
+        // Composzione del nome in modo sicuro contro i null
+        String fullName = (user.getName() != null ? user.getName() : "") + " " +
+                (user.getSurname() != null ? user.getSurname() : "");
+        Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
+
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, ALWAYS);
+
+        // Badge per il ruolo (stile etichetta azzurra)
+        String roleText = (user.getRole() != null) ? user.getRole() : "Worker";
+        Label roleLabel = new Label(roleText);
+        roleLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; " +
+                "-fx-background-color: #3498db; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
+        topBox.getChildren().addAll(nameLabel, spacer, roleLabel);
+
+
+        // Email in basso a sinistra
+        Label emailLabel = new Label(user.getEmail());
+        emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+        card.getChildren().addAll(topBox, emailLabel);
+        return card;
+    }
+    private VBox createPendingWorkerCard(UserBean user) {
+        VBox card = new VBox(5);
+        card.setPadding(new javafx.geometry.Insets(10));
+        card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
+        HBox topBox = new HBox(10);
+        topBox.setAlignment(Pos.CENTER_LEFT);
+        // Nome
+        String fullName = (user.getName() != null ? user.getName() : "") + " " +
+                (user.getSurname() != null ? user.getSurname() : "");
+        Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, ALWAYS);
+        // Pulsanti posizionati sulla destra
+        Button btnAcc = new Button("V");
+        btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
+
+        Button btnRej = new Button("X");
+        btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
+        btnAcc.setOnAction(e -> handleResponse(user.getEmail(), true));
+        btnRej.setOnAction(e -> handleResponse(user.getEmail(), false));
+        topBox.getChildren().addAll(nameLabel, spacer, btnAcc, btnRej);
+        // Email in basso a sinistra
+        Label emailLabel = new Label(user.getEmail());
+        emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+        card.getChildren().addAll(topBox, emailLabel);
+        return card;
+    }
 
 }
