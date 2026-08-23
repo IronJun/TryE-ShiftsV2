@@ -27,6 +27,8 @@ public class SearchWorkplacesAC {
             bean.setAddress(entity.getAddress());
             // Se la Home o la lista richiede l'email del proprietario:
             bean.setOwnerEmail(entity.getOwnerEmail());
+            bean.setSelectedDays(entity.getSelectedDays());
+            bean.setShiftsBean(entity.getShifts());
             resultBeans.add(bean);
         }
 
@@ -45,6 +47,9 @@ public class SearchWorkplacesAC {
            WorkplaceBean wpbean = new WorkplaceBean();
            wpbean.setWorkplaceName(wp.getName());
            wpbean.setAddress(wp.getAddress());
+           wpbean.setOwnerEmail(wp.getOwnerEmail());
+           wpbean.setSelectedDays(wp.getSelectedDays());
+           wpbean.setShiftsBean(wp.getShifts());
            result.add(wpbean);
         }
         return result;
@@ -61,6 +66,9 @@ public class SearchWorkplacesAC {
             WorkplaceBean bean = new WorkplaceBean();
             bean.setWorkplaceName((entity).getName());
             bean.setAddress((entity).getAddress());
+            bean.setOwnerEmail((entity).getOwnerEmail());
+            bean.setSelectedDays((entity).getSelectedDays());
+            bean.setShiftsBean((entity).getShifts());
             resultBeans.add(bean);
         }
         return resultBeans;

@@ -33,7 +33,7 @@ public class HomeGC {
     private static final Logger LOGGER = Logger.getLogger(HomeGC.class.getName());
     private static final String TECNICAL_ERROR = "Technical error: ";
     private UserBean loggedUser;
-    @FXML private ListView<String> workplaceListView;
+    @FXML private ListView<WorkplaceBean> workplaceListView;
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
     @FXML private VBox vboxWorkplaceLegend;
     @FXML private TextField searchField;
@@ -58,11 +58,7 @@ public class HomeGC {
             handleSearch(newValue);
         });
 
-        workplaceListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                handleGlobalSearchSelection(newVal);
-            }
-        });
+        setupWorkplaceListView();
         this.weekOffset = 0;
         this.currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
@@ -152,7 +148,7 @@ public class HomeGC {
             for (WorkplaceBean wp : result) {
                 msg = "Aggiungo: " + wp.getWorkplaceName();
                 LOGGER.info(msg); // DEBUG
-                workplaceListView.getItems().add(wp.getWorkplaceName());
+                workplaceListView.getItems().add(wp);
             }
         }catch(DataFetchException e){
             LOGGER.log(Level.SEVERE, "Errore durante la ricerca", e);
@@ -258,27 +254,48 @@ public class HomeGC {
                 return;
             }
             for (WorkplaceBean wp : workplaces) {
-                HBox row = new HBox(10);
-                row.setAlignment(Pos.CENTER_LEFT);
-                row.setPadding(new Insets(5));
-                row.setStyle("-fx-cursor: hand; -fx-background-radius: 5;");
+                //Contenitore Principale
+                VBox card = new VBox(5);
+                card.setPadding(new Insets(10));
+                card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
 
-                // Effetto hover per far capire che è cliccabile
-                row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #f0f0f0; -fx-cursor: hand;"));
-                row.setOnMouseExited(e -> row.setStyle("-fx-background-color: transparent;"));
 
-                // Azione al click (sostituisce il vecchio listener della ListView)
-                row.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getWorkplaceName()));
+                //Efetto hover
+                card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #cccccc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
+                card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; "));
+                card.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getWorkplaceName()));
 
-                // Quadratino colorato
-                Rectangle rect = new Rectangle(15, 15);
-                rect.setArcHeight(5); rect.setArcWidth(5);
+                //HBox name and color
+                HBox topBox = new HBox(10);
+                topBox.setAlignment(Pos.CENTER_LEFT);
+                Rectangle rect = new Rectangle(12,12);
+                rect.setArcHeight(4); rect.setArcWidth(4);
                 rect.setFill(Color.web(getColorForWorkplace(wp.getWorkplaceName())));
 
-                Label name = new Label(wp.getWorkplaceName());
+                Label nameLabel1 = new Label(wp.getWorkplaceName());
+                nameLabel1.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+                topBox.getChildren().addAll(rect, nameLabel1);
 
-                row.getChildren().addAll(rect, name);
-                vboxWorkplaceLegend.getChildren().add(row);
+                //HBox address e giorni
+                HBox bottomBox = new HBox();
+                bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+
+                Label addressLabel1 = new Label(wp.getAddress());
+                addressLabel1.setStyle("-fx-font-size: 11px;-fx-text-fill: #666666");
+
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                List<String> activeDayStr = wp.getSelectedDays();
+                String theOneString = (activeDayStr!=null && !activeDayStr.isEmpty()) ? String.join(", ",activeDayStr) : "No days for this workplace";
+                Label daysLabel = new Label("Days: "+theOneString);
+                daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");
+
+                bottomBox.getChildren().addAll(addressLabel1,spacer, daysLabel);
+
+                card.getChildren().addAll(topBox, bottomBox);
+                vboxWorkplaceLegend.getChildren().add(card);
             }
         } catch (BaseException _) {
             ErrorViewManager.screenError(TECNICAL_ERROR,"Impossibile recuperare i workplace");
@@ -349,5 +366,47 @@ public class HomeGC {
         buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), this.currentWeekId);
     }
 
+    private void setupWorkplaceListView(){
+        workplaceListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                handleGlobalSearchSelection(newVal.getWorkplaceName());
+            }
+        });
+
+        workplaceListView.setCellFactory(param -> new ListCell<WorkplaceBean>() {
+            @Override
+            protected void updateItem(WorkplaceBean wp, boolean empty) {
+                super.updateItem(wp, empty);
+                if (empty || wp == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    VBox card = new VBox(5);
+                    card.setPadding(new Insets(5));
+
+                    Label nameLabel = new Label(wp.getWorkplaceName());
+                    nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+                    HBox bottomBox = new HBox();
+                    bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+
+                    Label addressLabel = new Label(wp.getAddress() != null ? wp.getAddress() : "Nessun indirizzo");
+                    addressLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666666;");
+
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                    List<String> activeDayStr = wp.getSelectedDays();
+                    String theOneString = (activeDayStr!=null && !activeDayStr.isEmpty()) ? String.join(", ",activeDayStr) : "No days for this workplace";
+                    Label daysLabel = new Label("Days: "+theOneString);
+                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888;");
+
+                    bottomBox.getChildren().addAll(addressLabel, spacer, daysLabel);
+                    card.getChildren().addAll(nameLabel, bottomBox);
+
+                    setGraphic(card);
+                }
+            }
+        });
+    }
 
 }
