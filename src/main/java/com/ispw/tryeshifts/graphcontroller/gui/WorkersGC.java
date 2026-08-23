@@ -87,47 +87,8 @@ public class WorkersGC {
     }
 
     private void setupCells() {
-//        // Cella per i membri attivi: mostra "Email (Ruolo)"
-//        activeWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
-//            @Override
-//            protected void updateItem(UserBean item, boolean empty) {
-//                super.updateItem(item, empty);
-//                if (empty || item == null) {
-//                    setText(null);
-//                } else {
-//                    setText(item.getEmail() + " (" + item.getRole() + ")" + "        " + item.getName() +" "+ item.getSurname());
-//                }
-//            }
-//        });
-//
-//        // Cella per i pendenti: mostra "Email" + Bottoni
-//        pendingWorkersList.setCellFactory(lv -> new ListCell<UserBean>() {
-//            @Override
-//            protected void updateItem(UserBean item, boolean empty) {
-////                super.updateItem(item, empty);
-////                if (empty || item == null) {
-////                    setGraphic(null);
-////                } else {
-////                    HBox container = new HBox(10);
-////                    container.setAlignment(Pos.CENTER_LEFT);
-////
-////                    Label label = new Label(item.getEmail() + "      "+ item.getName() +" "+ item.getSurname());
-////                    Button btnAcc = new Button("V");
-////                    btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-////                    Button btnRej = new Button("X");
-////                    btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-////
-////                    btnAcc.setOnAction(e -> handleResponse(item.getEmail(), true));
-////                    btnRej.setOnAction(e -> handleResponse(item.getEmail(), false));
-////
-////                    container.getChildren().addAll(label, btnAcc, btnRej);
-////                    setGraphic(container);
-////                }
-////            }
-////        });
         activeWorkersList.setCellFactory(lv -> new ActiveWorkerCell());
         pendingWorkersList.setCellFactory(lv -> new PendingWorkerCell());
-
 
     }
 
@@ -160,9 +121,39 @@ public class WorkersGC {
             if(empty || item == null){
                 setText(null);
                 setGraphic(null);
-                return;
+            }else{
+                VBox card = new VBox(5);
+                card.setPadding(new Insets(10));
+                card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+                HBox topBox = new HBox();
+                topBox.setAlignment(Pos.CENTER_LEFT);
+
+
+                // Composzione del nome in modo sicuro contro i null
+                String fullName = (item.getName() != null ? item.getName() : "") + " " +
+                        (item.getSurname() != null ? item.getSurname() : "");
+                Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+                nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
+
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, ALWAYS);
+
+                // Badge per il ruolo (stile etichetta azzurra)
+                String roleText = (item.getRole() != null) ? item.getRole() : "Worker";
+                Label roleLabel = new Label(roleText);
+                roleLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; " +
+                        "-fx-background-color: #3498db; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
+                topBox.getChildren().addAll(nameLabel, spacer, roleLabel);
+
+
+                // Email in basso a sinistra
+                Label emailLabel = new Label(item.getEmail());
+                emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+                card.getChildren().addAll(topBox, emailLabel);
+                setGraphic(card);
             }
-            setGraphic(createActiveWorkerCard(item));
         }
     }
 
@@ -173,74 +164,39 @@ public class WorkersGC {
             if(empty || item == null){
                 setText(null);
                 setGraphic(null);
-                return;
+            }else {
+
+                VBox card = new VBox(5);
+                card.setPadding(new javafx.geometry.Insets(10));
+                card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
+                HBox topBox = new HBox(10);
+                topBox.setAlignment(Pos.CENTER_LEFT);
+                // Nome
+                String fullName = (item.getName() != null ? item.getName() : "") + " " +
+                        (item.getSurname() != null ? item.getSurname() : "");
+                Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+                nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, ALWAYS);
+                // Pulsanti posizionati sulla destra
+                Button btnAcc = new Button("V");
+                btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; " +
+                        "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
+
+                Button btnRej = new Button("X");
+                btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; " +
+                        "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
+                btnAcc.setOnAction(e -> handleResponse(item.getEmail(), true));
+                btnRej.setOnAction(e -> handleResponse(item.getEmail(), false));
+                topBox.getChildren().addAll(nameLabel, spacer, btnAcc, btnRej);
+                // Email in basso a sinistra
+                Label emailLabel = new Label(item.getEmail());
+                emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+                card.getChildren().addAll(topBox, emailLabel);
+                setGraphic(card);
             }
-            setGraphic(createPendingWorkerCard(item));
         }
     }
 
-    private VBox createActiveWorkerCard(UserBean user) {
-        VBox card = new VBox(5);
-        card.setPadding(new Insets(10));
-        card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
-
-        HBox topBox = new HBox();
-        topBox.setAlignment(Pos.CENTER_LEFT);
-
-
-        // Composzione del nome in modo sicuro contro i null
-        String fullName = (user.getName() != null ? user.getName() : "") + " " +
-                (user.getSurname() != null ? user.getSurname() : "");
-        Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
-
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, ALWAYS);
-
-        // Badge per il ruolo (stile etichetta azzurra)
-        String roleText = (user.getRole() != null) ? user.getRole() : "Worker";
-        Label roleLabel = new Label(roleText);
-        roleLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; " +
-                "-fx-background-color: #3498db; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
-        topBox.getChildren().addAll(nameLabel, spacer, roleLabel);
-
-
-        // Email in basso a sinistra
-        Label emailLabel = new Label(user.getEmail());
-        emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
-        card.getChildren().addAll(topBox, emailLabel);
-        return card;
-    }
-    private VBox createPendingWorkerCard(UserBean user) {
-        VBox card = new VBox(5);
-        card.setPadding(new javafx.geometry.Insets(10));
-        card.setStyle("-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8;");
-        HBox topBox = new HBox(10);
-        topBox.setAlignment(Pos.CENTER_LEFT);
-        // Nome
-        String fullName = (user.getName() != null ? user.getName() : "") + " " +
-                (user.getSurname() != null ? user.getSurname() : "");
-        Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, ALWAYS);
-        // Pulsanti posizionati sulla destra
-        Button btnAcc = new Button("V");
-        btnAcc.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; " +
-                "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
-
-        Button btnRej = new Button("X");
-        btnRej.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; " +
-                "-fx-cursor: hand; -fx-background-radius: 5; -fx-min-width: 30px;");
-        btnAcc.setOnAction(e -> handleResponse(user.getEmail(), true));
-        btnRej.setOnAction(e -> handleResponse(user.getEmail(), false));
-        topBox.getChildren().addAll(nameLabel, spacer, btnAcc, btnRej);
-        // Email in basso a sinistra
-        Label emailLabel = new Label(user.getEmail());
-        emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
-        card.getChildren().addAll(topBox, emailLabel);
-        return card;
-    }
 
 }
