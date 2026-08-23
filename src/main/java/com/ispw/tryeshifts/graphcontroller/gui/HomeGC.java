@@ -366,47 +366,52 @@ public class HomeGC {
         buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), this.currentWeekId);
     }
 
-    private void setupWorkplaceListView(){
+    private void setupWorkplaceListView() {
         workplaceListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 handleGlobalSearchSelection(newVal.getWorkplaceName());
             }
         });
 
-        workplaceListView.setCellFactory(param -> new ListCell<WorkplaceBean>() {
-            @Override
-            protected void updateItem(WorkplaceBean wp, boolean empty) {
-                super.updateItem(wp, empty);
-                if (empty || wp == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    VBox card = new VBox(5);
-                    card.setPadding(new Insets(5));
+        workplaceListView.setCellFactory(param -> new WorkplaceListCell());
+    }
 
-                    Label nameLabel = new Label(wp.getWorkplaceName());
-                    nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-                    HBox bottomBox = new HBox();
-                    bottomBox.setAlignment(Pos.BOTTOM_LEFT);
-
-                    Label addressLabel = new Label(wp.getAddress() != null ? wp.getAddress() : "Nessun indirizzo");
-                    addressLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666666;");
-
-                    Region spacer = new Region();
-                    HBox.setHgrow(spacer, Priority.ALWAYS);
-
-                    List<String> activeDayStr = wp.getSelectedDays();
-                    String theOneString = (activeDayStr!=null && !activeDayStr.isEmpty()) ? String.join(", ",activeDayStr) : "No days for this workplace";
-                    Label daysLabel = new Label("Days: "+theOneString);
-                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888;");
-
-                    bottomBox.getChildren().addAll(addressLabel, spacer, daysLabel);
-                    card.getChildren().addAll(nameLabel, bottomBox);
-
-                    setGraphic(card);
-                }
+    private class WorkplaceListCell extends ListCell<WorkplaceBean> {
+        @Override
+        protected void updateItem(WorkplaceBean wp, boolean empty) {
+            super.updateItem(wp, empty);
+            if (empty || wp == null) {
+                setText(null);
+                setGraphic(null);
             }
-        });
+            setGraphic(createWorkplaceCard(wp));
+        }
+    }
+
+    private VBox createWorkplaceCard(WorkplaceBean wp) {
+        VBox card = new VBox(5);
+        card.setPadding(new Insets(5));
+
+        Label nameLabel = new Label(wp.getWorkplaceName());
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        HBox bottomBox = new HBox();
+        bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+
+        Label addressLabel = new Label(wp.getAddress() != null ? wp.getAddress() : "Nessun indirizzo");
+        addressLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666666;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        List<String> activeDayStr = wp.getSelectedDays();
+        String theOneString = (activeDayStr!=null && !activeDayStr.isEmpty()) ? String.join(", ",activeDayStr) : "No days for this workplace";
+        Label daysLabel = new Label("Days: "+theOneString);
+        daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888;");
+
+        bottomBox.getChildren().addAll(addressLabel, spacer, daysLabel);
+        card.getChildren().addAll(nameLabel, bottomBox);
+
+        return card;
     }
 
 }
