@@ -171,7 +171,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
         String startShift = timeParts[0];
         String endShift = timeParts[1];
-        String query = "DELETE FROM availabilities" +"WHERE user_email = ?"+ "AND workplace_name = ?"+ "AND week_id = ?"+ "AND day_name = ?"+"AND start_shift = ?"+"AND end_shift = ?";
+        String query = "DELETE FROM availabilities " +"WHERE user_email = ? "+ "AND workplace_name = ? "+ "AND week_id = ? "+ "AND day_name = ? "+"AND start_shift = ? "+"AND end_shift = ? ";
 
         try(Connection conn = DBconnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){

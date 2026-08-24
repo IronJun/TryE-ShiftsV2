@@ -40,7 +40,7 @@ public class SettingsAC {
     }
     public void updateWorkplace(WorkplaceBean wp, String oldname) throws BaseException {
         Workplace workplace = workplaceRepo.findWorkplaceByName(oldname);
-        if(workplace == null) throw new NullPointerException("Workplace not found");
+        if(workplace == null) throw new EntityNotFoundException("Workplace",oldname );
 
         workplace.setName(wp.getWorkplaceName());
         workplace.setAddress(wp.getAddress());

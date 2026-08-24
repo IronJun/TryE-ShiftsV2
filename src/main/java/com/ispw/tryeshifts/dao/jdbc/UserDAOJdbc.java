@@ -61,11 +61,10 @@ public class UserDAOJdbc implements UserDAO {
             }
         }
     }
-    public void updateUser(UserInfo updateUser) throws  DataFetchException, EntityNotFoundException {
+    public void updateUser(UserInfo updateUser) throws  DataFetchException,EntityNotFoundException {
 // Nota: Uso 'users' al plurale come abbiamo fatto per 'workplaces'
         // Usiamo l'email presente nell'oggetto user sia per i nuovi dati che per il WHERE
         String sql = "UPDATE users SET nome = ?, cognome = ?, password = ? WHERE email = ?";
-
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -74,8 +73,10 @@ public class UserDAOJdbc implements UserDAO {
             pstmt.setString(3, updateUser.getPasswordHash());
             pstmt.setString(4, updateUser.getEmail()); // L'email identifica chi aggiornare
 
-            pstmt.executeUpdate();
-            if(updateUser == null){throw new EntityNotFoundException("User",updateUser.getEmail());}
+            int affectedRows = pstmt.executeUpdate();
+            if(affectedRows == 0) {
+                throw new EntityNotFoundException("User", updateUser.getEmail());
+            }
         } catch (SQLException e) {
             throw new DataFetchException("Errore update: " ,e);
         }
