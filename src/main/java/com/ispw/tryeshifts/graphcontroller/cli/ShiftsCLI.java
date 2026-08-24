@@ -6,9 +6,9 @@ import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 
-import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
+import com.ispw.tryeshifts.utils.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.*;

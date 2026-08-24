@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.appcontroller.LoginAC;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import com.ispw.tryeshifts.utils.PreferencesManager;
 

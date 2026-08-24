@@ -5,9 +5,9 @@ import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DataFetchException;
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.exception.DataFetchException;
+import com.ispw.tryeshifts.exception.DuplicateEntityException;
+import com.ispw.tryeshifts.exception.EntityNotFoundException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

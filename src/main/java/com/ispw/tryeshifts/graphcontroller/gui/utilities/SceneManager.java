@@ -126,6 +126,15 @@ public class SceneManager {
         alert.showAndWait();
     }
 
+    public Boolean showConfirmationAlert(String title, String content, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(content);
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent()&&result.get() == ButtonType.OK;
+    }
+
     public boolean logoutConfirmation(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");

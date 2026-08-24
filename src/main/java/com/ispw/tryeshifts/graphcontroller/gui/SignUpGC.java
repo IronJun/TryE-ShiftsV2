@@ -3,7 +3,7 @@ package com.ispw.tryeshifts.graphcontroller.gui;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

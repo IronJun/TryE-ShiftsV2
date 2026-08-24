@@ -4,8 +4,8 @@ import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.excpetion.ValidationException;
+import com.ispw.tryeshifts.exception.BaseException;
+import com.ispw.tryeshifts.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

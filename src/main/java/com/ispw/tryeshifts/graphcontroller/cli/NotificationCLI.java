@@ -3,7 +3,7 @@ package com.ispw.tryeshifts.graphcontroller.cli;
 import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 import com.ispw.tryeshifts.session.SessionContext;
 

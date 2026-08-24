@@ -26,6 +26,12 @@ public class UserBean {
 
     }
 
+    public UserBean(String email, String name, String surname) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+    }
+
     public String getEmail() {
         return email;
     }

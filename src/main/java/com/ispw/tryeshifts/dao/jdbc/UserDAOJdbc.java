@@ -3,7 +3,7 @@ package com.ispw.tryeshifts.dao.jdbc;
 import com.ispw.tryeshifts.dao.DBconnection;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

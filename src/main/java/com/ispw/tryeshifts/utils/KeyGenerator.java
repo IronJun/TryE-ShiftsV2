@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller;
+package com.ispw.tryeshifts.utils;
 
 public class KeyGenerator {
     private KeyGenerator() {} // Classe utility, non si istanzia

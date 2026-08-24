@@ -7,7 +7,7 @@ import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.ValidationException;
+import com.ispw.tryeshifts.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 
 public interface UserDAO {
     void save(UserInfo user) throws DuplicateEntityException, DataFetchException;

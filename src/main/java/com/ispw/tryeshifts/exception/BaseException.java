@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.excpetion;
+package com.ispw.tryeshifts.exception;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

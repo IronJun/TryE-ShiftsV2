@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.excpetion;
+package com.ispw.tryeshifts.exception;
 
 public class EntityNotFoundException extends EntityException {
     public EntityNotFoundException(String entityName, String id) {

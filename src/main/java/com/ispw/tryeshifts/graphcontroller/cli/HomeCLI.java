@@ -4,10 +4,10 @@ import com.ispw.tryeshifts.appcontroller.*;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.excpetion.MembershipPendingException;
-import com.ispw.tryeshifts.excpetion.UserNotMemberException;
-import com.ispw.tryeshifts.excpetion.ValidationException;
+import com.ispw.tryeshifts.exception.BaseException;
+import com.ispw.tryeshifts.exception.MembershipPendingException;
+import com.ispw.tryeshifts.exception.UserNotMemberException;
+import com.ispw.tryeshifts.exception.ValidationException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.ArrayList;

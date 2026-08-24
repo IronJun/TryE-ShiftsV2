@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
+import com.ispw.tryeshifts.exception.DuplicateEntityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

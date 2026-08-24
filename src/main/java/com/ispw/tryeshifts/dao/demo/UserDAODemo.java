@@ -4,8 +4,8 @@ import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
 
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.exception.DuplicateEntityException;
+import com.ispw.tryeshifts.exception.EntityNotFoundException;
 
 
 public class UserDAODemo implements UserDAO {

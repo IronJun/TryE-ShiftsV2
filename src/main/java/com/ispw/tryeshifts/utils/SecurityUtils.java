@@ -1,6 +1,6 @@
-package com.ispw.tryeshifts.dao;
+package com.ispw.tryeshifts.utils;
 
-import com.ispw.tryeshifts.excpetion.DataFetchException;
+import com.ispw.tryeshifts.exception.DataFetchException;
 
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;

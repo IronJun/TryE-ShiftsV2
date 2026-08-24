@@ -80,5 +80,7 @@ public class AppConfig {
         userDAO = null;
         membershipDAO = null;
         workplaceDAO = null;
+        availabilityDAO = null;
+        notificationDAO = null;
     }
 }

@@ -1,9 +1,9 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Availability;
-import com.ispw.tryeshifts.excpetion.DataFetchException;
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
+import com.ispw.tryeshifts.exception.DataFetchException;
+import com.ispw.tryeshifts.exception.DuplicateEntityException;
+import com.ispw.tryeshifts.exception.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Map;

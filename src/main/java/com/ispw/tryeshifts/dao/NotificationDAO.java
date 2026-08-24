@@ -1,7 +1,7 @@
 package com.ispw.tryeshifts.dao;
 
 import com.ispw.tryeshifts.entity.Notification;
-import com.ispw.tryeshifts.excpetion.DataFetchException;
+import com.ispw.tryeshifts.exception.DataFetchException;
 import java.util.List;
 
 public interface NotificationDAO {

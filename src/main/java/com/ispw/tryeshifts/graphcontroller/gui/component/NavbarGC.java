@@ -3,7 +3,7 @@ package com.ispw.tryeshifts.graphcontroller.gui.component;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.NotificationService;
 import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;

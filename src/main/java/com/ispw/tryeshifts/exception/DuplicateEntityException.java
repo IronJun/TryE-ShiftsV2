@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.excpetion;
+package com.ispw.tryeshifts.exception;
 
 public class DuplicateEntityException extends EntityException {
     public DuplicateEntityException(String entityName, String value) {

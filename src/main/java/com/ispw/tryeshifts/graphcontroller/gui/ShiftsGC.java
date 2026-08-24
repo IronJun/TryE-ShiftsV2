@@ -17,8 +17,8 @@ import com.ispw.tryeshifts.graphcontroller.gui.utilities.stratgui.WorkerShiftsSt
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
+import com.ispw.tryeshifts.exception.BaseException;
+import com.ispw.tryeshifts.utils.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -27,7 +27,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,8 +95,7 @@ public class ShiftsGC {
         this.workplaceTitleLabel.setText(wp.getWorkplaceName());
         // Qui potrai caricare i turni specifici di questo workplace
         buildDynamicTable();
-        msg = "DEBUG UI: Workplace selezionato: " + wp.getWorkplaceName();
-        logger.log(Level.FINE,msg);
+
     }
 
     private void buildDynamicTable() {
@@ -312,9 +310,7 @@ public class ShiftsGC {
             String start = timeParts[0].trim();
             String end = timeParts[1].trim(); // "00:00-01:00"
 
-            // LOG DI CONTROLLO FINALE
-            msg = "DEBUG SUCCESS: Creato bean per " + day + " dalle " + start + " alle " + end;
-            logger.log(Level.FINE, msg);
+
             AvailabilityBean bean = new AvailabilityBean(
                     loggedUser.getEmail(),
                     wp.getWorkplaceName(),
@@ -324,9 +320,6 @@ public class ShiftsGC {
                     weekIdForDb
             );
             availabilityBeans.add(bean);
-        } else {
-            msg = "DEBUG FAIL: timeParts ha lunghezza " + timeParts.length + " per la stringa: [" + fullTime + "]";
-            logger.log(Level.FINE, msg);
         }
     }
 

@@ -8,8 +8,8 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
-import com.ispw.tryeshifts.excpetion.*;
-import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
+import com.ispw.tryeshifts.exception.*;
+import com.ispw.tryeshifts.utils.KeyGenerator;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -96,8 +96,8 @@ public class ManageShiftsAC {
                 );
                 availabilityRepo.saveAvailability(entity);
             }
-        } catch(DataFetchException _) {
-            logger.severe( "Errore di persistenza durante il salvataggio");
+        } catch(DataFetchException e) {
+            throw new DataFetchException("Failed to save the avaialability", e);
              // Rilancia per far sapere alla GUI che è fallito
         }
     }

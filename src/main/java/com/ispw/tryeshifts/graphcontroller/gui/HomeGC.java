@@ -7,7 +7,7 @@ import com.ispw.tryeshifts.appcontroller.*;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -20,7 +20,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ import java.util.logging.Logger;
 
 public class HomeGC {
     private static final Logger LOGGER = Logger.getLogger(HomeGC.class.getName());
-    private static final String TECNICAL_ERROR = "Technical error: ";
+    private static final String TECHNICAL_ERROR = "Technical error: ";
     private UserBean loggedUser;
     @FXML private ListView<WorkplaceBean> workplaceListView;
     @FXML private GridPane shiftsGrid; // Corrisponde a fx:id="shiftsGrid"
@@ -67,17 +66,11 @@ public class HomeGC {
         if (this.loggedUser != null) {
             refreshWorkplaceList();
             handleSearch("");
-            currentWeekId = getCurrentWeekId();
+            currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
             buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), currentWeekId);
         }
     }
 
-    private String getCurrentWeekId() {
-        java.time.LocalDate now = java.time.LocalDate.now(ZoneId.systemDefault());
-        java.time.temporal.TemporalField woy = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).weekOfWeekBasedYear();
-        int weekNumber = now.get(woy);
-        return now.getYear() + "_" + String.format("%02d", weekNumber);
-    }
 
     public void handleGlobalSearchSelection(String workplaceName) {
         try{
@@ -91,29 +84,25 @@ public class HomeGC {
         }catch (EntityNotFoundException _){
             ErrorViewManager.screenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
         }catch (BaseException e){
-            ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
+            ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
         }
     }
 
     public void showJoinConfirmation(String workplaceName){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Richiesta di accesso");
-        alert.setHeaderText("Vuoi inviare una richiesta di accesso al workplace "+workplaceName+"?");
-        alert.setContentText("Inviando la richiesta, dovrai attendere l'owner che accetti");
 
-        alert.showAndWait().ifPresent(response -> {
-            if(response == ButtonType.OK){
+        Boolean response = SceneManager.getInstance().showConfirmationAlert("Access Request",
+                "Do you want to access: "+workplaceName+"?",
+                "Sending the request, the owner will decide your fate");
+            if(response){
                 try{
                     new ManageMembersAC().requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
-                    ErrorViewManager.screenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
+                    ErrorViewManager.screenError("Error Workplace","Could not find:  "+workplaceName);
                 }catch(BaseException e){
-                    ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
+                    ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
                 }
-
             }
-        });
     }
 
     public void handleWorkplaceSelection(String workplaceName) {
@@ -129,7 +118,7 @@ public class HomeGC {
         }catch(EntityNotFoundException _){
             ErrorViewManager.screenError("Errore Workplace", "il workpalce selezionato non esiste");
         }catch(BaseException e){
-            ErrorViewManager.screenError(TECNICAL_ERROR, e.getMessage());
+            ErrorViewManager.screenError(TECHNICAL_ERROR, e.getMessage());
         }
     }
 
@@ -156,7 +145,7 @@ public class HomeGC {
                     "Non è stato possibile recuperare i dati. Riprova più tardi.");
             workplaceListView.getItems().clear();
         }catch(BaseException e){
-            ErrorViewManager.screenError(TECNICAL_ERROR, e.getMessage());
+            ErrorViewManager.screenError(TECHNICAL_ERROR, e.getMessage());
             workplaceListView.getItems().clear();
         }
     }
@@ -298,7 +287,7 @@ public class HomeGC {
                 vboxWorkplaceLegend.getChildren().add(card);
             }
         } catch (BaseException e) {
-            ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
+            ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
         }
 
     }
@@ -344,7 +333,7 @@ public class HomeGC {
             handleSearch(searchField.getText());
 
             // Aggiorna la tabella dei turni
-            buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), getCurrentWeekId());
+            buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), manageShiftsAC.calculateWeekId(weekOffset));
         }
     }
 
@@ -376,7 +365,7 @@ public class HomeGC {
         workplaceListView.setCellFactory(param -> new WorkplaceListCell());
     }
 
-    private class WorkplaceListCell extends ListCell<WorkplaceBean> {
+    private static class WorkplaceListCell extends ListCell<WorkplaceBean> {
         @Override
         protected void updateItem(WorkplaceBean wp, boolean empty) {
             super.updateItem(wp, empty);

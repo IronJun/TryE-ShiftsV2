@@ -7,7 +7,7 @@ import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 
 
 public class AccessWorkplaceAC {

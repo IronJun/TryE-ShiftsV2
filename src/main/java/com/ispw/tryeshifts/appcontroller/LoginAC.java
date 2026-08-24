@@ -3,9 +3,9 @@ package com.ispw.tryeshifts.appcontroller;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.UserDAO;
-import com.ispw.tryeshifts.dao.SecurityUtils;
+import com.ispw.tryeshifts.utils.SecurityUtils;
 import com.ispw.tryeshifts.entity.UserInfo;
-import com.ispw.tryeshifts.excpetion.*;
+import com.ispw.tryeshifts.exception.*;
 
 
 public class LoginAC {

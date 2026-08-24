@@ -4,9 +4,9 @@ import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
-import com.ispw.tryeshifts.excpetion.BaseException;
-import com.ispw.tryeshifts.excpetion.DataFetchException;
-import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
+import com.ispw.tryeshifts.exception.BaseException;
+import com.ispw.tryeshifts.exception.DataFetchException;
+import com.ispw.tryeshifts.exception.DuplicateEntityException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
 
 import java.util.ArrayList;

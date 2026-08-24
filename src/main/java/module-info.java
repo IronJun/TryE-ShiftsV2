@@ -27,7 +27,7 @@ module com.ispw.tryeshifts {
     exports com.ispw.tryeshifts.graphcontroller.gui;
     exports com.ispw.tryeshifts.appcontroller;
     exports com.ispw.tryeshifts.entity;
-    exports com.ispw.tryeshifts.excpetion;
+    exports com.ispw.tryeshifts.exception;
     exports com.ispw.tryeshifts.bean;
     exports com.ispw.tryeshifts.dao;
     opens com.ispw.tryeshifts.graphcontroller.gui to javafx.fxml;
@@ -44,5 +44,6 @@ module com.ispw.tryeshifts {
     exports com.ispw.tryeshifts.graphcontroller.gui.utilities.factorycalendar;
 
     opens com.ispw.tryeshifts.graphcontroller.gui.component to javafx.fxml;
+    exports com.ispw.tryeshifts.utils;
 
 }

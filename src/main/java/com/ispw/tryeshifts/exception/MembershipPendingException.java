@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.excpetion;
+package com.ispw.tryeshifts.exception;
 
 public class MembershipPendingException extends ValidationException {
     public MembershipPendingException(String membership,String id) {

@@ -4,8 +4,7 @@ import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.dao.NotificationDAO;
 import com.ispw.tryeshifts.entity.Notification;
-import com.ispw.tryeshifts.excpetion.BaseException;
-import javafx.concurrent.Task;
+import com.ispw.tryeshifts.exception.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;

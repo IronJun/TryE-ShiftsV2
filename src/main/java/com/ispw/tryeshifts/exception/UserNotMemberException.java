@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.excpetion;
+package com.ispw.tryeshifts.exception;
 
 public class UserNotMemberException extends BaseException {
     public UserNotMemberException(String message) {

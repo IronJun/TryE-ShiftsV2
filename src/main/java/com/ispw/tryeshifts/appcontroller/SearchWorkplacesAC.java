@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +22,7 @@ public class SearchWorkplacesAC {
         List<WorkplaceBean> resultBeans = new ArrayList<>();
         for (Workplace entity : workplaceEntities) {
             // Usiamo un costruttore o i setter (meglio costruttore se disponibile per brevità)
-            WorkplaceBean bean = new WorkplaceBean();
-            bean.setWorkplaceName(entity.getName());
-            bean.setAddress(entity.getAddress());
-            // Se la Home o la lista richiede l'email del proprietario:
-            bean.setOwnerEmail(entity.getOwnerEmail());
-            bean.setSelectedDays(entity.getSelectedDays());
-            bean.setShiftsBean(entity.getShifts());
-            resultBeans.add(bean);
+            resultBeans.add(toBean(entity));
         }
 
         return resultBeans;
@@ -44,13 +37,7 @@ public class SearchWorkplacesAC {
 
         List<WorkplaceBean> result = new ArrayList<>();
         for (Workplace wp : entity) {
-           WorkplaceBean wpbean = new WorkplaceBean();
-           wpbean.setWorkplaceName(wp.getName());
-           wpbean.setAddress(wp.getAddress());
-           wpbean.setOwnerEmail(wp.getOwnerEmail());
-           wpbean.setSelectedDays(wp.getSelectedDays());
-           wpbean.setShiftsBean(wp.getShifts());
-           result.add(wpbean);
+           result.add(toBean(wp));
         }
         return result;
 
@@ -63,14 +50,11 @@ public class SearchWorkplacesAC {
         List<WorkplaceBean> resultBeans = new ArrayList<>();
 
         for (Workplace entity : workplaceEntities) {
-            WorkplaceBean bean = new WorkplaceBean();
-            bean.setWorkplaceName((entity).getName());
-            bean.setAddress((entity).getAddress());
-            bean.setOwnerEmail((entity).getOwnerEmail());
-            bean.setSelectedDays((entity).getSelectedDays());
-            bean.setShiftsBean((entity).getShifts());
-            resultBeans.add(bean);
+            resultBeans.add(toBean(entity));
         }
         return resultBeans;
+    }
+    private WorkplaceBean toBean(Workplace entity){
+        return new WorkplaceBean(entity.getName(), entity.getAddress(), entity.getSelectedDays(),entity.getShifts(),entity.getOwnerEmail());
     }
 }

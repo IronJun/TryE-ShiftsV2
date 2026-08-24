@@ -9,10 +9,10 @@ import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.excpetion.BaseException;
+import com.ispw.tryeshifts.exception.BaseException;
 
-import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
-import com.ispw.tryeshifts.excpetion.ValidationException;
+import com.ispw.tryeshifts.exception.EntityNotFoundException;
+import com.ispw.tryeshifts.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,8 @@ public class ManageMembersAC {
         List<UserBean> active = new ArrayList<>();
         for (Membership m : memberships) {
             if (m.isAccepted()) {
-                UserBean ub = new UserBean();
-                ub.setEmail(m.getUser().getEmail());
-                ub.setName(m.getUser().getName());
-                ub.setSurname(m.getUser().getSurname());
-                ub.setRole(m.getRole()); // Assicurati di avere setRole nel tuo UserBean
+                UserBean ub = toBeanFromMem(m);
+                ub.setRole(m.getRole());
                 active.add(ub);
             }
         }
@@ -79,15 +76,14 @@ public class ManageMembersAC {
 
         for (Membership m : allMembers) {
             if(!m.isAccepted()){
-                UserBean ub = new UserBean();
-                ub.setEmail(m.getUser().getEmail());
-                ub.setName(m.getUser().getName());
-                ub.setSurname(m.getUser().getSurname());
-                beans.add(ub);
+                beans.add(toBeanFromMem(m));
             }
 
         }
         return beans;
     }
 
+    private UserBean toBeanFromMem(Membership m){
+        return new UserBean(m.getUser().getEmail(),m.getUser().getName(),m.getUser().getSurname());
+    }
 }
