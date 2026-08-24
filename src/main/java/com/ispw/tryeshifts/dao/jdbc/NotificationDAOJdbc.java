@@ -3,10 +3,8 @@ package com.ispw.tryeshifts.dao.jdbc;
 import com.ispw.tryeshifts.dao.DBconnection;
 import com.ispw.tryeshifts.dao.NotificationDAO;
 import com.ispw.tryeshifts.entity.Notification;
-import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

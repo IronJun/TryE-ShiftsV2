@@ -2,7 +2,6 @@ package com.ispw.tryeshifts.dao.demo;
 
 import com.ispw.tryeshifts.dao.NotificationDAO;
 import com.ispw.tryeshifts.entity.Notification;
-import com.ispw.tryeshifts.excpetion.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;

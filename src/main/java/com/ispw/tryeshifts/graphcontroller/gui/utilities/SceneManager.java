@@ -76,7 +76,6 @@ public class SceneManager {
 
         } catch (IOException e) {
             LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
-            e.printStackTrace();
 
         }
     }

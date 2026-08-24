@@ -4,7 +4,6 @@ import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.entity.UserInfo;
 
-import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
