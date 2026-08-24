@@ -35,9 +35,9 @@ public class UserDAOJdbc implements UserDAO {
                     return null;
                 }
             }
-        } catch (SQLException _) {
+        } catch (SQLException e) {
             // Incapsuliamo l'errore tecnico
-            throw new DataFetchException("Errore durante la ricerca dell'utente: " + email);
+            throw new DataFetchException("Errore durante la ricerca dell'utente: " + email,e);
         }
     }
     public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
@@ -57,11 +57,11 @@ public class UserDAOJdbc implements UserDAO {
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
                 throw new DuplicateEntityException("User",user.getEmail());
             } else {
-                throw new DataFetchException("Errore durante il salvataggio dell'utente: " + e.getMessage());
+                throw new DataFetchException("Errore durante il salvataggio dell'utente: ",e);
             }
         }
     }
-    public void updateUser(UserInfo updateUser) throws  DataFetchException {
+    public void updateUser(UserInfo updateUser) throws  DataFetchException, EntityNotFoundException {
 // Nota: Uso 'users' al plurale come abbiamo fatto per 'workplaces'
         // Usiamo l'email presente nell'oggetto user sia per i nuovi dati che per il WHERE
         String sql = "UPDATE users SET nome = ?, cognome = ?, password = ? WHERE email = ?";
@@ -75,8 +75,9 @@ public class UserDAOJdbc implements UserDAO {
             pstmt.setString(4, updateUser.getEmail()); // L'email identifica chi aggiornare
 
             pstmt.executeUpdate();
+            if(updateUser == null){throw new EntityNotFoundException("User",updateUser.getEmail());}
         } catch (SQLException e) {
-            throw new DataFetchException("Errore update: " + e.getMessage());
+            throw new DataFetchException("Errore update: " ,e);
         }
     }
 

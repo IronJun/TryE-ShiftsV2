@@ -50,7 +50,7 @@ public class AvailabilityDAODemo implements AvailabilityDAO {
         }
         return result;
     }
-    public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws EntityNotFoundException {
+    public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) {
         db.getAvailabilities().removeIf(a ->
                 a.getUserEmail().equals(email) &&
                         a.getWorkplaceName().equals(workplaceName) &&

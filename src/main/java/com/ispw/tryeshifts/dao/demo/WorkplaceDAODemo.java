@@ -4,6 +4,7 @@ import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Workplace;
+import com.ispw.tryeshifts.excpetion.DataFetchException;
 import com.ispw.tryeshifts.excpetion.DuplicateEntityException;
 import com.ispw.tryeshifts.excpetion.EntityNotFoundException;
 
@@ -15,15 +16,25 @@ import java.util.Map;
 public class WorkplaceDAODemo implements WorkplaceDAO {
     private final InMemory db = InMemory.getInstance();
 
-    public void saveWorkplace(Workplace wp) throws DuplicateEntityException {
-        if(wp == null) {throw new NullPointerException("Invalid parameters");}
-        if(db.getWorkplaces().containsKey(wp.getName())){throw new DuplicateEntityException("Workplace", wp.getName());}
-        db.getWorkplaces().put(wp.getName(),wp);
+    public void saveWorkplace(Workplace wp) throws DuplicateEntityException,DataFetchException {
+        if (wp == null) {
+            throw new IllegalArgumentException("Invalid parameters");
+        }
+        if (db.getWorkplaces().containsKey(wp.getName())) {
+            throw new DuplicateEntityException("Workplace", wp.getName());
+        }
+        db.getWorkplaces().put(wp.getName(), wp);
     }
-    public void updateWorkplace(Workplace updateWp,String oldName) throws DuplicateEntityException, EntityNotFoundException {
-        if(!db.getWorkplaces().containsKey(oldName)){throw new EntityNotFoundException("Workplace", oldName);}
+
+    public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException, EntityNotFoundException {
+        if(updateWp == null) {
+            throw new IllegalArgumentException("Invalid parameters");
+        }
+        if (!db.getWorkplaces().containsKey(oldName)) {
+            throw new EntityNotFoundException("Workplace", oldName);
+        }
         String newName = updateWp.getName();
-        if(!newName.equals(oldName)) {
+        if (!newName.equals(oldName)) {
             if (db.getWorkplaces().containsKey(newName)) {
                 throw new DuplicateEntityException("Workplace", newName);
             }
@@ -32,12 +43,17 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         }
         db.getWorkplaces().put(newName, updateWp);
     }
-    public boolean existsWorkplaceByName(String name) {
-        return name!= null && db.getWorkplaces().containsKey(name);
+
+    public boolean existsWorkplaceByName(String name) throws DataFetchException {
+        if(name == null) {
+            throw new IllegalArgumentException("Invalid parameters");
+        }
+        return name != null && db.getWorkplaces().containsKey(name);
     }
-    public Workplace findWorkplaceByName(String name)throws EntityNotFoundException {
+
+    public Workplace findWorkplaceByName(String name) throws EntityNotFoundException {
         if (name == null || name.isEmpty()) {
-            throw new NullPointerException("name passed null or empty");
+            throw new IllegalArgumentException("name passed null or empty");
         }
         Workplace wp = db.getWorkplaces().get(name);
         if (wp == null) {
@@ -45,27 +61,36 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         }
         return wp;
     }
+
     public List<Workplace> findWorkplacesbyEmail(String email) {
-        if(email==null){throw new NullPointerException("email of the user cannot be null");}
+        if (email == null) {
+            throw new NullPointerException("email of the user cannot be null");
+        }
         return db.getMemberships().stream().filter(m -> m.getUser().getEmail().equals(email)).map(Membership::getWorkplace).toList();
     }
-    public List<Workplace> findAllWorkplaces(){
+
+    public List<Workplace> findAllWorkplaces() {
         return new ArrayList<>(db.getWorkplaces().values());
     }
-    public List<Workplace> findWorkplacesByName(String name) throws EntityNotFoundException{
-        if(name == null || name.isEmpty()){throw new EntityNotFoundException("Workplace", name);}
+
+    public List<Workplace> findWorkplacesByName(String name)  {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Invalid name passed or empty");
+        }
         List<Workplace> result = new ArrayList<>();
         String lowerCaseQuery = name.toLowerCase();
-        for(Workplace wp : db.getWorkplaces().values()){
-            if(wp.getName().toLowerCase().contains(lowerCaseQuery)){
+        for (Workplace wp : db.getWorkplaces().values()) {
+            if (wp.getName().toLowerCase().contains(lowerCaseQuery)) {
                 result.add(wp);
             }
         }
         return result;
     }
-    public String getWeekStatus(String workplaceName, String weekId){
-        return db.getWeekStatusDbDemo().getOrDefault(workplaceName + "_" + weekId, "OPEN");
+
+    public String getWeekStatus(String workplaceName, String weekId) {
+        return db.getWeekStatusDbDemo().get(workplaceName + "_" + weekId);
     }
+
     public void updateWeekStatus(String workplaceName, String weekId, String newStatus) {
         // Usiamo la stessa chiave usata per il recupero
         db.getWeekStatusDbDemo().put(workplaceName + "_" + weekId, newStatus);
@@ -82,7 +107,7 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         Map<String, List<String>> filteredAssignments = new HashMap<>();
 
         // Il prefisso che identifica univocamente la settimana per quel posto di lavoro
-        String prefix = workplaceName + "_" ;
+        String prefix = workplaceName + "_";
 
         db.getPublishedShifts().forEach((fullKey, workers) -> {
             if (fullKey.startsWith(prefix)) {
@@ -93,5 +118,24 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         });
 
         return filteredAssignments;
+    }
+
+    public Map<String, String> getUserPublishedShiftsByWeek(String userEmail, String weekId) throws DataFetchException {
+        if(userEmail == null || userEmail.isEmpty()) {
+            throw new IllegalArgumentException("userEmail cannot be null or empty");
+        }
+        Map<String, String> assignments = new HashMap<>();
+        String searchString = "_" + weekId + "_";
+        db.getPublishedShifts().forEach((fullKey, workers) -> {
+            boolean isUserAssigned = workers.stream().anyMatch(email -> email.equalsIgnoreCase(userEmail));
+
+            if (fullKey.contains(searchString) && isUserAssigned) {
+                int weekIndex = fullKey.indexOf(searchString);
+                String workplaceName = fullKey.substring(0, weekIndex);
+                String cellKey = fullKey.substring(weekIndex + searchString.length());
+                assignments.put(cellKey, workplaceName);
+            }
+        });
+        return assignments;
     }
 }

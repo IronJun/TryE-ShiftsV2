@@ -28,8 +28,8 @@ public class UserDAOCsvDecorator implements UserDAO {
                     user.getName(),
                     user.getSurname());
             out.println(line);
-        }catch (IOException _){
-            throw new DataFetchException("I/O Error during the file writing");
+        }catch (IOException e){
+            throw new DataFetchException("I/O Error during the file writing",e);
         }
     }
 
@@ -51,15 +51,15 @@ public class UserDAOCsvDecorator implements UserDAO {
                     lines.add(line);
                 }
             }
-        }catch (IOException _){
-            throw new DataFetchException("could not update the csv file");
+        }catch (IOException e){
+            throw new DataFetchException("could not update the csv file",e);
         }
         try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_PATH)))){
             for(String l : lines){
                 out.println(l);
             }
-        }catch(IOException _){
-            throw new DataFetchException("could not update the csv file");
+        }catch(IOException e){
+            throw new DataFetchException("could not update the csv file",e);
         }
     }
 

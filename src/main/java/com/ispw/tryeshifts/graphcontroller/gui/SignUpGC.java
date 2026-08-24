@@ -48,9 +48,9 @@ public class SignUpGC {
             UserBean bean = new UserBean(email, pwd, name, surname, repeat);
             new SignupAC().registerUser(bean);
             SceneManager.getInstance().switchScene("Login.fxml", "Login", 900, 600);
-        } catch (IncompleteDataException | DuplicateEntityException | InvalidCredentialException e) {
+        } catch ( DuplicateEntityException | InvalidCredentialException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
-        }catch(ValidationException | SecuriryException e){
+        }catch(ValidationException e){
             ErrorViewManager.showError(errorLabel, e.getMessage());
         } catch (BaseException e){
             ErrorViewManager.screenError("System Error",e.getMessage());

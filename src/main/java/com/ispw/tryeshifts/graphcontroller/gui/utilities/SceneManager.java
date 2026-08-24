@@ -74,8 +74,10 @@ public class SceneManager {
             // Ritorna il Controller associato, che potrebbe essere utile per passare dati
             fxmlLoader.getController();
 
-        } catch (IOException _) {
-            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName);
+        } catch (IOException e) {
+            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
+            e.printStackTrace();
+
         }
     }
 
@@ -103,8 +105,8 @@ public class SceneManager {
 
             return controller;
 
-        } catch (IOException _) {
-            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName);
+        } catch (IOException e) {
+            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
             return null;
         }
     }

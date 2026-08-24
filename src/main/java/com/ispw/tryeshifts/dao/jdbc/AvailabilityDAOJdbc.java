@@ -45,24 +45,22 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
                 throw new DuplicateEntityException("Availability",
-                        availability.getUserEmail() + " il " + availability.getDay());
+                        availability.getUserEmail() + " il " + availability.getDay(),e);
             }
             // 2. Errore generico di database (Connessione, permessi, tabella mancante)
-            throw new DataFetchException("Impossibile salvare la disponibilità nel database");        }
+            throw new DataFetchException("Impossibile salvare la disponibilità nel database",e);        }
     }
 
     public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
         String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ? AND week_id = ?";
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
             pstmt.setString(3, weekId);
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
-            throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " + e.getMessage());
+            throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " ,e);
         }
     }
     public List<Availability> getAvailabilitiesByWorkplace(String workplaceName,String weekId) throws DataFetchException {
@@ -91,7 +89,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": ",e);
         }
         return list;
     }
@@ -120,7 +118,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero disponibilità: " + e.getMessage());
+            throw new DataFetchException("Errore nel recupero disponibilità: " ,e);
         }
         return list;
     }
@@ -155,8 +153,8 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                     availabilitiesMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(email);
                 }
             }
-        } catch (SQLException _) {
-            throw new DataFetchException("impossibile recupare le diposniblità dalla settimana");
+        } catch (SQLException e) {
+            throw new DataFetchException("impossibile recupare le diposniblità dalla settimana",e);
         }
 
         return availabilitiesMap;
@@ -190,7 +188,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 throw new EntityNotFoundException("No availability found to eliminate for: ", email);
             }
         }catch(SQLException e){
-            throw new DataFetchException("Impossibile eliminare le availability: "+e.getMessage());
+            throw new DataFetchException("Impossibile eliminare le availability: ",e);
         }
     }
 }

@@ -14,6 +14,7 @@ import com.ispw.tryeshifts.graphcontroller.KeyGenerator;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.time.ZoneId;
@@ -74,12 +75,14 @@ public class ManageShiftsAC {
                 calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
                 beans.get(0).getWeekId();
 
-        // 1. CANCELLAZIONE (fuori dal try-catch principale se vuoi che sia ignorabile)
-        try {
-            availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
-        } catch(EntityNotFoundException _) {
-            logger.info("Nessuna disponibilità precedente da rimuovere, procedo al salvataggio.");
+        String currentWeekStatus = getWeekStatusShifts(wpName,currentWeekId);
+
+        boolean isBoss = userEmail.equals(currentWorkplace.getOwnerEmail());
+        if(!isBoss && !currentWeekStatus.equals("OPEN")){
+            throw new ValidationException("Failed to save the avaialability, out of temporal window: "+currentWeekStatus, "Shifts");
         }
+        // 1. CANCELLAZIONE
+        availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
 
         // 2. SALVATAGGIO (deve essere garantito)
         try {
@@ -105,7 +108,7 @@ public class ManageShiftsAC {
         String status = workplaceRepo.getWeekStatus(workplaceName, weekId);
 
         // Logica di fallback: se il repository restituisce null, la settimana è nuova/aperta
-        return (status != null) ? status : "OPEN";
+        return (status != null) ? status : getAutomaticWeekStatus(weekId);
     }
 
     public void updateWeekStatusShifts(String workplaceName,String weekId, String status)throws BaseException{
@@ -117,32 +120,17 @@ public class ManageShiftsAC {
             throw new NullPointerException("Parametri di ricerca mancanti");
         }
 
-        Map<String, String> assignments = new HashMap<>();
         TreeSet<String> timeSlots = new TreeSet<>();
+        Map<String, String> assignments = workplaceRepo.getUserPublishedShiftsByWeek(userEmail, weekId);
 
-        List<Workplace> myWorkplaces = workplaceRepo.findWorkplacesbyEmail(userEmail);
-
-        for (Workplace wp : myWorkplaces) {
-                // Recuperiamo i turni pubblicati per questo locale
-                Map<String, List<String>> shifts = workplaceRepo.getPublishedShiftsByWeek(wp.getName(), weekId);
-                for (Map.Entry<String, List<String>> entry : shifts.entrySet()) {
-                    if (entry.getValue().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
-                        // Esempio entry.getKey(): "Mon_08:00-09:00"
-                        String fullKey = entry.getKey(); // Es: "2026_04_Mon_00:00-01:00"
-                        String cleanKey = fullKey.replace(weekId + "_", ""); // Diventa "Mon_00:00-01:00"
-                        assignments.put(cleanKey, wp.getName());
-                        // Aggiungiamo l'orario al set per le righe della tabella
-                        String timePart = cleanKey.split("_")[1];
-                        timeSlots.add(timePart);
-                    }
-                }
+        for(String cleanKey : assignments.keySet()){
+            String timeParts = cleanKey.split("_")[1];
+            timeSlots.add(timeParts);
         }
-
-        // Impacchettiamo tutto in una mappa generica
         Map<String, Object> result = new HashMap<>();
         result.put("assignments", assignments);
         result.put("slots", timeSlots);
-        return result;
+        return  result;
     }
 
     public  String calculateWeekId(int weekOffset) {
@@ -214,5 +202,28 @@ public class ManageShiftsAC {
         int minutes = Integer.parseInt(hm[1]);
 
         return hours * 60 + minutes;
+    }
+
+    private String getAutomaticWeekStatus(String weekId){
+        String[] parts = weekId.split("_");
+        int year = Integer.parseInt(parts[0]);
+        int week = Integer.parseInt(parts[1]);
+
+        LocalDate targetMonday = LocalDate.ofYearDay(year, 1)
+                .with(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear(), week)
+                .with(DayOfWeek.MONDAY);
+
+        LocalDateTime weDeadLine = targetMonday.minusDays(5).atTime(23,59,59);
+        LocalDateTime friDeadline = targetMonday.minusDays(3).atTime(23,59,59);
+        LocalDateTime sunDeadline = targetMonday.minusDays(1).atTime(23,59,59);
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+
+        if(now.isAfter(friDeadline)&&now.isBefore(sunDeadline)){
+            return "PUBLISHED";
+        }
+        if(now.isAfter(weDeadLine) && now.isBefore(friDeadline)){
+            return "LOCKED";
+        }
+        return "OPEN";
     }
 }

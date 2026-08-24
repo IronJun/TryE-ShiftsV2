@@ -92,10 +92,8 @@ public class NewWorkplaceCLI {
                 logger.info(msg);
             }catch(IllegalArgumentException e){
                 logger.warning("\nHour error: " +e.getMessage());
-            }catch(BaseException e){
-                logger.warning("\nShit error: " +e.getMessage());
-            }catch(Exception _){
-                logger.warning("\nError fetching, retry");
+            }catch(BaseException e) {
+                logger.warning("\nShit error: " + e.getMessage());
             }
             // Formattiamo noi la stringa per essere sicuri del separatore " - "
             String cont = CLIReader.readString("\nDo you want to add more shifts? (y/n): ");

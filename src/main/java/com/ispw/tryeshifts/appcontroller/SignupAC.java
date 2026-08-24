@@ -18,16 +18,16 @@ public class SignupAC {
         UserDAO userRepo = AppConfig.getUserRepository();
 
         if (isDataInvalid(userbean)) {
-            throw new IncompleteDataException("Tutti i campi sono obbligatori");
+            throw new ValidationException("All fields must be completed","Form");
         }
         if (pwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
-            throw new ValidationException("Le password non corrispondono","PwdRep");
+            throw new ValidationException("Password doesn't match","PwdRep");
         }
         if(userbean.getPassword().length() < 6){
-            throw new SecuriryException("Password troppo corta (min 6 caratteri)");
+            throw new ValidationException("Password too short","Password");
         }
         if(!userbean.getEmail().contains("@") || !userbean.getEmail().contains(".")){
-            throw new InvalidCredentialException("Email non valida");
+            throw new ValidationException("Email address is invalid","Email");
         }
 
         if(userRepo.findByEmail(userbean.getEmail())!= null){

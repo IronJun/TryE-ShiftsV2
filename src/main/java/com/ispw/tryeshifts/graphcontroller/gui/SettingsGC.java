@@ -144,8 +144,8 @@ public class SettingsGC {
 
             SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
 
-        }catch(Exception _){
-            SceneManager.getInstance().showErrorAlert("Errore aggiornamento","Impossibile aggiornare il workplace");
+        }catch(BaseException e){
+            SceneManager.getInstance().showErrorAlert("Errore aggiornamento",e.getMessage());
         }
     }
 
@@ -184,8 +184,8 @@ public class SettingsGC {
 
             newPasswordField.clear();
             confirmPasswordField.clear();
-        }catch(Exception _){
-            SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2","Impossibile aggiornare il profilo");
+        }catch(BaseException e){
+            SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2",e.getMessage());
         }
     }
     private void showLeftPaneRestriction(String message) {

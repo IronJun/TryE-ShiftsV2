@@ -36,11 +36,11 @@ public class MembershipDAOJdbc implements MembershipDAO {
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
                 throw new DuplicateEntityException("Membership",
-                        m.getUser().getEmail() + " per " + m.getWorkplace().getName());
+                        m.getUser().getEmail() + " per " + m.getWorkplace().getName(),e);
             }
 
             // 2. Errore tecnico (connessione, sintassi, etc.)
-            throw new DataFetchException("Errore critico durante il salvataggio della richiesta di accesso");
+            throw new DataFetchException("Errore critico durante il salvataggio della richiesta di accesso",e);
         }
     }
     public void updateMembership(Membership updateMembership) throws EntityNotFoundException, DataFetchException {
@@ -58,8 +58,8 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 throw new EntityNotFoundException("Membership",
                         updateMembership.getUser().getEmail() + " in " + updateMembership.getWorkplace().getName());
             }
-        } catch (SQLException _) {
-            throw new DataFetchException("Errore critico durante l'aggiornamento SQL della membership");
+        } catch (SQLException e) {
+            throw new DataFetchException("Errore critico durante l'aggiornamento SQL della membership",e);
         }
     }
     public void removeMembership(Membership membership) throws EntityNotFoundException,DataFetchException {
@@ -75,9 +75,9 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 throw new EntityNotFoundException("Membership",
                         membership.getUser().getEmail() + " @ " + membership.getWorkplace().getName());
             }
-        } catch (SQLException _) {
+        } catch (SQLException e) {
             // Errore tecnico (connessione, permessi, etc.)
-            throw new DataFetchException("Errore durante la rimozione della membership dal database");
+            throw new DataFetchException("Errore durante la rimozione della membership dal database",e);
         }
     }
     public Membership findMembership(String email, String workplaceName) throws DataFetchException {
@@ -95,7 +95,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore findMembership: " + e.getMessage());
+            throw new DataFetchException("Errore findMembership: ",e);
         }
         return null;
     }
@@ -117,7 +117,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore getMembershipsByWorkplace: " + e.getMessage());
+            throw new DataFetchException("Errore getMembershipsByWorkplace: ",e);
         }
         return list;
     }
@@ -139,7 +139,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel controllo permessi: " + e.getMessage());
+            throw new DataFetchException("Errore nel controllo permessi: ",e);
         }
     }
 }

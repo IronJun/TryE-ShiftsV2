@@ -301,8 +301,8 @@ public class ShiftsGC {
             // Messaggio di successo
             SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
 
-        } catch (Exception _) {
-            SceneManager.getInstance().showErrorAlert("Errore", "Impossibile salvare le disponibilità.");
+        } catch (BaseException e) {
+            SceneManager.getInstance().showErrorAlert("Errore", e.getMessage());
         }
     }
 
@@ -361,8 +361,8 @@ public class ShiftsGC {
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();
-        }catch(BaseException _){
-            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,"Impossibile aggiornare lo stato dei turni.");
+        }catch(BaseException e){
+            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,e.getMessage());
         }
     }
 
@@ -403,8 +403,8 @@ public class ShiftsGC {
                 manageAC.removeWorkerFromShift(email,selectedWorkplace.getWorkplaceName(),currentWeekId,day,fullTime);
                 buildDynamicTable();
             }
-        }catch(BaseException _){
-            ErrorViewManager.showError(errorlbl,"Impossibile eliminare la shift");
+        }catch(BaseException e){
+            ErrorViewManager.showError(errorlbl,e.getMessage());
         }
     }
 

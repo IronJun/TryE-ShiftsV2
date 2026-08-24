@@ -12,9 +12,9 @@ public class NotificationDAODemo implements NotificationDAO {
 
 
     @Override
-    public List<Notification> findByUserEmail(String email) throws BaseException {
+    public List<Notification> findByUserEmail(String email)  {
         List<Notification> result = new ArrayList<>();
-        if (email == null || email.isEmpty()) throw new BaseException("email empty");
+        if (email == null || email.isEmpty()) throw new IllegalArgumentException("email empty");
         for (Notification n : notifications) {
             if (n.getDestUser().equalsIgnoreCase(email)) {
                 result.add(n);
@@ -24,7 +24,7 @@ public class NotificationDAODemo implements NotificationDAO {
     }
 
     @Override
-    public void markAllAsread(String email) throws BaseException {
+    public void markAllAsread(String email) {
         for (Notification n : notifications) {
             if (n.getDestUser().equalsIgnoreCase(email)) {
                 n.setRead(true);
@@ -33,13 +33,13 @@ public class NotificationDAODemo implements NotificationDAO {
     }
 
     @Override
-    public void saveNotification(String email, String message, String type) throws BaseException {
+    public void saveNotification(String email, String message, String type){
         notifications.add(new Notification(email, message, type, false, "Proprio Ora"));
     }
 
     @Override
-    public void deleteNotification(String email) throws BaseException {
-        if (email == null || email.isEmpty()) throw new BaseException("Email is empty");
+    public void deleteNotification(String email)  {
+        if (email == null || email.isEmpty()) throw new IllegalArgumentException("Email is empty");
 
         List<Notification> toRemove = new ArrayList<>();
         for (Notification n : notifications) {
@@ -51,8 +51,8 @@ public class NotificationDAODemo implements NotificationDAO {
         notifications.removeAll(toRemove);
     }
 
-    public int countNotificationByUserEmail(String email) throws BaseException {
-        if(email == null || email.isEmpty()) throw new BaseException("email is empty");
+    public int countNotificationByUserEmail(String email) {
+        if(email == null || email.isEmpty()) throw new IllegalArgumentException("email is empty");
         int count = 0;
         for (Notification n : notifications) {
             if (n.getDestUser().equalsIgnoreCase(email)) {

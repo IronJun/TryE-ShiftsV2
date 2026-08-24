@@ -90,8 +90,8 @@ public class HomeGC {
             ErrorViewManager.screenError("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
         }catch (EntityNotFoundException _){
             ErrorViewManager.screenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
-        }catch (BaseException _){
-            ErrorViewManager.screenError("unkown error","ask the programmer");
+        }catch (BaseException e){
+            ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
         }
     }
 
@@ -108,8 +108,8 @@ public class HomeGC {
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
                     ErrorViewManager.screenError("Errore Workplace 2","Impossibile trovare il workplace "+workplaceName);
-                }catch(BaseException _){
-                    ErrorViewManager.screenError(TECNICAL_ERROR,"Impossibile inviare la richiesta");
+                }catch(BaseException e){
+                    ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
                 }
 
             }
@@ -297,8 +297,8 @@ public class HomeGC {
                 card.getChildren().addAll(topBox, bottomBox);
                 vboxWorkplaceLegend.getChildren().add(card);
             }
-        } catch (BaseException _) {
-            ErrorViewManager.screenError(TECNICAL_ERROR,"Impossibile recuperare i workplace");
+        } catch (BaseException e) {
+            ErrorViewManager.screenError(TECNICAL_ERROR,e.getMessage());
         }
 
     }

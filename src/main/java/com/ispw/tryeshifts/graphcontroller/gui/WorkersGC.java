@@ -79,10 +79,10 @@ public class WorkersGC {
             pendingWorkersList.getItems().setAll(pending);
 
             setupCells();
-        }catch(EntityNotFoundException _){
-            ErrorViewManager.screenError("Errore","Impossibile trovare il workplace");
-        }catch(BaseException _){
-            ErrorViewManager.screenError("Errore tecnico","Impossibile recuperare i membri");
+        }catch(EntityNotFoundException e){
+            ErrorViewManager.screenError("Errore",e.getMessage());
+        }catch(BaseException e){
+            ErrorViewManager.screenError("Errore tecnico",e.getMessage());
         }
     }
 
@@ -106,10 +106,10 @@ public class WorkersGC {
             ac.acceptWorker(userEmail, wpName, accept);
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
-        }catch(EntityNotFoundException _){
-            ErrorViewManager.screenError("Errore","Impossibile trovare il workplace");
-        }catch(BaseException _){
-            ErrorViewManager.screenError("Errore tecnico","Impossibile aggiornare il DB");
+        }catch(EntityNotFoundException e){
+            ErrorViewManager.screenError("Errore",e.getMessage());
+        }catch(BaseException e){
+            ErrorViewManager.screenError("Errore tecnico",e.getMessage());
         }
 
     }

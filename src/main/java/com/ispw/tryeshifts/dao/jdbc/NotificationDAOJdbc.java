@@ -6,6 +6,7 @@ import com.ispw.tryeshifts.entity.Notification;
 import com.ispw.tryeshifts.excpetion.BaseException;
 import com.ispw.tryeshifts.excpetion.DataFetchException;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ import java.util.List;
 public class NotificationDAOJdbc implements NotificationDAO {
 
     @Override
-    public List<Notification> findByUserEmail(String email) throws BaseException {
+    public List<Notification> findByUserEmail(String email) throws DataFetchException {
         List<Notification> result = new ArrayList<>();
         if(email == null|| email.isEmpty()){
             return result;
@@ -26,11 +27,11 @@ public class NotificationDAOJdbc implements NotificationDAO {
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             return executeNotificationQuery(email,pstmt);
         }catch (SQLException e){
-            throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
+            throw new DataFetchException("Error while trying to find notifications by email",e);
         }
     }
 
-    private List<Notification> executeNotificationQuery(String email, PreparedStatement pstmt) throws BaseException, SQLException {
+    private List<Notification> executeNotificationQuery(String email, PreparedStatement pstmt) throws SQLException {
             List<Notification> result = new ArrayList<>();
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -44,16 +45,14 @@ public class NotificationDAOJdbc implements NotificationDAO {
                     );
                     result.add(n);
                 }
-            }catch (SQLException e){
-                throw new BaseException("Error while trying to find notifications by email"+e.getMessage());
             }
             return result;
     }
 
     @Override
-    public void markAllAsread(String email) throws BaseException {
+    public void markAllAsread(String email) throws DataFetchException {
         if(email == null|| email.isEmpty()){
-            throw new DataFetchException("Email address cannot be empty");
+            throw new IllegalArgumentException("Email address cannot be empty");
         }
         String query = "UPDATE notification SET is_read = ? WHERE dest_user = ?";
         try(Connection conn = DBconnection.getConnection();
@@ -62,14 +61,14 @@ public class NotificationDAOJdbc implements NotificationDAO {
             pstmt.setString(2,email);
             pstmt.executeUpdate();
         }catch (SQLException e){
-            throw new BaseException("Error while trying to update notifications by email"+e.getMessage());
+            throw new DataFetchException("Error while trying to update notifications by email",e);
         }
     }
 
     @Override
-    public void saveNotification(String email, String message, String type) throws BaseException {
+    public void saveNotification(String email, String message, String type) throws DataFetchException {
         if(email == null||email.isEmpty()){
-            throw new DataFetchException("Email address cannot be empty");
+            throw new IllegalArgumentException("Email address cannot be empty");
         }
         String query = "INSERT INTO notification (dest_user, message, type, is_read, timestamp) VALUES (?, ?, ?, ?, ?)";
         try(Connection conn = DBconnection.getConnection();
@@ -82,14 +81,14 @@ public class NotificationDAOJdbc implements NotificationDAO {
 
             pstmt.executeUpdate();
         }catch (SQLException e){
-            throw new BaseException("Error while trying to save notification"+e.getMessage());
+            throw new DataFetchException("Error while trying to save notification",e);
         }
     }
 
     @Override
-    public void deleteNotification(String email) throws BaseException {
+    public void deleteNotification(String email) throws DataFetchException {
         if (email == null || email.trim().isEmpty()) {
-            return;
+            throw new IllegalArgumentException("Email address cannot be empty");
         }
 
         String query = "DELETE FROM notification WHERE dest_user = ?";
@@ -101,24 +100,24 @@ public class NotificationDAOJdbc implements NotificationDAO {
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new BaseException("Errore JDBC durante la cancellazione delle notifiche: " + e.getMessage());
+            throw new DataFetchException("Errore JDBC durante la cancellazione delle notifiche: ",e);
         }
     }
 
-    public int countNotificationByUserEmail(String email) throws BaseException {
+    public int countNotificationByUserEmail(String email) throws DataFetchException {
         String query = "SELECT COUNT(*) AS total FROM notification Where dest_user = ?";
         int count = 0;
 
         try(Connection conn = DBconnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)){
             count = queryNotifications(email,pstmt);
-        } catch (SQLException _) {
-            throw new BaseException("general error");
+        } catch (SQLException e) {
+            throw new DataFetchException("general error",e);
         }
         return count;
     }
 
-    private int queryNotifications(String email, PreparedStatement pstmt) throws BaseException, SQLException {
+    private int queryNotifications(String email, PreparedStatement pstmt) throws SQLException {
         pstmt.setString(1, email);
         int count = 0;
         try (ResultSet rs = pstmt.executeQuery()) {
@@ -126,8 +125,6 @@ public class NotificationDAOJdbc implements NotificationDAO {
                 count = rs.getInt("total");
 
             }
-        } catch (SQLException e) {
-            throw new BaseException("Error while trying to count notifications by email" + e.getMessage());
         }
         return count;
     }
