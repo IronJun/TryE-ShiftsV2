@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
@@ -34,7 +35,7 @@ public class WorkersGC {
     @FXML private NavbarGC navbarController;
     private WorkplaceBean currentWorkplace;
     private final ManageMembersAC ac = new ManageMembersAC();
-
+    private final NotificationAC notificationAC = new NotificationAC();
 
     public void initialize(){
         this.currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
@@ -105,6 +106,7 @@ public class WorkersGC {
             // Chiamiamo l'applicativo per aggiornare il DB
             ac.acceptWorker(userEmail, wpName, accept);
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
+            notificationAC.sendUserNotif(userEmail,"You have been accepted to: "+wpName, "ACCEPTED");
             loadLists();
         }catch(EntityNotFoundException e){
             ErrorViewManager.screenError("Errore",e.getMessage());

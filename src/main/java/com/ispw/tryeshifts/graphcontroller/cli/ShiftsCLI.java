@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
+import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -345,6 +346,7 @@ public class ShiftsCLI {
         logger.info(msg);
     }
     private  void publishShifts(WorkplaceBean wp){
+        NotificationAC nc = new NotificationAC();
         try {
             logger.info("\n--- PUBBLICAZIONE TURNI DEFINITIVI ---");
             logger.info("\nStai per rendere i turni visibili a tutti i lavoratori.");
@@ -356,6 +358,7 @@ public class ShiftsCLI {
                 pubAc.publish(wp, currentWeekId);
 
                 logger.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
+                nc.sendActiveWorkerNotifAsync(wp.getWorkplaceName(),"Turni per: "+wp.getWorkplaceName()+" pubblicati","SHIFTS");
             } else {
                 logger.info("\nOperazione annullata.");
             }

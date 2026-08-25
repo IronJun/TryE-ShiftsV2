@@ -48,8 +48,6 @@ public class ManageMembersAC {
             if (accept) {
                 m.setAccepted(true);
                 membershipRepo.updateMembership(m);
-                String message = "You have been accepted to: "+ workplaceName;
-                notificationRepo.saveNotification(m.getUser().getEmail(),message,"ACCEPTED");
             } else {
                 // Se rifiuta, eliminiamo semplicemente la richiesta/membership
                 membershipRepo.removeMembership(m);

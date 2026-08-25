@@ -341,16 +341,10 @@ public class ShiftsGC {
             else if(LOCKED_STATUS.equals(currentStatus)){
                 PublishShiftsAC pubAC = new PublishShiftsAC();
                 pubAC.publish(wp, this.currentWeekId);
-                ManageMembersAC manageMembersAC = new ManageMembersAC();
-                List<UserBean> workers;
-                workers = manageMembersAC.getActiveMembers(wp.getWorkplaceName());
                 String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
                 String type = "SHIFTS";
                 NotificationAC notificationAC = new NotificationAC();
-
-                for(UserBean worker : workers ) {
-                    notificationAC.sendNotificationsAsync(worker.getEmail(), message, type);
-                }
+                notificationAC.sendActiveWorkerNotifAsync(wp.getWorkplaceName(), message,type);
                 SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
             }
             buildDynamicTable();

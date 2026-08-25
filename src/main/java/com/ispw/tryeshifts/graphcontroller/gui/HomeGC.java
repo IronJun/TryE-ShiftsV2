@@ -90,7 +90,7 @@ public class HomeGC {
 
     public void showJoinConfirmation(String workplaceName){
 
-        Boolean response = SceneManager.getInstance().showConfirmationAlert("Access Request",
+        boolean response = SceneManager.getInstance().showConfirmationAlert("Access Request",
                 "Do you want to access: "+workplaceName+"?",
                 "Sending the request, the owner will decide your fate");
             if(response){

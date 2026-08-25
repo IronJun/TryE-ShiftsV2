@@ -49,7 +49,6 @@ public class NotificationService {
             String icon = switch(n.getType() != null ? n.getType().toUpperCase() : ""){
                 case "SHIFTS" -> "📅 ";
                 case "ACCEPTED" -> "✅ ";
-                case "KICKED" -> "❌ ";
                 default -> "🔔 ";
             };
             Label msgLabel = new Label(icon+n.getMessage());

@@ -1,6 +1,7 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
+import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 public class WorkersCLI {
     private final Logger logger = Logger.getLogger(WorkersCLI.class.getName());
     private final ManageMembersAC ac =  new ManageMembersAC();
+    private final NotificationAC notificationAC = new NotificationAC();
     private  String msg;
     public  void activeWorkers(WorkplaceBean wp){
         try {
@@ -53,7 +55,12 @@ public class WorkersCLI {
 
                 boolean accept = action.equals("y");
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
-                logger.info(accept ? "\n✅ User Accepted!" : "❌ User not accepted.");
+                if(accept){
+                    logger.info("\n✅ User Accepted!");
+                    notificationAC.sendUserNotif(selected.getEmail(), "You have been accepted to: "+wp.getWorkplaceName(),"ACCEPTED");
+                }else{
+                    logger.info( "\n❌ User not accepted.");
+                }
             }
         } catch (BaseException e) {
             logger.severe("Errore: " + e.getMessage());
