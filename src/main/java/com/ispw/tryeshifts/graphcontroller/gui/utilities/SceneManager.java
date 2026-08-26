@@ -16,8 +16,6 @@ import java.util.logging.Logger;
 // Singleton initialization
 public class SceneManager {
     private static final Logger LOGGER = Logger.getLogger(SceneManager.class.getName());
-
-    private static SceneManager instance;
     private Stage primaryStage;
 
 
@@ -25,14 +23,13 @@ public class SceneManager {
     private SceneManager() {
     }
 
+    private static class LazyContainer {
+        public static final SceneManager instance = new SceneManager();
+    }
 
     // singleton method
     public static SceneManager getInstance() {
-
-        if(instance == null) {
-            instance = new SceneManager();
-        }
-        return instance;
+        return LazyContainer.instance;
     }
 
     // Metodo per inizializzare lo Stage principale

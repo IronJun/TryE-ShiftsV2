@@ -10,7 +10,7 @@ public class MangeShiftsACTest {
 
     @BeforeEach
     public void setup() {
-        AppConfig.setTestMode(true,false);
+        AppConfig.getInstance().setTestMode(true,false);
     }
     @Test
     void testCalcoloWeekIdCorrett(){

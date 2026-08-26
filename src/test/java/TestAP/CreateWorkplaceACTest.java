@@ -14,16 +14,16 @@ public class CreateWorkplaceACTest {
 
     @BeforeEach
     void setup() {
-        AppConfig.setTestMode(true,false);
+        AppConfig.getInstance().setTestMode(true,false);
         try{
-            if(AppConfig.getUserRepository().findByEmail("boss@test.com")==null){
+            if(AppConfig.getInstance().getUserRepository().findByEmail("boss@test.com")==null){
                 UserInfo fakeBoss = new UserInfo("boss@test.com","Mario","Rossi");
-                AppConfig.getUserRepository().save(fakeBoss);
+                AppConfig.getInstance().getUserRepository().save(fakeBoss);
             }
 
-            if(!AppConfig.getWorkplaceRepository().existsWorkplaceByName("LocaleEsistente")) {
+            if(!AppConfig.getInstance().getWorkplaceRepository().existsWorkplaceByName("LocaleEsistente")) {
                 Workplace wp = new Workplace("LocaleEsistente", "Via Roma 1", null, null, "boss@test.com");
-                AppConfig.getWorkplaceRepository().saveWorkplace(wp);
+                AppConfig.getInstance().getWorkplaceRepository().saveWorkplace(wp);
             }
         }catch (Exception e){
             fail("Error during the test's setup: "+e.getMessage());

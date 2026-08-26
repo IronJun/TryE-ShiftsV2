@@ -22,12 +22,11 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ManageShiftsAC {
-    private  final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
-    private  final AvailabilityDAO availabilityRepo = AppConfig.getAvailabilityRepository();
+    private  final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
+    private  final AvailabilityDAO availabilityRepo = AppConfig.getInstance().getAvailabilityRepository();
     private final  Pattern shiftSeparator = Pattern.compile(" - ");
     private final Pattern timeSeparator = Pattern.compile(":");
 
-    private  final Logger logger = Logger.getLogger(ManageShiftsAC.class.getName());
 
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
         if (workplace == null || user == null || weekId == null) {

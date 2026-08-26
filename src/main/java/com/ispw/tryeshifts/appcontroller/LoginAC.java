@@ -9,7 +9,7 @@ import com.ispw.tryeshifts.exception.*;
 
 
 public class LoginAC {
-    private final UserDAO userRepo = AppConfig.getUserRepository();
+    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
 
     public  UserBean loginUser(UserBean userBean) throws BaseException{
         UserInfo savedUser;

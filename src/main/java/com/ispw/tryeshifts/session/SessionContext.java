@@ -6,15 +6,16 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 
 
 public class SessionContext {
-    private static SessionContext instance;
     private UserBean loggeduser;
     private WorkplaceBean loggedWorkplace;
 
     private SessionContext(){}
 
+    private static class LazyContainer {
+        private static final SessionContext instance = new SessionContext();
+    }
     public static SessionContext getInstance(){
-        if(instance == null) instance = new SessionContext();
-        return instance;
+        return  LazyContainer.instance;
     }
 
     public UserBean getLoggeduser() {return loggeduser;}

@@ -16,7 +16,7 @@ public class SignupAC {
 
     public void registerUser(UserBean userbean) throws BaseException {
 
-        UserDAO userRepo = AppConfig.getUserRepository();
+        UserDAO userRepo = AppConfig.getInstance().getUserRepository();
 
         if (isDataInvalid(userbean)) {
             throw new ValidationException("All fields must be completed","Form");

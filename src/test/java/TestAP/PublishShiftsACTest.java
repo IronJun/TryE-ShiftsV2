@@ -20,33 +20,33 @@ public class PublishShiftsACTest {
 
     @BeforeEach
     void setup(){
-        AppConfig.setTestMode(true,false);
+        AppConfig.getInstance().setTestMode(true,false);
 
 
         try{
-            UserInfo fakeWorker = AppConfig.getUserRepository().findByEmail("worker@test.com");
+            UserInfo fakeWorker = AppConfig.getInstance().getUserRepository().findByEmail("worker@test.com");
             if(fakeWorker==null){
                 fakeWorker = new UserInfo("worker@test.com","Mario","Rossi");
-                AppConfig.getUserRepository().save(fakeWorker);
+                AppConfig.getInstance().getUserRepository().save(fakeWorker);
             }
 
             Workplace fakeWp;
-            if(!AppConfig.getWorkplaceRepository().existsWorkplaceByName("LocaleTest")) {
+            if(!AppConfig.getInstance().getWorkplaceRepository().existsWorkplaceByName("LocaleTest")) {
                 fakeWp = new Workplace("LocaleTest", "Via Roma 1", null, null, "boss@test.com");
-                AppConfig.getWorkplaceRepository().saveWorkplace(fakeWp);
+                AppConfig.getInstance().getWorkplaceRepository().saveWorkplace(fakeWp);
             } else {
-                fakeWp = AppConfig.getWorkplaceRepository().findWorkplaceByName("LocaleTest");
+                fakeWp = AppConfig.getInstance().getWorkplaceRepository().findWorkplaceByName("LocaleTest");
             }
 
-            if(AppConfig.getMembershipRepository().findMembership("worker@test.com","LocaleTest")==null){
+            if(AppConfig.getInstance().getMembershipRepository().findMembership("worker@test.com","LocaleTest")==null){
                 Membership fakeMem = new Membership(fakeWorker,fakeWp,"WORKER",true);
-                AppConfig.getMembershipRepository().saveMembership(fakeMem);
+                AppConfig.getInstance().getMembershipRepository().saveMembership(fakeMem);
             }
 
             // Usa .isEmpty() perché il DAO restituisce una Mappa, non null!
-            if(AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek("LocaleTest", validWeek).isEmpty()){
+            if(AppConfig.getInstance().getAvailabilityRepository().getAvailabilitiesByWeek("LocaleTest", validWeek).isEmpty()){
                 Availability fakeAvail = new Availability("worker@test.com","LocaleTest","Mon","08:00","12:00", validWeek);
-                AppConfig.getAvailabilityRepository().saveAvailability(fakeAvail);
+                AppConfig.getInstance().getAvailabilityRepository().saveAvailability(fakeAvail);
             }
 
 
@@ -84,7 +84,7 @@ public class PublishShiftsACTest {
 
 
         try {
-            AppConfig.getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek);
+            AppConfig.getInstance().getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek);
         } catch (Exception e) {
             fail("Error during the uploading of availabilities: "+e.getMessage());
         }

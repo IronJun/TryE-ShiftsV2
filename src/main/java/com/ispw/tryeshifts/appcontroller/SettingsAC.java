@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 public class SettingsAC {
     private final Logger logger = Logger.getLogger(SettingsAC.class.getName());
-    private final UserDAO userRepo = AppConfig.getUserRepository();
-    private final WorkplaceDAO workplaceRepo = AppConfig.getWorkplaceRepository();
+    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
+    private final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
 
 
     public void updateUserProfile(UserBean user) throws BaseException {

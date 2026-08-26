@@ -13,8 +13,8 @@ import com.ispw.tryeshifts.exception.*;
 public class AccessWorkplaceAC {
 
     public  WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
-        MembershipDAO membershipDB = AppConfig.getMembershipRepository();
-        WorkplaceDAO workplaceDB = AppConfig.getWorkplaceRepository();
+        MembershipDAO membershipDB = AppConfig.getInstance().getMembershipRepository();
+        WorkplaceDAO workplaceDB = AppConfig.getInstance().getWorkplaceRepository();
 
         if(user == null){throw new IllegalArgumentException("User not logged in");}
 

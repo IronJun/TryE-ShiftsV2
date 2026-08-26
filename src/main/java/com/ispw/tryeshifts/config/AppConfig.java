@@ -8,21 +8,28 @@ import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
 
 public class AppConfig {
-    private static boolean IS_DEMO_MODE = true;
-    private static boolean SAVE_USER_TO_CSV = false;
+    private boolean IS_DEMO_MODE = true;
+    private boolean SAVE_USER_TO_CSV = false;
 
-    private static DAOFactory daoFactory;
-    private static UserDAO userDAO;
-    private static MembershipDAO membershipDAO;
-    private static WorkplaceDAO workplaceDAO;
-    private static AvailabilityDAO availabilityDAO;
-    private static NotificationDAO notificationDAO;
+    private DAOFactory daoFactory;
+    private UserDAO userDAO;
+    private MembershipDAO membershipDAO;
+    private WorkplaceDAO workplaceDAO;
+    private AvailabilityDAO availabilityDAO;
+    private NotificationDAO notificationDAO;
 
     private AppConfig() {
-        throw new IllegalStateException("Utility class");
     }
 
-    private static DAOFactory getDAOFactory() {
+    private static class LazyContainer{
+        public static final AppConfig instance = new AppConfig();
+    }
+
+    public static AppConfig getInstance() {
+        return  LazyContainer.instance;
+    }
+
+    private DAOFactory getDAOFactory() {
         if(daoFactory == null) {
             if(IS_DEMO_MODE){
                 daoFactory = new DemoDAOFactory();
@@ -33,7 +40,7 @@ public class AppConfig {
         return daoFactory;
     }
 
-    public static UserDAO getUserRepository() {
+    public UserDAO getUserRepository() {
         if(userDAO == null) {
             userDAO = getDAOFactory().getUserDAO();
             if(SAVE_USER_TO_CSV){
@@ -43,28 +50,28 @@ public class AppConfig {
         return userDAO;
     }
 
-    public static MembershipDAO getMembershipRepository() {
+    public MembershipDAO getMembershipRepository() {
         if(membershipDAO == null) {
             membershipDAO = getDAOFactory().getMembershipDAO();
         }
         return membershipDAO;
     }
 
-    public static WorkplaceDAO getWorkplaceRepository() {
+    public WorkplaceDAO getWorkplaceRepository() {
         if(workplaceDAO == null) {
             workplaceDAO = getDAOFactory().getWorkplaceDAO();
         }
         return workplaceDAO;
     }
 
-    public static AvailabilityDAO getAvailabilityRepository() {
+    public AvailabilityDAO getAvailabilityRepository() {
         if(availabilityDAO == null) {
             availabilityDAO = getDAOFactory().getAvailabilityDAO();
         }
         return availabilityDAO;
     }
 
-    public static NotificationDAO getNotificationRepository() {
+    public NotificationDAO getNotificationRepository() {
         if(notificationDAO == null){
             notificationDAO = getDAOFactory().getNotificationDAO();
         }
@@ -72,7 +79,7 @@ public class AppConfig {
     }
 
     //Metodo per il setup dei test
-    public static void setTestMode(boolean demoMode, boolean csvMode){
+    public void setTestMode(boolean demoMode, boolean csvMode){
         IS_DEMO_MODE = demoMode;
         SAVE_USER_TO_CSV = csvMode;
 
