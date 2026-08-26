@@ -3,7 +3,7 @@ package com.ispw.tryeshifts.factory;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.dao.jdbc.*;
 
-public class JdbcDAOFactory implements DAOFactory{
+public class JdbcDAOFactory extends DAOFactory{
     @Override
     public UserDAO getUserDAO(){
         return new UserDAOJdbc();

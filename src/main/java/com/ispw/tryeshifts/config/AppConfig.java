@@ -3,8 +3,6 @@ package com.ispw.tryeshifts.config;
 import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.dao.decorator.UserDAOCsvDecorator;
 import com.ispw.tryeshifts.factory.DAOFactory;
-import com.ispw.tryeshifts.factory.DemoDAOFactory;
-import com.ispw.tryeshifts.factory.JdbcDAOFactory;
 
 
 public class AppConfig {
@@ -18,7 +16,9 @@ public class AppConfig {
     private AvailabilityDAO availabilityDAO;
     private NotificationDAO notificationDAO;
 
+
     private AppConfig() {
+
     }
 
     private static class LazyContainer{
@@ -31,11 +31,7 @@ public class AppConfig {
 
     private DAOFactory getDAOFactory() {
         if(daoFactory == null) {
-            if(IS_DEMO_MODE){
-                daoFactory = new DemoDAOFactory();
-            }else{
-                daoFactory = new JdbcDAOFactory();
-            }
+            daoFactory = DAOFactory.getFactory(IS_DEMO_MODE);
         }
         return daoFactory;
     }

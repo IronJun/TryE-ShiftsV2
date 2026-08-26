@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.dao.*;
 import com.ispw.tryeshifts.dao.demo.*;
 
 
-public class DemoDAOFactory implements DAOFactory{
+public class DemoDAOFactory extends DAOFactory{
     @Override
     public UserDAO getUserDAO() {
         return new UserDAODemo();
