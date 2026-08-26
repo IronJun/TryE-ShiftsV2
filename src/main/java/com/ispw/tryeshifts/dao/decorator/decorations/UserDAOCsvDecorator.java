@@ -1,6 +1,7 @@
-package com.ispw.tryeshifts.dao.decorator;
+package com.ispw.tryeshifts.dao.decorator.decorations;
 
 import com.ispw.tryeshifts.dao.UserDAO;
+import com.ispw.tryeshifts.dao.decorator.UserDAODecorator;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.exception.DataFetchException;
 import com.ispw.tryeshifts.exception.DuplicateEntityException;
@@ -10,17 +11,16 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAOCsvDecorator implements UserDAO {
+public class UserDAOCsvDecorator extends UserDAODecorator {
     private static final String FILE_PATH = "persistency/users.csv";
-    private UserDAO wrappedDAO;
 
-    public UserDAOCsvDecorator(UserDAO wrappedDAO) {
-        this.wrappedDAO = wrappedDAO;
+    public UserDAOCsvDecorator(UserDAO component) {
+        super(component);
     }
 
     @Override
     public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
-        wrappedDAO.save(user);
+        super.save(user);
         try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_PATH,true)))) {
             String line = String.format("%s;%s;%s;%s",
                     user.getEmail(),
@@ -35,7 +35,7 @@ public class UserDAOCsvDecorator implements UserDAO {
 
     @Override
     public void updateUser(UserInfo updateUser) throws EntityNotFoundException,DataFetchException{
-        wrappedDAO.updateUser(updateUser);
+        super.updateUser(updateUser);
         List<String> lines = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))){
             String line;
@@ -65,7 +65,7 @@ public class UserDAOCsvDecorator implements UserDAO {
 
     @Override
     public UserInfo findByEmail(String email) throws DataFetchException {
-        UserInfo user = wrappedDAO.findByEmail(email);
+        UserInfo user = super.findByEmail(email);
         if(user != null){
             return user;
         }
@@ -75,12 +75,10 @@ public class UserDAOCsvDecorator implements UserDAO {
                 String[] parts = line.split(";");
 
                 if(parts[0].equals(email)){
-                    UserInfo recoveredUser = new UserInfo(parts[0],parts[1],parts[2],parts[3]);
-                    wrappedDAO.save(recoveredUser);
-                    return recoveredUser;
+                   return  new UserInfo(parts[0],parts[1],parts[2],parts[3]);
                 }
             }
-        }catch (IOException | DuplicateEntityException e){
+        }catch (IOException e){
             throw new DataFetchException("Error reading the CSV file ",e);
         }
         return null;

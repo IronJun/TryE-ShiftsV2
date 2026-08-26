@@ -1,13 +1,13 @@
 package com.ispw.tryeshifts.config;
 
 import com.ispw.tryeshifts.dao.*;
-import com.ispw.tryeshifts.dao.decorator.UserDAOCsvDecorator;
+import com.ispw.tryeshifts.dao.decorator.decorations.UserDAOCsvDecorator;
 import com.ispw.tryeshifts.factory.DAOFactory;
 
 
 public class AppConfig {
-    private boolean IS_DEMO_MODE = true;
-    private boolean SAVE_USER_TO_CSV = true;
+    private boolean isDemo = true;
+    private boolean saveCSV = true;
 
     private DAOFactory daoFactory;
     private UserDAO userDAO;
@@ -30,10 +30,10 @@ public class AppConfig {
     }
 
     private void intiDAOS(){
-        this.daoFactory = DAOFactory.getFactory(IS_DEMO_MODE);
+        this.daoFactory = DAOFactory.getFactory(isDemo);
 
         UserDAO tempUserDAO = daoFactory.getUserDAO();
-        if(SAVE_USER_TO_CSV){
+        if(saveCSV){
             tempUserDAO = new UserDAOCsvDecorator(tempUserDAO);
         }
         this.userDAO = tempUserDAO;
@@ -66,8 +66,8 @@ public class AppConfig {
 
     //Metodo per il setup dei test
     public void setTestMode(boolean demoMode, boolean csvMode){
-        IS_DEMO_MODE = demoMode;
-        SAVE_USER_TO_CSV = csvMode;
+        isDemo = demoMode;
+        saveCSV = csvMode;
         intiDAOS();
     }
 }
