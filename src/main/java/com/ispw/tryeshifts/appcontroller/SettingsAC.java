@@ -16,9 +16,17 @@ import java.util.logging.Logger;
 
 public class SettingsAC {
     private final Logger logger = Logger.getLogger(SettingsAC.class.getName());
-    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
-    private final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
+    private final UserDAO userRepo ;
+    private final WorkplaceDAO workplaceRepo ;
 
+    public SettingsAC(UserDAO userRepo, WorkplaceDAO workplaceRepo) {
+        this.userRepo = userRepo;
+        this.workplaceRepo = workplaceRepo;
+    }
+
+    public SettingsAC(){
+        this(AppConfig.getInstance().getUserRepository(), AppConfig.getInstance().getWorkplaceRepository());
+    }
 
     public void updateUserProfile(UserBean user) throws BaseException {
         UserInfo existingUser = userRepo.findByEmail(user.getEmail());

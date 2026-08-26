@@ -2,7 +2,6 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
-import com.ispw.tryeshifts.dao.NotificationDAO;
 import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.MembershipDAO;
@@ -18,11 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageMembersAC {
-    private final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
-    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
-    private final MembershipDAO membershipRepo = AppConfig.getInstance().getMembershipRepository();
-    private final NotificationDAO notificationRepo = AppConfig.getInstance().getNotificationRepository();
+    private final WorkplaceDAO workplaceRepo;
+    private final UserDAO userRepo;
+    private final MembershipDAO membershipRepo;
 
+    public ManageMembersAC(WorkplaceDAO workplaceRepo, UserDAO userRepo, MembershipDAO membershipRepo) {
+        this.workplaceRepo = workplaceRepo;
+        this.userRepo = userRepo;
+        this.membershipRepo = membershipRepo;
+    }
+
+    public ManageMembersAC(){
+        this(AppConfig.getInstance().getWorkplaceRepository(), AppConfig.getInstance().getUserRepository(), AppConfig.getInstance().getMembershipRepository());
+    }
     public List<UserBean> getActiveMembers(String wpName) throws BaseException{
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);
         List<UserBean> active = new ArrayList<>();

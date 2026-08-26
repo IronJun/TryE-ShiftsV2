@@ -9,8 +9,14 @@ import com.ispw.tryeshifts.exception.*;
 
 
 public class LoginAC {
-    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
+    private final UserDAO userRepo;
 
+    public LoginAC(UserDAO userRepo) {
+        this.userRepo = userRepo;
+    }
+    public LoginAC() {
+        this(AppConfig.getInstance().getUserRepository());
+    }
     public  UserBean loginUser(UserBean userBean) throws BaseException{
         UserInfo savedUser;
         savedUser=userRepo.findByEmail(userBean.getEmail());

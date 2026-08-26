@@ -15,6 +15,13 @@ public class UserInfo{
 
     }
 
+    public UserInfo(String email,String passwordHash, String name,String surname){
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
+
 
     public void setName(String name){
         this.name = name;

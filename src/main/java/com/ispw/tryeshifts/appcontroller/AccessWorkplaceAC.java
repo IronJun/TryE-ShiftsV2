@@ -11,10 +11,18 @@ import com.ispw.tryeshifts.exception.*;
 
 
 public class AccessWorkplaceAC {
+    private final MembershipDAO membershipDB;
+    private final WorkplaceDAO workplaceDB;
 
+    public AccessWorkplaceAC(MembershipDAO membershipDB, WorkplaceDAO workplaceDB) {
+        this.membershipDB = membershipDB;
+        this.workplaceDB = workplaceDB;
+    }
+    public  AccessWorkplaceAC(){
+        this(AppConfig.getInstance().getMembershipRepository(), AppConfig.getInstance().getWorkplaceRepository());
+    }
     public  WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
-        MembershipDAO membershipDB = AppConfig.getInstance().getMembershipRepository();
-        WorkplaceDAO workplaceDB = AppConfig.getInstance().getWorkplaceRepository();
+
 
         if(user == null){throw new IllegalArgumentException("User not logged in");}
 

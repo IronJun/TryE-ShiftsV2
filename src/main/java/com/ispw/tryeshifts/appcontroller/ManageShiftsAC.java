@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
+import com.ispw.tryeshifts.dao.UserDAO;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
@@ -18,16 +19,21 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ManageShiftsAC {
-    private  final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
-    private  final AvailabilityDAO availabilityRepo = AppConfig.getInstance().getAvailabilityRepository();
+    private  final WorkplaceDAO workplaceRepo ;
+    private  final AvailabilityDAO availabilityRepo;
     private final  Pattern shiftSeparator = Pattern.compile(" - ");
     private final Pattern timeSeparator = Pattern.compile(":");
 
-
+    public ManageShiftsAC(WorkplaceDAO workplaceRepo, AvailabilityDAO availabilityRepo) {
+        this.workplaceRepo = workplaceRepo;
+        this.availabilityRepo = availabilityRepo;
+    }
+    public ManageShiftsAC() {
+        this(AppConfig.getInstance().getWorkplaceRepository(), AppConfig.getInstance().getAvailabilityRepository());
+    }
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
         if (workplace == null || user == null || weekId == null) {
             throw new NullPointerException("Workplace or User passed null");

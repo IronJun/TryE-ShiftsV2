@@ -3,8 +3,6 @@ package com.ispw.tryeshifts.factory;
 import com.ispw.tryeshifts.dao.*;
 
 public abstract class DAOFactory {
-    public static final String DEMO_MODE = "DEMO";
-    public static final String JDBC_MODE = "JDBC";
 
     public static DAOFactory getFactory(boolean isDemo){
         if(isDemo){

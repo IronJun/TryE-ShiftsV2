@@ -65,6 +65,24 @@ public class UserDAOCsvDecorator implements UserDAO {
 
     @Override
     public UserInfo findByEmail(String email) throws DataFetchException {
-        return wrappedDAO.findByEmail(email);
+        UserInfo user = wrappedDAO.findByEmail(email);
+        if(user != null){
+            return user;
+        }
+        try(BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))){
+            String line;
+            while((line = br.readLine()) != null){
+                String[] parts = line.split(";");
+
+                if(parts[0].equals(email)){
+                    UserInfo recoveredUser = new UserInfo(parts[0],parts[1],parts[2],parts[3]);
+                    wrappedDAO.save(recoveredUser);
+                    return recoveredUser;
+                }
+            }
+        }catch (IOException | DuplicateEntityException e){
+            throw new DataFetchException("Error reading the CSV file ",e);
+        }
+        return null;
     }
 }

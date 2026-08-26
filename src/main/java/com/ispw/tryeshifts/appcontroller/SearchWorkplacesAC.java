@@ -10,7 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchWorkplacesAC {
-    private final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
+    private final WorkplaceDAO workplaceRepo;
+
+    public SearchWorkplacesAC(WorkplaceDAO workplaceRepo) {
+        this.workplaceRepo = workplaceRepo;
+    }
+    public SearchWorkplacesAC() {
+        this(AppConfig.getInstance().getWorkplaceRepository());
+    }
 
     public List<WorkplaceBean> getAllWorkplaces()throws BaseException{
 

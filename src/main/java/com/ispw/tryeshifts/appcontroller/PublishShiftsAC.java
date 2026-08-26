@@ -13,9 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 public class PublishShiftsAC {
-    private final WorkplaceDAO workplaceRepo = AppConfig.getInstance().getWorkplaceRepository();
-    private final UserDAO userRepo = AppConfig.getInstance().getUserRepository();
-    private final AvailabilityDAO availabilityRepo = AppConfig.getInstance().getAvailabilityRepository();
+    private final WorkplaceDAO workplaceRepo ;
+    private final UserDAO userRepo;
+    private final AvailabilityDAO availabilityRepo;
+
+    public PublishShiftsAC(WorkplaceDAO workplaceRepo, UserDAO userRepo, AvailabilityDAO availabilityRepo) {
+        this.workplaceRepo = workplaceRepo;
+        this.userRepo = userRepo;
+        this.availabilityRepo = availabilityRepo;
+    }
+
+    public PublishShiftsAC() {
+        this(AppConfig.getInstance().getWorkplaceRepository(),AppConfig.getInstance().getUserRepository(),AppConfig.getInstance().getAvailabilityRepository());
+    }
 
     public void publish(WorkplaceBean wp, String weekId) throws BaseException {
 

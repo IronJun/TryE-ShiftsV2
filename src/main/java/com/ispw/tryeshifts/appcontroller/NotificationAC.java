@@ -14,9 +14,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class NotificationAC {
-    private final NotificationDAO notificationDAO = AppConfig.getInstance().getNotificationRepository();
-    private final MembershipDAO membershipDAO = AppConfig.getInstance().getMembershipRepository();
+    private final NotificationDAO notificationDAO ;
+    private final MembershipDAO membershipDAO;
 
+    public NotificationAC(NotificationDAO notificationDAO, MembershipDAO membershipDAO) {
+        this.notificationDAO = notificationDAO;
+        this.membershipDAO = membershipDAO;
+    }
+
+    public NotificationAC(){
+        this(AppConfig.getInstance().getNotificationRepository(), AppConfig.getInstance().getMembershipRepository());
+    }
 
     public CompletableFuture<List<NotificationBean>> getUserNotificationsAsync(String email) {
         return CompletableFuture.supplyAsync(()->{
