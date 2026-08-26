@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAOCsvDecorator extends UserDAODecorator {
-    private static final String FILE_PATH = "persistency/users.csv";
+    private final String filePath = "persistency/users.csv";
 
     public UserDAOCsvDecorator(UserDAO component) {
         super(component);
@@ -21,7 +21,7 @@ public class UserDAOCsvDecorator extends UserDAODecorator {
     @Override
     public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
         super.save(user);
-        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_PATH,true)))) {
+        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath,true)))) {
             String line = String.format("%s;%s;%s;%s",
                     user.getEmail(),
                     user.getPasswordHash(),
@@ -37,7 +37,7 @@ public class UserDAOCsvDecorator extends UserDAODecorator {
     public void updateUser(UserInfo updateUser) throws EntityNotFoundException,DataFetchException{
         super.updateUser(updateUser);
         List<String> lines = new ArrayList<>();
-        try(BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))){
+        try(BufferedReader br = new BufferedReader(new FileReader(filePath))){
             String line;
             while((line=br.readLine())!= null){
                 String[] parts = line.split(";");
@@ -54,7 +54,7 @@ public class UserDAOCsvDecorator extends UserDAODecorator {
         }catch (IOException e){
             throw new DataFetchException("could not update the csv file",e);
         }
-        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_PATH)))){
+        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))){
             for(String l : lines){
                 out.println(l);
             }
@@ -69,7 +69,7 @@ public class UserDAOCsvDecorator extends UserDAODecorator {
         if(user != null){
             return user;
         }
-        try(BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))){
+        try(BufferedReader br = new BufferedReader(new FileReader(filePath))){
             String line;
             while((line = br.readLine()) != null){
                 String[] parts = line.split(";");

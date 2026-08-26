@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 // Singleton initialization
 public class SceneManager {
-    private static final Logger LOGGER = Logger.getLogger(SceneManager.class.getName());
+    private final Logger logger = Logger.getLogger(SceneManager.class.getName());
     private Stage primaryStage;
 
 
@@ -37,7 +37,7 @@ public class SceneManager {
         if(this.primaryStage == null){
             this.primaryStage = stage;
         }else{
-            LOGGER.warning("Tentativo di sovrascrizione dello stage principale.");
+            logger.warning("Tentativo di sovrascrizione dello stage principale.");
         }
     }
 
@@ -72,7 +72,7 @@ public class SceneManager {
             fxmlLoader.getController();
 
         } catch (IOException e) {
-            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
+            logger.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
 
         }
     }
@@ -102,7 +102,7 @@ public class SceneManager {
             return controller;
 
         } catch (IOException e) {
-            LOGGER.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
+            logger.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
             return null;
         }
     }

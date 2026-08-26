@@ -9,7 +9,7 @@ import com.ispw.tryeshifts.exception.EntityNotFoundException;
 public abstract class UserDAODecorator implements UserDAO {
     protected UserDAO component;
 
-    public UserDAODecorator(UserDAO component) {
+    protected UserDAODecorator(UserDAO component) {
         this.component = component;
     }
 
