@@ -60,7 +60,7 @@ public class PublishShiftsACTest {
     void testPublishNullParameter(){
         PublishShiftsAC controller = new PublishShiftsAC();
         NullPointerException npe = assertThrows(NullPointerException.class, ()->{
-            controller.publish(null, validWeek);
+            controller.handlePublishAction(null, validWeek);
         });
         assertEquals("Workplace or weekId passed null",npe.getMessage());
     }
@@ -72,7 +72,7 @@ public class PublishShiftsACTest {
         WorkplaceBean validwpBean = new WorkplaceBean("LocaleTest","Via Roma 1",new ArrayList<>(),new ArrayList<>(),"boss@test.com");
 
         ValidationException ecception = assertThrows(ValidationException.class, ()->{
-            controller.publish(validwpBean,emptyweek);
+            controller.handlePublishAction(validwpBean,emptyweek);
         });
         assertTrue(ecception.getMessage().contains(emptyweek));
     }
@@ -89,7 +89,7 @@ public class PublishShiftsACTest {
             fail("Error during the uploading of availabilities: "+e.getMessage());
         }
         assertDoesNotThrow(()->{
-            controller.publish(validwpBean, validWeek);
+            controller.handlePublishAction(validwpBean, validWeek);
         },"The publication should end well with valid data");
     }
 }

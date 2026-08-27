@@ -1,5 +1,7 @@
 package com.ispw.tryeshifts.appcontroller;
 
+import com.ispw.tryeshifts.appcontroller.utils.NotificationDispatcher;
+import com.ispw.tryeshifts.appcontroller.utils.WeekStatusCalc;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.*;
@@ -27,19 +29,41 @@ public class PublishShiftsAC {
         this(AppConfig.getInstance().getWorkplaceRepository(),AppConfig.getInstance().getUserRepository(),AppConfig.getInstance().getAvailabilityRepository());
     }
 
-    public void publish(WorkplaceBean wp, String weekId) throws BaseException {
+    public String handlePublishAction(WorkplaceBean wp, String weekId) throws BaseException {
 
         if(wp==null || weekId == null){throw new NullPointerException("Workplace or weekId passed null");}
-        Map<String, List<String>> availabilities = availabilityRepo.getAvailabilitiesByWeek(wp.getWorkplaceName(),weekId);
 
+        NotificationDispatcher notifDisp  = new NotificationDispatcher();
+        String pubRes;
+
+        Map<String, List<String>> availabilities = availabilityRepo.getAvailabilitiesByWeek(wp.getWorkplaceName(),weekId);
         if(availabilities.isEmpty()){throw new ValidationException("No availabilities found for week " + weekId,"grid");}
 
+        String weekCurrentStatus = workplaceRepo.getWeekStatus(wp.getWorkplaceName(),weekId);
+        if(weekCurrentStatus == null){
+            WeekStatusCalc autoWeek = new WeekStatusCalc();
+            weekCurrentStatus = autoWeek.getAutomaticWeekStatus(weekId);
+        }
+        if("OPEN".equals(weekCurrentStatus)){
+            workplaceRepo.updateWeekStatus(wp.getWorkplaceName(),weekId,"LOCKED");
+            pubRes="Shifts have Been locked";
+            return pubRes ;
+        }else if("LOCKED".equals(weekCurrentStatus)){
+            workplaceRepo.savePublishedShifts(wp.getWorkplaceName(), weekId, availabilities);
+            workplaceRepo.updateWeekStatus(wp.getWorkplaceName(), weekId, "PUBLISHED");
+
+            String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
+            String type = "SHIFTS";
+            notifDisp.sendActiveWorkerNotifAsync(wp.getWorkplaceName(), message,type);
+            pubRes = "Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
+            return pubRes;
+        }
 
 
-        workplaceRepo.savePublishedShifts(wp.getWorkplaceName(), weekId, availabilities);
-        workplaceRepo.updateWeekStatus(wp.getWorkplaceName(), weekId, "PUBLISHED");
-
+        return "Unable to proceed. Current status is: "+weekCurrentStatus;
     }
+
+
 
     public Map<String, List<String>> getAssignmentsForWeek(WorkplaceBean wp, String weekId) throws BaseException {
         // Chiediamo al repo tutti i turni pubblicati per quel contesto

@@ -4,6 +4,7 @@ import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 
 
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemory {
-    private static InMemory instance;
 
     // Sposta qui tutte le tue variabili demo
     private final Map<String, UserInfo> usersDbDemo = new HashMap<>();
@@ -22,13 +22,19 @@ public class InMemory {
     private final Map<String, String> weekStatusDbDemo = new HashMap<>();
     private final Map<String, List<String>> publishedShiftsDbDemo = new HashMap<>();
 
+    private InMemory(){
 
-    public static synchronized InMemory getInstance() {
-        if (instance == null) {
-            instance = new InMemory();
-        }
-        return instance;
     }
+
+    private static class LazyContainer {
+        public static final InMemory instance = new InMemory();
+    }
+
+    // singleton method
+    public static InMemory getInstance() {
+        return LazyContainer.instance;
+    }
+
 
     public Map<String, UserInfo> getUsers() { return usersDbDemo; }
     public Map<String, Workplace> getWorkplaces() { return workplacesDbDemo; }

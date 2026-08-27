@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
+import com.ispw.tryeshifts.appcontroller.utils.NotificationDispatcher;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.dao.UserDAO;
@@ -55,6 +56,8 @@ public class ManageMembersAC {
             if (accept) {
                 m.setAccepted(true);
                 membershipRepo.updateMembership(m);
+                NotificationDispatcher nf = new NotificationDispatcher();
+                nf.sendUserNotif(m.getUser().getEmail(),"You have been accepted to : "+workplaceName, "ACCEPTED");
             } else {
                 // Se rifiuta, eliminiamo semplicemente la richiesta/membership
                 membershipRepo.removeMembership(m);

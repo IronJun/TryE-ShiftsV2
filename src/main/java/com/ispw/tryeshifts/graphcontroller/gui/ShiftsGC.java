@@ -1,7 +1,5 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
-import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
-import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
@@ -330,23 +328,10 @@ public class ShiftsGC {
             ErrorViewManager.showError(errorlbl,"workplace is null\n");
             return;
         }
-        ManageShiftsAC manageAC = new ManageShiftsAC();
         try{
-            String currentStatus = manageAC.getWeekStatusShifts(wp.getWorkplaceName(),this.currentWeekId);
-
-            if("OPEN".equals(currentStatus)){
-                manageAC.updateWeekStatusShifts(wp.getWorkplaceName(), this.currentWeekId,LOCKED_STATUS);
-                SceneManager.getInstance().showInfoAlert("Locking", "The Shifts are now locked");
-            }
-            else if(LOCKED_STATUS.equals(currentStatus)){
-                PublishShiftsAC pubAC = new PublishShiftsAC();
-                pubAC.publish(wp, this.currentWeekId);
-                String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
-                String type = "SHIFTS";
-                NotificationAC notificationAC = new NotificationAC();
-                notificationAC.sendActiveWorkerNotifAsync(wp.getWorkplaceName(), message,type);
-                SceneManager.getInstance().showInfoAlert("Pubblicazione", "Turni ufficiali pubblicati e Boss in attesa di approvazione.");
-            }
+            PublishShiftsAC pubAC = new PublishShiftsAC();
+            String resultMSG = pubAC.handlePublishAction(wp, this.currentWeekId);
+            SceneManager.getInstance().showInfoAlert("Shifts Operation", resultMSG);
             buildDynamicTable();
         }catch(BaseException e){
             SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,e.getMessage());

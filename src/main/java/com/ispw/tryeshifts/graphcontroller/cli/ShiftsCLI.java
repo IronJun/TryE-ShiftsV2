@@ -46,14 +46,14 @@ public class ShiftsCLI {
                 printUI(wp, status);
 
                 // 2. Gestione Input
-                String choice = CLIReader.readString("Seleziona: ").toUpperCase();
+                String choice = CLIReader.readString("Select: ").toUpperCase();
                 if (choice.equals("0")) {
                     back = true;
                 } else {
                     handleAction(choice, wp, status, user);
                 }
             } catch (BaseException e) {
-                logger.severe("Errore: " + e.getMessage());
+                logger.severe("Error: " + e.getMessage());
             }
         }
     }
@@ -62,34 +62,34 @@ public class ShiftsCLI {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
 
-        logger.info("\n--- GESTIONE TURNI: " + wp.getWorkplaceName() + " ---\n");
+        logger.info("\n--- SHIFTS DASHBOARD: " + wp.getWorkplaceName() + " ---\n");
         printWorkerTable(wp);
 
-        logger.info("\nAZIONI DISPONIBILI:\n");
+        logger.info("\nAVAILABLE ACTIONS:\n");
         if (user.getEmail().equals(wp.getOwnerEmail())) {
             printOwnerMenu(status);
         } else {
             printWorkerMenu(isLocked);
         }
 
-        logger.info("N. Next Week \nP. Previous Week \n0. Torna alla Home\n");
+        logger.info("N. Next Week \nP. Previous Week \n0. Back to the Home\n");
 
     }
 
     private  void printOwnerMenu(String status) {
         if (status.equals(OPEN_STATUS)) {
-            logger.info("1. Blocca disponibilità (Chiudi prenotazioni)\n");
+            logger.info("1. Lock Availability (Worker's will not be able to give other shifts)\n");
         } else if (status.equals(LOCKED_STATUS)) {
             logger.info("1. Pubblica Turni Definitivi\n");
         }
-        logger.info("2. Modifica Turni manualmente\n");
+        logger.info("2. Modify Shifts Manually\n");
     }
 
     private  void printWorkerMenu(boolean isLocked) {
         if (!isLocked) {
-            logger.info("1. Inserisci/Modifica le tue disponibilità\n");
+            logger.info("1. Insert/modify your availaibility\n");
         } else {
-            logger.info("[SETTIMANA BLOCCATA - Disponibilità non modificabili]\n");
+            logger.info("[WEEK LOCKED - Availability not mutable]\n");
         }
     }
     private  void handleAction(String choice, WorkplaceBean wp, String status, UserBean user) {
@@ -107,7 +107,7 @@ public class ShiftsCLI {
                 weekOffset--;
                 break;
             default:
-                logger.warning("Opzione non valida!");
+                logger.warning("Invalid operation!");
         }
     }
 
@@ -346,7 +346,6 @@ public class ShiftsCLI {
         logger.info(msg);
     }
     private  void publishShifts(WorkplaceBean wp){
-        NotificationAC nc = new NotificationAC();
         try {
             logger.info("\n--- PUBBLICAZIONE TURNI DEFINITIVI ---");
             logger.info("\nStai per rendere i turni visibili a tutti i lavoratori.");
@@ -355,10 +354,9 @@ public class ShiftsCLI {
             if (conferma.equalsIgnoreCase("y")) {
 
                 // Chiamata al tuo Applicativo
-                pubAc.publish(wp, currentWeekId);
+                String resPub = pubAc.handlePublishAction(wp, currentWeekId);
 
                 logger.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
-                nc.sendActiveWorkerNotifAsync(wp.getWorkplaceName(),"Turni per: "+wp.getWorkplaceName()+" pubblicati","SHIFTS");
             } else {
                 logger.info("\nOperazione annullata.");
             }

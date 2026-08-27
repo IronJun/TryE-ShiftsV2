@@ -106,7 +106,6 @@ public class WorkersGC {
             // Chiamiamo l'applicativo per aggiornare il DB
             ac.acceptWorker(userEmail, wpName, accept);
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
-            notificationAC.sendUserNotif(userEmail,"You have been accepted to: "+wpName, "ACCEPTED");
             loadLists();
         }catch(EntityNotFoundException e){
             ErrorViewManager.screenError("Errore",e.getMessage());

@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.appcontroller;
 
+import com.ispw.tryeshifts.appcontroller.utils.WeekStatusCalc;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -109,9 +110,12 @@ public class ManageShiftsAC {
     public String getWeekStatusShifts(String workplaceName, String weekId) throws BaseException {
         if(workplaceName == null || weekId == null){throw new NullPointerException("Parametri di ricerca mancanti");}
         String status = workplaceRepo.getWeekStatus(workplaceName, weekId);
-
-        // Logica di fallback: se il repository restituisce null, la settimana è nuova/aperta
-        return (status != null) ? status : getAutomaticWeekStatus(weekId);
+        if(status != null) {
+            return status;
+        }else{
+            WeekStatusCalc autoStatus = new  WeekStatusCalc();
+            return autoStatus.getAutomaticWeekStatus(weekId);
+        }
     }
 
     public void updateWeekStatusShifts(String workplaceName,String weekId, String status)throws BaseException{
@@ -207,26 +211,4 @@ public class ManageShiftsAC {
         return hours * 60 + minutes;
     }
 
-    private String getAutomaticWeekStatus(String weekId){
-        String[] parts = weekId.split("_");
-        int year = Integer.parseInt(parts[0]);
-        int week = Integer.parseInt(parts[1]);
-
-        LocalDate targetMonday = LocalDate.ofYearDay(year, 1)
-                .with(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear(), week)
-                .with(DayOfWeek.MONDAY);
-
-        LocalDateTime weDeadLine = targetMonday.minusDays(5).atTime(23,59,59);
-        LocalDateTime friDeadline = targetMonday.minusDays(3).atTime(23,59,59);
-        LocalDateTime sunDeadline = targetMonday.minusDays(1).atTime(23,59,59);
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-
-        if(now.isAfter(friDeadline)&&now.isBefore(sunDeadline)){
-            return "PUBLISHED";
-        }
-        if(now.isAfter(weDeadLine) && now.isBefore(friDeadline)){
-            return "LOCKED";
-        }
-        return "OPEN";
-    }
 }

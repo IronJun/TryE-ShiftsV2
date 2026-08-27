@@ -48,34 +48,10 @@ public class NotificationAC {
         });
     }
 
-    //method that would be used if i wanted a user to send a notification manually
-    public CompletableFuture<Void> sendUserNotif(String email, String message, String type) {
-        return CompletableFuture.runAsync(() -> {
-            try{
-                notificationDAO.saveNotification(email,message,type);
-            }catch(BaseException e){
-                throw new CompletionException("Error during the saving of the notifications.", e);
-            }
-        });
-     }
      public int getNotificationNumberforUserEmail(String email) throws BaseException{
         return notificationDAO.countNotificationByUserEmail(email);
      }
 
-    public CompletableFuture<Void> sendActiveWorkerNotifAsync(String workplaceName, String message, String type) {
-        return CompletableFuture.runAsync(() -> {
-            try{
-                List<Membership> memberships = membershipDAO.getMembershipsByWorkplace(workplaceName);
-                for(Membership m : memberships) {
-                    if(m.isAccepted()){
-                        notificationDAO.saveNotification(m.getUser().getEmail(),message,type);
-                    }
-                }
-            }catch(BaseException e){
-                throw new CompletionException("Error during the saving of the notifications.", e);
-            }
-        });
-    }
 
     public void markAllAsRead(String email) throws BaseException {
         notificationDAO.markAllAsread(email);

@@ -57,7 +57,6 @@ public class WorkersCLI {
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
                 if(accept){
                     logger.info("\n✅ User Accepted!");
-                    notificationAC.sendUserNotif(selected.getEmail(), "You have been accepted to: "+wp.getWorkplaceName(),"ACCEPTED");
                 }else{
                     logger.info( "\n❌ User not accepted.");
                 }

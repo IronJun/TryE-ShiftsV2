@@ -16,7 +16,7 @@ import java.util.Map;
 public class WorkplaceDAODemo implements WorkplaceDAO {
     private final InMemory db = InMemory.getInstance();
 
-    public void saveWorkplace(Workplace wp) throws DuplicateEntityException,DataFetchException {
+    public void saveWorkplace(Workplace wp) throws DuplicateEntityException {
         if (wp == null) {
             throw new IllegalArgumentException("Invalid parameters");
         }
@@ -26,7 +26,7 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         db.getWorkplaces().put(wp.getName(), wp);
     }
 
-    public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException, EntityNotFoundException {
+    public void updateWorkplace(Workplace updateWp, String oldName) throws DuplicateEntityException, EntityNotFoundException {
         if(updateWp == null) {
             throw new IllegalArgumentException("Invalid parameters");
         }
