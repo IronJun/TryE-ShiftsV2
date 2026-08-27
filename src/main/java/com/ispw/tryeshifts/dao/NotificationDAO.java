@@ -7,7 +7,7 @@ import java.util.List;
 public interface NotificationDAO {
     List<Notification> findByUserEmail(String email) throws DataFetchException;
     void markAllAsread(String email) throws DataFetchException;
-    void saveNotification(String email, String message, String type) throws DataFetchException;
+    void saveNotification(Notification notif) throws DataFetchException;
     void deleteNotification(String email) throws DataFetchException;
     int countNotificationByUserEmail(String email) throws DataFetchException ;
 

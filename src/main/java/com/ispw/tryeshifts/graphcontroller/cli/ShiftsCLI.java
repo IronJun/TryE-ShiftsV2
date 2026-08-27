@@ -1,7 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
-import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.AvailabilityBean;
 import com.ispw.tryeshifts.session.SessionContext;
@@ -354,7 +353,7 @@ public class ShiftsCLI {
             if (conferma.equalsIgnoreCase("y")) {
 
                 // Chiamata al tuo Applicativo
-                String resPub = pubAc.handlePublishAction(wp, currentWeekId);
+                pubAc.handlePublishAction(wp, currentWeekId);
 
                 logger.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
             } else {

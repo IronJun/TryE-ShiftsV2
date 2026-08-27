@@ -64,16 +64,16 @@ public class NotificationDAOJdbc implements NotificationDAO {
     }
 
     @Override
-    public void saveNotification(String email, String message, String type) throws DataFetchException {
-        if(email == null||email.isEmpty()){
+    public void saveNotification(Notification notif) throws DataFetchException {
+        if(notif.getDestUser() == null){
             throw new IllegalArgumentException("Email address cannot be empty");
         }
         String query = "INSERT INTO notification (dest_user, message, type, is_read, timestamp) VALUES (?, ?, ?, ?, ?)";
         try(Connection conn = DBconnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
-            pstmt.setString(1, email);
-            pstmt.setString(2, message);
-            pstmt.setString(3, type);
+            pstmt.setString(1, notif.getDestUser());
+            pstmt.setString(2, notif.getMessage());
+            pstmt.setString(3, notif.getType());
             pstmt.setBoolean(4, false); // Appena creata è non letta
             pstmt.setString(5, "Proprio Ora");
 

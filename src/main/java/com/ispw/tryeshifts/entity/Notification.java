@@ -14,12 +14,15 @@ public class Notification {
         this.isRead = isRead;
         this.timestamp = timestamp;
     }
+    public Notification(String destUser, String message, String type) {
+        this.destUser = destUser;
+        this.message = message;
+        this.type = type;
+
+    }
 
     public String getDestUser() {
         return destUser;
-    }
-    public void setDestUser(String destUser) {
-        this.destUser = destUser;
     }
 
     public String getMessage() {
@@ -33,9 +36,6 @@ public class Notification {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public boolean isRead() {
         return isRead;
@@ -47,8 +47,5 @@ public class Notification {
 
     public String getTimestamp() {
         return timestamp;
-    }
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
     }
 }

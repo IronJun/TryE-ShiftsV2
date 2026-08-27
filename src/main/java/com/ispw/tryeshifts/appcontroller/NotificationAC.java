@@ -2,9 +2,7 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.config.AppConfig;
-import com.ispw.tryeshifts.dao.MembershipDAO;
 import com.ispw.tryeshifts.dao.NotificationDAO;
-import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.Notification;
 import com.ispw.tryeshifts.exception.BaseException;
 
@@ -15,15 +13,13 @@ import java.util.concurrent.CompletionException;
 
 public class NotificationAC {
     private final NotificationDAO notificationDAO ;
-    private final MembershipDAO membershipDAO;
 
-    public NotificationAC(NotificationDAO notificationDAO, MembershipDAO membershipDAO) {
+    public NotificationAC(NotificationDAO notificationDAO) {
         this.notificationDAO = notificationDAO;
-        this.membershipDAO = membershipDAO;
     }
 
     public NotificationAC(){
-        this(AppConfig.getInstance().getNotificationRepository(), AppConfig.getInstance().getMembershipRepository());
+        this(AppConfig.getInstance().getNotificationRepository());
     }
 
     public CompletableFuture<List<NotificationBean>> getUserNotificationsAsync(String email) {

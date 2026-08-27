@@ -4,7 +4,6 @@ import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.entity.Workplace;
-import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 
 
 import java.util.ArrayList;

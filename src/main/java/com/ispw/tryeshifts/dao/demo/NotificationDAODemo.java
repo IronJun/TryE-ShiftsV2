@@ -32,8 +32,8 @@ public class NotificationDAODemo implements NotificationDAO {
     }
 
     @Override
-    public void saveNotification(String email, String message, String type){
-        notifications.add(new Notification(email, message, type, false, "Proprio Ora"));
+    public void saveNotification(Notification notif){
+        notifications.add(new Notification(notif.getDestUser(), notif.getMessage(), notif.getType(), notif.isRead(), notif.getTimestamp()));
     }
 
     @Override

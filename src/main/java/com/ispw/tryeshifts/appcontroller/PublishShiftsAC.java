@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.appcontroller;
 
 import com.ispw.tryeshifts.appcontroller.utils.NotificationDispatcher;
 import com.ispw.tryeshifts.appcontroller.utils.WeekStatusCalc;
+import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.config.AppConfig;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.dao.*;
@@ -54,7 +55,8 @@ public class PublishShiftsAC {
 
             String message = " Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
             String type = "SHIFTS";
-            notifDisp.sendActiveWorkerNotifAsync(wp.getWorkplaceName(), message,type);
+            NotificationBean notificationBean = new NotificationBean(message,type);
+            notifDisp.sendActiveWorkerNotifAsync(wp.getWorkplaceName(), notificationBean);
             pubRes = "Shifts of "+wp.getWorkplaceName()+" has been successfully published.";
             return pubRes;
         }
