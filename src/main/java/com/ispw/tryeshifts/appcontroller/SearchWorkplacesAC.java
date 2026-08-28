@@ -28,7 +28,6 @@ public class SearchWorkplacesAC {
         }
         List<WorkplaceBean> resultBeans = new ArrayList<>();
         for (Workplace entity : workplaceEntities) {
-            // Usiamo un costruttore o i setter (meglio costruttore se disponibile per brevità)
             resultBeans.add(toBean(entity));
         }
 

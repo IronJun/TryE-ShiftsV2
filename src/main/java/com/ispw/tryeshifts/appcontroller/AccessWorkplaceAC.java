@@ -22,13 +22,11 @@ public class AccessWorkplaceAC {
         this(AppConfig.getInstance().getMembershipRepository(), AppConfig.getInstance().getWorkplaceRepository());
     }
     public  WorkplaceBean canAccess(UserBean user, String workplaceName) throws BaseException {
-
-
         if(user == null){throw new IllegalArgumentException("User not logged in");}
 
         Membership membership = membershipDB.findMembership(user.getEmail(),workplaceName);
 
-        if(membership == null){throw new UserNotMemberException("Non sei ancora membro di questo workplace.");}
+        if(membership == null){throw new UserNotMemberException("You are not member of this workplace");}
         if(!membership.isAccepted()){throw new MembershipPendingException("membership", workplaceName);}
         Workplace entity = workplaceDB.findWorkplaceByName(workplaceName);
         return new WorkplaceBean(entity.getName(),entity.getAddress(),entity.getSelectedDays(),entity.getShifts(),entity.getOwnerEmail());

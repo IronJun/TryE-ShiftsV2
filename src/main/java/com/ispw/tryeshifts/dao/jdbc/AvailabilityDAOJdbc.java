@@ -161,12 +161,12 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
     }
 
     @Override
-    public void deleteSpecificAvailability(String email, String workplaceName, String weekId, String day, String fullTime) throws EntityNotFoundException, DataFetchException {
-        String cleanTime = fullTime.replace(" ","");
+    public void deleteSpecificAvailability(Availability ava) throws EntityNotFoundException, DataFetchException {
+        String cleanTime = ava.getFullShift().replace(" ","");
         String [] timeParts = cleanTime.split("-");
 
         if(timeParts.length < 2){
-            throw new DataFetchException("Shift format invalid: "+fullTime);
+            throw new DataFetchException("Shift format invalid: "+ava.getFullShift());
         }
 
         String startShift = timeParts[0];
@@ -175,17 +175,17 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
         try(Connection conn = DBconnection.getInstance().getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
-            pstmt.setString(1,email);
-            pstmt.setString(2,workplaceName);
-            pstmt.setString(3,weekId);
-            pstmt.setString(4,day);
+            pstmt.setString(1,ava.getUserEmail());
+            pstmt.setString(2,ava.getWorkplaceName());
+            pstmt.setString(3,ava.getWeekId());
+            pstmt.setString(4,ava.getDay());
             pstmt.setString(5,startShift);
             pstmt.setString(6,endShift);
 
             int rowsAffected = pstmt.executeUpdate();
 
             if(rowsAffected == 0){
-                throw new EntityNotFoundException("No availability found to eliminate for: ", email);
+                throw new EntityNotFoundException("No availability found to eliminate for: ", ava.getUserEmail());
             }
         }catch(SQLException e){
             throw new DataFetchException("Impossibile eliminare le availability: ",e);

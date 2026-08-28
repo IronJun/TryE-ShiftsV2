@@ -57,7 +57,7 @@ public class SettingsGC {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(loggedUser == null){
-            ErrorViewManager.showError(overlayMessage, "Workplace or User is null!\n");
+            SceneManager.getInstance().showErrorAlert("User Error", "User can't be null!\n");
             return;
         }
         shiftsListView.setCellFactory(lv -> new ShiftCellHandling());
@@ -114,13 +114,13 @@ public class SettingsGC {
         String startM = startMinuteCombo.getValue();
         String endH = endHourCombo.getValue();
         String endM = endMinuteCombo.getValue();
-        try{
-            String formattedShift =new ManageShiftsAC().addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
+        try {
+            String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM, startH, endM, endH, shiftsListView.getItems());
             shiftsListView.getItems().add(formattedShift);
             Collections.sort(shiftsListView.getItems());
-        }catch (InvalidCredentialException _){
-            ErrorViewManager.showError(errorlabel,"Invalid shift time!");
-        } catch (BaseException e) {
+        }catch (IllegalArgumentException e){
+            ErrorViewManager.showError(errorlabel, e.getMessage());
+        }catch (BaseException e){
             ErrorViewManager.showError(errorlabel,e.getMessage());
         }
     }
@@ -128,24 +128,25 @@ public class SettingsGC {
 
     @FXML
     private void saveWorkplaceChanges(){
-        try{
+        try {
             List<String> selectedDays = dayCheckBoxes.stream().filter(CheckBox::isSelected).map(CheckBox::getText).toList();
             WorkplaceBean currentWp = SessionContext.getInstance().getLoggedWorkplace();
-            if(currentWp == null){
-                ErrorViewManager.showError(errorlabel,"No Workplace Selected!\n");
+            if (currentWp == null) {
+                ErrorViewManager.showError(errorlabel, "No Workplace Selected!\n");
                 return;
             }
             String oldName = currentWp.getWorkplaceName();
 
-            WorkplaceBean updatedBean = new WorkplaceBean(nameField.getText(),addressField.getText(),selectedDays,shiftsListView.getItems(),currentWp.getOwnerEmail());
+            WorkplaceBean updatedBean = new WorkplaceBean(nameField.getText(), addressField.getText(), selectedDays, shiftsListView.getItems(), currentWp.getOwnerEmail());
 
             SettingsAC ac = new SettingsAC();
-            ac.updateWorkplace(updatedBean,oldName);
+            ac.updateWorkplace(updatedBean, oldName);
 
-            SceneManager.getInstance().showInfoAlert("Success","Workplace updated correctly");
-
+            SceneManager.getInstance().showInfoAlert("Success", "Workplace updated correctly");
+        }catch (IllegalArgumentException e){
+            ErrorViewManager.showError(errorlabel,e.getMessage());
         }catch(BaseException e){
-            SceneManager.getInstance().showErrorAlert("Errore aggiornamento",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Error Updating: ",e.getMessage());
         }
     }
 
@@ -156,11 +157,11 @@ public class SettingsGC {
 
             if (!newPwd.isEmpty()) {
                 if (!newPwd.equals(confirmPwd)) {
-                    SceneManager.getInstance().showErrorAlert("Errore Pswd", "Le password non coincidono!");
+                    SceneManager.getInstance().showErrorAlert("Password Error", "The 2 Password Must match ");
                     return;
                 }
                 if (newPwd.length() < 6) {
-                    SceneManager.getInstance().showErrorAlert("Errore Pswd 2", "La password deve essere di almeno 6 caratteri.");
+                    SceneManager.getInstance().showErrorAlert("Password Error", "Password must be at least 6 characters");
                     return;
                 }
             }
@@ -185,7 +186,7 @@ public class SettingsGC {
             newPasswordField.clear();
             confirmPasswordField.clear();
         }catch(BaseException e){
-            SceneManager.getInstance().showErrorAlert("Errore aggioranemnto 2",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Updating Error",e.getMessage());
         }
     }
     private void showLeftPaneRestriction(String message) {

@@ -23,6 +23,7 @@ public class ManageMembersAC {
     private final UserDAO userRepo;
     private final MembershipDAO membershipRepo;
 
+    //Constructors
     public ManageMembersAC(WorkplaceDAO workplaceRepo, UserDAO userRepo, MembershipDAO membershipRepo) {
         this.workplaceRepo = workplaceRepo;
         this.userRepo = userRepo;
@@ -32,6 +33,8 @@ public class ManageMembersAC {
     public ManageMembersAC(){
         this(AppConfig.getInstance().getWorkplaceRepository(), AppConfig.getInstance().getUserRepository(), AppConfig.getInstance().getMembershipRepository());
     }
+
+    //usefully methods
     public List<UserBean> getActiveMembers(String wpName) throws BaseException{
         List<Membership> memberships = membershipRepo.getMembershipsByWorkplace(wpName);
         List<UserBean> active = new ArrayList<>();
@@ -52,7 +55,7 @@ public class ManageMembersAC {
             throw new EntityNotFoundException("membership",userEmail+" is not in "+workplaceName);
         }
         if(m.isAccepted() && accept){
-            throw new ValidationException("Questa richiesta è già stata accettata", "Status");
+            throw new ValidationException("This request has been already accepted", "Status");
         }
             if (accept) {
                 m.setAccepted(true);

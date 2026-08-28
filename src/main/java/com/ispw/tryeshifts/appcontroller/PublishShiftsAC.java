@@ -79,14 +79,10 @@ public class PublishShiftsAC {
 
             for (String email : emails) {
                 // Convertiamo ogni email nel nome reale
-                if ("SELECTED".equals(email)) {
-                    names.add("Lavoratore Demo"); // Fallback per la demo
-                } else {
-                    UserInfo user = userRepo.findByEmail(email);
-                    names.add((user != null) ? user.getName() + " " + user.getSurname() : email );
-                }
-            }
 
+                UserInfo user = userRepo.findByEmail(email);
+                names.add((user != null) ? user.getName() + " " + user.getSurname() : email );
+            }
             formattedData.put(entry.getKey(), names);
         }
         return formattedData;

@@ -69,12 +69,12 @@ public class AvailabilityDAODemo implements AvailabilityDAO {
     }
 
     @Override
-    public void deleteSpecificAvailability(String email, String workplaceName, String weekId, String day, String fullTime) throws EntityNotFoundException, DataFetchException {
+    public void deleteSpecificAvailability(Availability ava) {
         db.getAvailabilities().removeIf(a->
-                a.getUserEmail().equalsIgnoreCase(email) &&
-                        a.getWorkplaceName().equalsIgnoreCase(workplaceName) &&
-                        a.getWeekId().equals(weekId) &&
-                        a.getDay().equalsIgnoreCase(day) &&
-                        a.getFullShift().replace(" ", "").equals(fullTime.replace(" ", "")));
+                a.getUserEmail().equalsIgnoreCase(ava.getUserEmail()) &&
+                        a.getWorkplaceName().equalsIgnoreCase(ava.getWorkplaceName()) &&
+                        a.getWeekId().equals(ava.getWeekId()) &&
+                        a.getDay().equalsIgnoreCase(ava.getDay()) &&
+                        a.getFullShift().replace(" ", "").equals(ava.getFullShift().replace(" ", "")));
     }
 }

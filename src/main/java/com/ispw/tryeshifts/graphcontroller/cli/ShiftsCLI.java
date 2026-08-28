@@ -199,7 +199,7 @@ public class ShiftsCLI {
             logger.info("Rimozione disponibilità...");
         }
 
-        ac.saveAvailabilities(beansToSave);
+        ac.saveAvailabilities(beansToSave,user,wp);
     }
 
     private  List<AvailabilityBean> convertMapToBeans(Map<String, List<String>> currentData,

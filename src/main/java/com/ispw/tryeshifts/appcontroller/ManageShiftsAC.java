@@ -10,7 +10,6 @@ import com.ispw.tryeshifts.dao.WorkplaceDAO;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.exception.*;
-import com.ispw.tryeshifts.utils.KeyGenerator;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -33,13 +32,15 @@ public class ManageShiftsAC {
     public ManageShiftsAC() {
         this(AppConfig.getInstance().getWorkplaceRepository(), AppConfig.getInstance().getAvailabilityRepository());
     }
+
+
     public Map<String, List<String>> getShiftData(UserBean user, WorkplaceBean workplace ,String weekId) throws BaseException {
         if (workplace == null || user == null || weekId == null) {
             throw new NullPointerException("Workplace or User passed null");
         }
         Map<String, List<String>> viewMap = new HashMap<>();
 
-        workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName()); //lancia exception se non trova nullainterExcept
+        workplaceRepo.findWorkplaceByName(workplace.getWorkplaceName());//throws exceptio if workplace name passed is not a real workpalce
 
         boolean isBoss = user.getEmail().equals(workplace.getOwnerEmail());
 
@@ -53,7 +54,7 @@ public class ManageShiftsAC {
 
         for(Availability a : list){
             String shiftKey = a.getFullShift().replace(" ","");
-            String key = KeyGenerator.buildShiftKey(weekId,a.getDay(),shiftKey);
+            String key = weekId + "_" + a.getDay() + "_" + shiftKey;
             if(isBoss){
                 viewMap.computeIfAbsent(key, k -> new ArrayList<>()).add(a.getUserEmail());
             }else{
@@ -63,28 +64,26 @@ public class ManageShiftsAC {
         return viewMap;
     }
 
-    public void saveAvailabilities(List<AvailabilityBean> beans) throws BaseException {
+    public void saveAvailabilities(List<AvailabilityBean> beans,UserBean user, WorkplaceBean workplace) throws BaseException {
         if(beans == null){throw new IllegalArgumentException("Bean passed null");}
-        UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
-        WorkplaceBean currentWorkplace = SessionContext.getInstance().getLoggedWorkplace();
 
-        if(loggedUser == null || currentWorkplace == null){throw new BaseException("User or Workplace passed null");}
 
-        String userEmail = loggedUser.getEmail();
-        String wpName = currentWorkplace.getWorkplaceName();
-        // ATTENZIONE: Se sei nella "settimana prossima", calculateWeekId(0) ti darà la settimana SBAGLIATA.
-        // Sarebbe meglio passare il weekId corrente direttamente dalla GUI come parametro.
+        if(user == null || workplace == null){throw new BaseException("User or Workplace passed null");}
+
+        String userEmail = user.getEmail();
+        String wpName = workplace.getWorkplaceName();
+
         String currentWeekId = beans.isEmpty() ?
                 calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
                 beans.get(0).getWeekId();
 
         String currentWeekStatus = getWeekStatusShifts(wpName,currentWeekId);
 
-        boolean isBoss = userEmail.equals(currentWorkplace.getOwnerEmail());
+        boolean isBoss = userEmail.equals(workplace.getOwnerEmail());
         if(!isBoss && !currentWeekStatus.equals("OPEN")){
             throw new ValidationException("Failed to save the avaialability, out of temporal window: "+currentWeekStatus, "Shifts");
         }
-        // 1. CANCELLAZIONE
+        // 1. CANCELLAZIONE disponibilità cambiate
         availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
 
         // 2. SALVATAGGIO (deve essere garantito)
@@ -107,7 +106,7 @@ public class ManageShiftsAC {
     }
 
     public String getWeekStatusShifts(String workplaceName, String weekId) throws BaseException {
-        if(workplaceName == null || weekId == null){throw new NullPointerException("Parametri di ricerca mancanti");}
+        if(workplaceName == null || weekId == null){throw new NullPointerException("Missing research parameter");}
         String status = workplaceRepo.getWeekStatus(workplaceName, weekId);
         if(status != null) {
             return status;
@@ -118,22 +117,29 @@ public class ManageShiftsAC {
     }
 
     public void updateWeekStatusShifts(String workplaceName,String weekId, String status)throws BaseException{
+        if(workplaceName == null){
+            throw new NullPointerException("Workplacename passed null");
+        }
         workplaceRepo.updateWeekStatus(workplaceName,weekId,status);
     }
 
     public  Map<String, Object> getHomeScheduleData(String userEmail, String weekId) throws BaseException {
         if (userEmail == null || weekId == null) {
-            throw new NullPointerException("Parametri di ricerca mancanti");
+            throw new NullPointerException("Missing research parameter");
         }
 
+        //TreeSet per salvare orari in modo ordinato e senza duplicati
         TreeSet<String> timeSlots = new TreeSet<>();
+        //Mappa per collegare i diversi wrokpalce con i diversi giorni di lavoro
         Map<String, String> assignments = workplaceRepo.getUserPublishedShiftsByWeek(userEmail, weekId);
 
         for(String cleanKey : assignments.keySet()){
             String timeParts = cleanKey.split("_")[1];
             timeSlots.add(timeParts);
         }
+        //Mappa che tornerò popolata da una mappa associata ad una string e da un oggetto TreeSet assocaito ad una string
         Map<String, Object> result = new HashMap<>();
+
         result.put("assignments", assignments);
         result.put("slots", timeSlots);
         return  result;
@@ -154,14 +160,12 @@ public class ManageShiftsAC {
         return start.format(formatter) + " - " + end.format(formatter);
     }
 
-
-
     public  String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
         int startTotalMinutes = parseToMinutes(startH+ timeSeparator +startM);
         int endTotalMinutes = parseToMinutes(endH+ timeSeparator +endM);
 
         if (endTotalMinutes  <= startTotalMinutes) {
-            throw new IllegalArgumentException("La fine deve essere dopo l'inizio");
+            throw new IllegalArgumentException("The Shifts must end after it started");
         }
 
         String fullShift = startH + timeSeparator + startM + shiftSeparator + endH + timeSeparator + endM;
@@ -191,7 +195,9 @@ public class ManageShiftsAC {
             throw new NullPointerException("Missing parameter to remove someone from the shifts");
         }
         try{
-            availabilityRepo.deleteSpecificAvailability(email, workplaceName, weekId, day, fullTime);
+            String[] fullShift = fullTime.split("-");
+            Availability ava = new Availability(email,workplaceName,day,fullShift[0],fullShift[1],weekId);
+            availabilityRepo.deleteSpecificAvailability(ava);
         }catch(Exception _){
             throw new DataFetchException("Impossibile eliminare il turno dalla memoria");
         }

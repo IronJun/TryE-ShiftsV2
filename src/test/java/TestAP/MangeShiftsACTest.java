@@ -29,7 +29,7 @@ public class MangeShiftsACTest {
         ManageShiftsAC ac = new ManageShiftsAC();
 
         IllegalArgumentException ecc = assertThrows(IllegalArgumentException.class, () -> {
-            ac.saveAvailabilities(null);
+            ac.saveAvailabilities(null,null,null);
         });
         assertEquals("Bean passed null",ecc.getMessage());
     }

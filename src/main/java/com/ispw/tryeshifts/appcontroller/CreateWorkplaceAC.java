@@ -26,6 +26,7 @@ public class CreateWorkplaceAC {
                 AppConfig.getInstance().getUserRepository(),
                 AppConfig.getInstance().getMembershipRepository());
     }
+
     public void createWorkplace(WorkplaceBean wp) throws BaseException {
         if(wp.getWorkplaceName().isEmpty()){throw new NullPointerException("Workplace name cannot be empty");}
 
@@ -43,6 +44,7 @@ public class CreateWorkplaceAC {
         workplaceRepo.saveWorkplace(newWp);
         membershipRepo.saveMembership(membership);
     }
+
 
 
 }

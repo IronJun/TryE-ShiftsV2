@@ -348,7 +348,7 @@ public class ShiftsGC {
 
         }
         try {
-            manageAC.saveAvailabilities(availabilityBeans);
+            manageAC.saveAvailabilities(availabilityBeans,loggedUser,wp);
 
             // Messaggio di successo
             SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
