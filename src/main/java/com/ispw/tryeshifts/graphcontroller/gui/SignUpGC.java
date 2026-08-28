@@ -5,6 +5,7 @@ import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,6 +16,9 @@ import javafx.scene.image.ImageView;
 
 public class SignUpGC {
 
+    public Button AppleLogButton;
+    public Button FacebookLogButton;
+    public Button GoogleLogButton;
     @FXML private TextField emailField;
     @FXML private TextField nameField;
     @FXML private TextField surnameField;
@@ -84,5 +88,9 @@ public class SignUpGC {
             icon.setImage(new Image(getClass().getResourceAsStream("/com/ispw/tryeshifts/view/assets/openedEye.png")));
             return true;
         }
+    }
+
+    public void metaLog() {
+        SceneManager.getInstance().showInfoAlert("Error", "access by third part software is not yet implemented");
     }
 }

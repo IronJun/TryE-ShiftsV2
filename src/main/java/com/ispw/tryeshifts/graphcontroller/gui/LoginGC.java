@@ -16,6 +16,9 @@ import javafx.scene.image.ImageView;
 
 public class LoginGC {
 
+    public Button AppleLogButton;
+    public Button FaceBookLogButton;
+    public Button GoogleLogButton;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
@@ -74,5 +77,9 @@ public class LoginGC {
             eyeIcon.setImage(new Image(getClass().getResourceAsStream("/com/ispw/tryeshifts/view/assets/openedEye.png")));
             isPasswordVisible = true;
         }
+    }
+
+    public void metaLog() {
+        SceneManager.getInstance().showInfoAlert("Error", "access by third part software is not yet implemented");
     }
 }

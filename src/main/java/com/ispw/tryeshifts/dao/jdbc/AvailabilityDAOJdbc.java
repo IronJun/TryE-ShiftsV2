@@ -28,7 +28,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
     public void saveAvailability(Availability availability) throws DuplicateEntityException, DataFetchException {
         String query = "INSERT INTO availabilities (user_email, workplace_name,week_id, day_name, start_shift, end_shift) VALUES (?, ?, ?, ?, ?,?)";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, availability.getUserEmail());
@@ -53,7 +53,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
     public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
         String query = "DELETE FROM availabilities WHERE user_email = ? AND workplace_name = ? AND week_id = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
@@ -68,7 +68,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         String query = "SELECT user_email, day_name, start_shift, end_shift, week_id " +
                 "FROM availabilities WHERE workplace_name = ? AND week_id = ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, workplaceName);
@@ -98,7 +98,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         List<Availability> list = new ArrayList<>();
         String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift " +
                 "FROM availabilities WHERE user_email = ? AND workplace_name = ? AND week_id = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
@@ -131,7 +131,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 "FROM availabilities " +
                 "WHERE workplace_name = ? AND week_id = ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, workplaceName);
@@ -173,7 +173,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         String endShift = timeParts[1];
         String query = "DELETE FROM availabilities " +"WHERE user_email = ? "+ "AND workplace_name = ? "+ "AND week_id = ? "+ "AND day_name = ? "+"AND start_shift = ? "+"AND end_shift = ? ";
 
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
             pstmt.setString(1,email);
             pstmt.setString(2,workplaceName);

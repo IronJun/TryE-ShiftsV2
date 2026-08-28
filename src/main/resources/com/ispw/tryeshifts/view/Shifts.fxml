@@ -33,6 +33,7 @@
 
                     <Button fx:id="btnNextWeek" text="Settimana Successiva &gt;" onAction="#handleNextWeek"
                             style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-cursor: hand;" />
+
                 </HBox>
                 <Label fx:id ="errorlbl" textFill="#4B4488" visible="false" managed="false"/>
 
@@ -67,11 +68,13 @@
                 </HBox>
             </VBox>
             <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 10;">
+                <Label fx:id = "countdownLabel" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-font-size: 15;"/>
+
                 <padding>
                     <Insets left="10.0" />
                 </padding>
-                <Label fx:id="lblMode" text="Modalità pubblicazione turni: " style="-fx-font-weight: bold; -fx-text-fill: #4B4488;" />
-                <Label text="Per cambiarla andare nelle impostazioni" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
+                <Label fx:id="lblMode" text="Shifts publication mode: " style="-fx-font-weight: bold; -fx-text-fill: #4B4488;" />
+                <Label text="go to the settings to change that" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
             </HBox>
         </VBox>
     </center>

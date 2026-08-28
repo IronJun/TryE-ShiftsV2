@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.appcontroller.utils.WeekStatusCalc;
 import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
@@ -18,12 +19,17 @@ import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.utils.KeyGenerator;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,20 +53,23 @@ public class ShiftsGC {
     @FXML private Label lblWeekDisplay;
     @FXML private Label errorlbl;
     @FXML private NavbarGC navbarController;
+    @FXML private Label countdownLabel;
     private final Map<String, Boolean> selectedCellsMap = new HashMap<>();
     private final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
     private final String[] daysShown = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    private String shiftsMode= "Forzata" ;
+    private Timeline timeline;
+    ManageShiftsAC manageAC = new ManageShiftsAC();
+    PublishShiftsAC pubAc = new PublishShiftsAC();
+
 
     public void initialize()  {
-        ManageShiftsAC manageAC = new ManageShiftsAC();
         ErrorViewManager.setupAutoHide(errorlbl);
         if(navbarController != null){
             navbarController.setActivePage(NavPage.SHIFTS);
         }
         this.loggeduser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean info = SessionContext.getInstance().getLoggedWorkplace();
-        this.weekOffset = 0;
+        this.weekOffset = 1;
         this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
             lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
@@ -80,12 +89,63 @@ public class ShiftsGC {
                 strat = new WorkerShiftsStrat();
             }
             strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn,context.status());
-            lblMode.setText("Modalità pubblicazione turni: "+ shiftsMode);
+            String shiftsMode = "Manual ";
+            lblMode.setText("Shifts handling mode: "+ shiftsMode);
             buildDynamicTable();
+            setupStateTimer();
         }catch(BaseException e){
             logger.log(Level.SEVERE, "Errore durante l'inizializzazione della UI", e);
         }
 
+    }
+
+    private void setupStateTimer(){
+        try{
+            WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
+            if(wp == null || this.currentWeekId == null){
+                ErrorViewManager.showError(errorlbl,"no workplace passed or week id null");
+            }
+            String weekCurrentStatus = manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
+
+            WeekStatusCalc calc = new WeekStatusCalc();
+
+            LocalDateTime deadline = calc.getNextDeadLine(this.currentWeekId, weekCurrentStatus);
+            if(deadline != null){
+                String actionName ="OPEN".equals(weekCurrentStatus) ? "Until Lock " : "Until Publication";
+                startCountDownTimer(deadline,actionName);
+            }else{
+                if (timeline != null) timeline.stop();
+                countdownLabel.setText("official shifts published");
+                }
+            }catch(BaseException e){
+                ErrorViewManager.showError(errorlbl,e.getMessage());
+            } catch (Exception e) {
+                countdownLabel.setText("Error during status upload");
+        }
+    }
+
+    private void startCountDownTimer(LocalDateTime deadline, String actionName){
+        if(timeline != null)timeline.stop();
+
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), event ->{
+            LocalDateTime now = LocalDateTime.now();
+
+
+            if(now.isAfter(deadline)|| now.isEqual(deadline)){
+                countdownLabel.setText("Time expired for: " + actionName +"!");
+                timeline.stop();
+            }else{
+                java.time.Duration diff = java.time.Duration.between(now,deadline);
+
+                long days = diff.toDays();
+                long hours = diff.toHoursPart();
+                long minutes = diff.toMinutesPart();
+                long seconds = diff.toSecondsPart();
+                countdownLabel.setText(String.format("Time left %s : %02dgg %02dh %02dm %02ds", actionName, days, hours, minutes, seconds));
+            }
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
     }
 
     public void setSelectedWorkplace(WorkplaceBean wp) {
@@ -98,10 +158,7 @@ public class ShiftsGC {
 
     private void buildDynamicTable() {
         try {
-            // 1. Setup Strutturale della Grid
             resetAndSetupGrid();
-
-            // 2. Recupero Dati e Context
             TableContext context = fetchTableContext();
             ShiftsUIStrat strat = (loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail()))
                     ? new BossShiftsStrat()
@@ -186,11 +243,10 @@ public class ShiftsGC {
             UserBean loggedUser,
             WorkplaceBean wp
     ) {}
+
     private TableContext fetchTableContext() throws BaseException {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        ManageShiftsAC manageAC = new ManageShiftsAC();
-        PublishShiftsAC pubAc = new PublishShiftsAC();
         if(user == null || wp == null) {
             ErrorViewManager.showError(errorlbl,"user or workplace is null!");
             return null;
@@ -329,8 +385,7 @@ public class ShiftsGC {
             return;
         }
         try{
-            PublishShiftsAC pubAC = new PublishShiftsAC();
-            String resultMSG = pubAC.handlePublishAction(wp, this.currentWeekId);
+            String resultMSG = pubAc.handlePublishAction(wp, this.currentWeekId);
             SceneManager.getInstance().showInfoAlert("Shifts Operation", resultMSG);
             buildDynamicTable();
         }catch(BaseException e){
@@ -340,11 +395,11 @@ public class ShiftsGC {
 
     @FXML
     private void handleNextWeek() {
-        if(weekOffset<1){
+        if(weekOffset<2){
             weekOffset++;
             updateView();
         }else{
-            ErrorViewManager.showError(errorlbl,"puoi dare disponibilità solo per la settimana successiva");
+            ErrorViewManager.showError(errorlbl,"You can give availability until next week at the latest");
         }
     }
     @FXML
@@ -360,7 +415,7 @@ public class ShiftsGC {
         this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         // Aggiorna la label per far capire all'utente dove si trova
         selectedCellsMap.clear();
-        lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
+        lblWeekDisplay.setText("Week: "+ manageAC.getWeekRangeString(weekOffset));
         // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
         buildDynamicTable();
     }

@@ -4,6 +4,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
@@ -20,15 +22,34 @@ public class WeekStatusCalc {
 
         LocalDateTime weDeadLine = targetMonday.minusDays(5).atTime(23,59,59);
         LocalDateTime friDeadline = targetMonday.minusDays(3).atTime(23,59,59);
-        LocalDateTime sunDeadline = targetMonday.minusDays(1).atTime(23,59,59);
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
-        if(now.isAfter(friDeadline)&&now.isBefore(sunDeadline)){
-            return "PUBLISHED";
+        if(now.isBefore(weDeadLine) || now.isEqual(weDeadLine)){
+            return "OPEN";
         }
-        if(now.isAfter(weDeadLine) && now.isBefore(friDeadline)){
+        if(now.isBefore(friDeadline) || now.isEqual(friDeadline)){
             return "LOCKED";
         }
-        return "OPEN";
+        return  "PUBLISHED";
+    }
+
+    public LocalDateTime getNextDeadLine(String weekId, String currentStatus){
+
+        String[] parts = weekId.split("_");
+        int year = Integer.parseInt(parts[0]);
+        int week = Integer.parseInt(parts[1]);
+
+
+        LocalDate targetMonday = LocalDate.now()
+                .with(IsoFields.WEEK_BASED_YEAR, year)
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        if("OPEN".equals(currentStatus)){
+            return targetMonday.minusDays(5).atTime(23,59,59);
+        }else if("LOCKED".equals(currentStatus)){
+            return targetMonday.minusDays(3).atTime(23,59,59);
+        }
+        return null;
     }
 }

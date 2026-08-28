@@ -87,14 +87,12 @@ public class NewWorkplaceGC {
         try {
             WorkplaceBean wpBean = new WorkplaceBean(nameField.getText(), addressField.getText(), days, shifts, email);
             new CreateWorkplaceAC().createWorkplace(wpBean);
-            SceneManager.getInstance().showInfoAlert("Successo", "Workplace creato con successo!");
+            SceneManager.getInstance().showInfoAlert("Success", "Workplace created con correctly!");
             closeWindow();
-        }catch(DuplicateEntityException e){
-            SceneManager.getInstance().showErrorAlert("Errore Creazione del Workplace",e.getMessage());
-        }catch(EntityNotFoundException e){
-            SceneManager.getInstance().showErrorAlert("Errore Creazione del Workplace",e.getMessage());
-        }catch(BaseException e) {
-            SceneManager.getInstance().showErrorAlert("Errore tecnico salvataggio dati", e.getMessage());
+        }catch(DuplicateEntityException | EntityNotFoundException e){
+            SceneManager.getInstance().showErrorAlert("Workplace creation went wrong: ",e.getMessage());
+        } catch(BaseException e) {
+            SceneManager.getInstance().showErrorAlert("Technical error occurred: ", e.getMessage());
         }
     }
     @FXML

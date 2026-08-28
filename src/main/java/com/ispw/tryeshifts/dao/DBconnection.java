@@ -12,26 +12,52 @@ public class DBconnection {
     private static final Logger LOGGER = Logger.getLogger(DBconnection.class.getName());
     private static final Properties props = new Properties();
 
+    private Connection connection;
+
     static {
         // Carichiamo il file una sola volta all'avvio della classe
         try (InputStream input = DBconnection.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (input == null) {
-                LOGGER.log(Level.SEVERE, "Spiacente, impossibile trovare db.properties");
+                LOGGER.log(Level.SEVERE, "Sorry, could not find db.properties");
             } else {
                 props.load(input);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Errore durante il caricamento della configurazione DB", e);
+            LOGGER.log(Level.SEVERE, "Error during the DB configuration ", e);
         }
     }
 
-
     private DBconnection(){
-        throw new IllegalStateException("Utility class");
+        try{
+            connect();
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "error during DB connection", e);
+        }
     }
-    public static Connection getConnection() throws SQLException{
+
+    private static class LazyContainer {
+        public static final DBconnection instance = new DBconnection();
+    }
+
+    // singleton method
+    public static DBconnection getInstance() {
+        return LazyContainer.instance;
+    }
+
+    private void connect() throws SQLException {
         String password = System.getenv("DB_password");
-        if(password == null){LOGGER.warning("ERRORE CRITICO: La variabile d'ambiente DB_PASSWORD non è impostata!");}
-        return DriverManager.getConnection(props.getProperty("db.url"),props.getProperty("db.user"),password);
+        if (password == null || password.isEmpty()){
+            LOGGER.warning("CRITICAL ERROR: environment variable DB_password is null or empty");
+        }
+        this.connection = DriverManager.getConnection(props.getProperty("db.url"),
+            props.getProperty("db.user"),password);
+    }
+
+    public Connection getConnection() throws SQLException {
+        if(connection == null || connection.isClosed()) {
+            LOGGER.warning("CRITICAL ERROR: connection is expired or closed, i try to open it again...");
+            connect();
+        }
+        return connection;
     }
 }

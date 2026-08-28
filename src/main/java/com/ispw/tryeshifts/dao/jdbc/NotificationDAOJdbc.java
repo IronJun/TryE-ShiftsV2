@@ -21,7 +21,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
             return result;
         }
         String query = "SELECT dest_user, message, type, is_read,timestamp FROM notification WHERE dest_user = ?";
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             return executeNotificationQuery(email,pstmt);
         }catch (SQLException e){
@@ -53,7 +53,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
             throw new IllegalArgumentException("Email address cannot be empty");
         }
         String query = "UPDATE notification SET is_read = ? WHERE dest_user = ?";
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
             pstmt.setBoolean(1, true);
             pstmt.setString(2,email);
@@ -69,7 +69,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
             throw new IllegalArgumentException("Email address cannot be empty");
         }
         String query = "INSERT INTO notification (dest_user, message, type, is_read, timestamp) VALUES (?, ?, ?, ?, ?)";
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query)){
             pstmt.setString(1, notif.getDestUser());
             pstmt.setString(2, notif.getMessage());
@@ -91,7 +91,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
 
         String query = "DELETE FROM notification WHERE dest_user = ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
@@ -106,7 +106,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
         String query = "SELECT COUNT(*) AS total FROM notification Where dest_user = ?";
         int count = 0;
 
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)){
             count = queryNotifications(email,pstmt);
         } catch (SQLException e) {

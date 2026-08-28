@@ -29,7 +29,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         }
         Connection conn = null;
         try {
-            conn = DBconnection.getConnection(); // Usa il tuo metodo di connessione
+            conn = DBconnection.getInstance().getConnection(); // Usa il tuo metodo di connessione
             conn.setAutoCommit(false);
 
             // Delego le operazioni a metodi specializzati
@@ -49,7 +49,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     }
     public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException,EntityNotFoundException {
         String sql = "UPDATE workplaces SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, updateWp.getName());
@@ -71,7 +71,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     }
     public boolean existsWorkplaceByName(String name) throws DataFetchException {
         String query = "SELECT COUNT(*) FROM workplaces WHERE name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, name);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -85,7 +85,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     public Workplace findWorkplaceByName(String name) throws DataFetchException {
         String query = "SELECT id, name, address, owner_email FROM workplaces WHERE name = ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, name);
@@ -122,7 +122,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 "FROM workplaces w JOIN memberships m ON w.name = m.workplace_name " +
                 "WHERE m.user_email = ? AND m.is_accepted = true";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
@@ -153,7 +153,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         List<Workplace> list = new ArrayList<>();
         String query = "SELECT id, name, address, owner_email FROM workplaces";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -172,7 +172,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         // Usiamo LIKE per permettere ricerche parziali (es. "Off" trova "Officina")
         String query = "SELECT id, name, address, owner_email FROM workplaces WHERE name LIKE ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, "%" + name + "%");
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -190,7 +190,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     }
     public String getWeekStatus(String workplaceName, String weekId) throws DataFetchException{
         String query = "SELECT status_name FROM week_status WHERE workplace_name = ? AND week_id = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, workplaceName);
             pstmt.setString(2, weekId);
@@ -205,7 +205,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         // ON DUPLICATE KEY UPDATE permette di inserire o aggiornare se esiste già
         String query = "INSERT INTO week_status (workplace_name, week_id, status_name) VALUES (?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE status_name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, workplaceName);
             pstmt.setString(2, weekId);
@@ -218,7 +218,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     }
     public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) throws DataFetchException{
         String query = "INSERT INTO published_shifts (workplace_name, week_id, cell_key, worker_email) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DBconnection.getConnection()) {
+        try (Connection conn = DBconnection.getInstance().getConnection()) {
             conn.setAutoCommit(false); // Transazione per sicurezza
             mapPopulation(conn, workplace, weekId, assignments, query);
         } catch (SQLException e) {
@@ -228,7 +228,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) throws DataFetchException {
         Map<String, List<String>> shifts = new HashMap<>();
         String query = "SELECT cell_key, worker_email FROM published_shifts WHERE workplace_name = ? AND week_id = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, workplaceName);
             pstmt.setString(2, weekId);
@@ -337,7 +337,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
     public Map<String, String> getUserPublishedShiftsByWeek(String userEmail, String weekId) throws DataFetchException {
         Map<String, String> assignments = new HashMap<>();
         String query = "SELECT cell_key, workplace_name FROM published_shifts WHERE worker_email= ? AND week_id= ?";
-        try(Connection conn = DBconnection.getConnection();
+        try(Connection conn = DBconnection.getInstance().getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)){
             pstmt.setString(1,userEmail);
             pstmt.setString(2,weekId);

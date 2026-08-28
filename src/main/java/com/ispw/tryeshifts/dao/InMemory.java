@@ -22,7 +22,6 @@ public class InMemory {
     private final Map<String, List<String>> publishedShiftsDbDemo = new HashMap<>();
 
     private InMemory(){
-
     }
 
     private static class LazyContainer {

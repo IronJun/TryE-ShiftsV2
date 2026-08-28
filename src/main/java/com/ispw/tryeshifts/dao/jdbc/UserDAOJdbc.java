@@ -16,7 +16,7 @@ public class UserDAOJdbc implements UserDAO {
         // Selezioniamo solo i campi che servono al tuo costruttore
         String query = "SELECT email, nome, cognome, password FROM users WHERE email = ?";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
@@ -42,7 +42,7 @@ public class UserDAOJdbc implements UserDAO {
     }
     public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
         String query = "INSERT INTO users (email, nome, cognome,password) VALUES (?,?,?,?)";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
 
@@ -65,7 +65,7 @@ public class UserDAOJdbc implements UserDAO {
 // Nota: Uso 'users' al plurale come abbiamo fatto per 'workplaces'
         // Usiamo l'email presente nell'oggetto user sia per i nuovi dati che per il WHERE
         String sql = "UPDATE users SET nome = ?, cognome = ?, password = ? WHERE email = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, updateUser.getName());

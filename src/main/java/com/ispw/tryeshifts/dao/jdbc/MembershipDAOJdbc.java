@@ -26,7 +26,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
 
     public void saveMembership(Membership m) throws DuplicateEntityException, DataFetchException {
         String query = "INSERT INTO memberships (user_email, workplace_name, role, is_accepted) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, m.getUser().getEmail());
             pstmt.setString(2, m.getWorkplace().getName());
@@ -45,7 +45,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
     }
     public void updateMembership(Membership updateMembership) throws EntityNotFoundException, DataFetchException {
         String query = "UPDATE memberships SET role = ?, is_accepted = ? WHERE user_email = ? AND workplace_name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, updateMembership.getRole());
             pstmt.setBoolean(2, updateMembership.isAccepted());
@@ -64,7 +64,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
     }
     public void removeMembership(Membership membership) throws EntityNotFoundException,DataFetchException {
         String query = "DELETE FROM memberships WHERE user_email = ? AND workplace_name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, membership.getUser().getEmail());
             pstmt.setString(2, membership.getWorkplace().getName());
@@ -82,7 +82,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
     }
     public Membership findMembership(String email, String workplaceName) throws DataFetchException {
         String query = "SELECT role, is_accepted FROM memberships WHERE user_email = ? AND workplace_name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
             pstmt.setString(2, workplaceName);
@@ -105,7 +105,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 "FROM memberships m " +
                 "JOIN users u ON m.user_email = u.email " +
                 "WHERE m.workplace_name = ?";
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, workplaceName);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -128,7 +128,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
                 "LEFT JOIN memberships m ON w.name = m.workplace_name AND m.user_email = ? " +
                 "WHERE w.name = ? AND (w.owner_email = ? OR m.is_accepted = true)";
 
-        try (Connection conn = DBconnection.getConnection();
+        try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);      // Per la JOIN con memberships
