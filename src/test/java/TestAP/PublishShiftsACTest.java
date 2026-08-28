@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PublishShiftsACTest {
-    private final String validWeek = "2026_10";
+class PublishShiftsACTest {
+    final String validWeek = "2026_10";
 
     @BeforeEach
     void setup(){
@@ -83,11 +83,10 @@ public class PublishShiftsACTest {
         WorkplaceBean validwpBean = new WorkplaceBean("LocaleTest","Via Roma 1",new ArrayList<>(),new ArrayList<>(),"boss@test.com");
 
 
-        try {
+        assertDoesNotThrow(()-> {
             AppConfig.getInstance().getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek);
-        } catch (Exception e) {
-            fail("Error during the uploading of availabilities: "+e.getMessage());
-        }
+        },"Error during the uploading of availabilities: ");
+
         assertDoesNotThrow(()->{
             controller.handlePublishAction(validwpBean, validWeek);
         },"The publication should end well with valid data");
