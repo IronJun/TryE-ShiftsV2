@@ -120,7 +120,7 @@ public class ShiftsGC {
             }catch(BaseException e){
                 ErrorViewManager.showError(errorlbl,e.getMessage());
             } catch (Exception e) {
-                countdownLabel.setText("Error during status upload");
+                countdownLabel.setText("Error during status upload: "+e.getMessage());
         }
     }
 
@@ -137,11 +137,11 @@ public class ShiftsGC {
             }else{
                 java.time.Duration diff = java.time.Duration.between(now,deadline);
 
-                long days = diff.toDays();
+                long daysTimer = diff.toDays();
                 long hours = diff.toHoursPart();
                 long minutes = diff.toMinutesPart();
                 long seconds = diff.toSecondsPart();
-                countdownLabel.setText(String.format("Time left %s : %02dgg %02dh %02dm %02ds", actionName, days, hours, minutes, seconds));
+                countdownLabel.setText(String.format("Time left %s : %02dgg %02dh %02dm %02ds", actionName, daysTimer, hours, minutes, seconds));
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
@@ -318,7 +318,6 @@ public class ShiftsGC {
         // 1. Recuperiamo i dati contestuali
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        ManageShiftsAC manageAC = new ManageShiftsAC();
         msg = "DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size();
         logger.log(Level.FINE, msg);
         // 2. Creiamo una lista di AvailabilityBean
@@ -411,7 +410,6 @@ public class ShiftsGC {
     }
 
     private void updateView() {
-        ManageShiftsAC manageAC = new ManageShiftsAC();
         this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         // Aggiorna la label per far capire all'utente dove si trova
         selectedCellsMap.clear();
@@ -426,7 +424,6 @@ public class ShiftsGC {
             if(parts.length >= 4){
                 String day = parts[2];
                 String fullTime = parts[3];
-                ManageShiftsAC manageAC = new ManageShiftsAC();
                 manageAC.removeWorkerFromShift(email,selectedWorkplace.getWorkplaceName(),currentWeekId,day,fullTime);
                 buildDynamicTable();
             }

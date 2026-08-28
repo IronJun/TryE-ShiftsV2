@@ -121,7 +121,7 @@
             </VBox.margin>
 
             <!-- Apple -->
-            <Button fx:id="AppleLogButton" onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
+            <Button fx:id="appleLogButton" onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
                 <graphic>
                     <ImageView preserveRatio="true" fitHeight="25.0" pickOnBounds="true">
                         <image>
@@ -132,7 +132,7 @@
             </Button>
 
             <!-- Facebook -->
-            <Button fx:id="FacebookLogButton"  onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
+            <Button fx:id="facebookLogButton"  onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
                 <graphic>
                     <ImageView preserveRatio="true" fitHeight="50.0" pickOnBounds="true">
                         <image>
@@ -143,7 +143,7 @@
             </Button>
 
             <!-- Google -->
-            <Button fx:id="GoogleLogButton" onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
+            <Button fx:id="googleLogButton" onAction="#metaLog" style="-fx-background-color: transparent; -fx-cursor: hand;">
                 <graphic>
                     <ImageView preserveRatio="true" fitHeight="25.0" pickOnBounds="true">
                         <image>

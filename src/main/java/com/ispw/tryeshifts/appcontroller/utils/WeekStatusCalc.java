@@ -40,7 +40,7 @@ public class WeekStatusCalc {
         int week = Integer.parseInt(parts[1]);
 
 
-        LocalDate targetMonday = LocalDate.now()
+        LocalDate targetMonday = LocalDate.now(ZoneId.systemDefault())
                 .with(IsoFields.WEEK_BASED_YEAR, year)
                 .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));

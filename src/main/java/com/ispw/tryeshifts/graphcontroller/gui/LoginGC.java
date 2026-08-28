@@ -16,9 +16,9 @@ import javafx.scene.image.ImageView;
 
 public class LoginGC {
 
-    public Button AppleLogButton;
-    public Button FaceBookLogButton;
-    public Button GoogleLogButton;
+    public Button appleLogButton;
+    public Button faceBookLogButton;
+    public Button googleLogButton;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;

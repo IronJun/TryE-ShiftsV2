@@ -3,9 +3,7 @@ package com.ispw.tryeshifts.dao.demo;
 import com.ispw.tryeshifts.dao.AvailabilityDAO;
 import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.entity.Availability;
-import com.ispw.tryeshifts.exception.DataFetchException;
 import com.ispw.tryeshifts.exception.DuplicateEntityException;
-import com.ispw.tryeshifts.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
