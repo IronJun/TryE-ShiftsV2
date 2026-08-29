@@ -6,6 +6,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.session.SessionContext;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -13,56 +14,63 @@ import java.util.logging.Logger;
 public class WorkersCLI {
     private final Logger logger = Logger.getLogger(WorkersCLI.class.getName());
     private final ManageMembersAC ac =  new ManageMembersAC();
-    private final NotificationAC notificationAC = new NotificationAC();
     private  String msg;
     public  void activeWorkers(WorkplaceBean wp){
         try {
-            logger.info("\n--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
+            CLIReader.println("--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
             List<UserBean> active = ac.getActiveMembers(wp.getWorkplaceName());
             if(active.isEmpty()){
-                logger.info("No active members yet.");
+                CLIReader.println("No active members yet.");
             }else{
                 msg = String.format("%n %-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL");
-                logger.info(msg);
+                CLIReader.println(msg);
                 for(UserBean ub : active){
                     msg = String.format("%n %-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail());
-                    logger.info(msg);
+                    CLIReader.println(msg);
                 }
             }
-            CLIReader.readString("\nPress Enter to continue...");
+            CLIReader.readString("Press Enter to continue...");
         }catch (BaseException e){
-            logger.severe("Errore: " + e.getMessage());
+            logger.severe("Errore: " + e.getMessage()+"\n");
         }
     }
     public  void pendingWorkers(WorkplaceBean wp){
         try{
-            List<UserBean> pending = ac.getPendingRequests(wp.getWorkplaceName());
-            if (pending.isEmpty()) {
-                logger.info("\nNo pending requests.");
+            UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
+            if(loggedUser == null||!loggedUser.getEmail().equals(wp.getOwnerEmail())){
+                logger.warning("Only the Boss can handle the pending workers.\n");
                 return;
             }
-            logger.info("\n--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---\n");
+            List<UserBean> pending = ac.getPendingRequests(wp.getWorkplaceName());
+            if (pending.isEmpty()) {
+                CLIReader.println("No pending requests.");
+                return;
+            }
+            CLIReader.println("--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---");
             for (int i = 0; i < pending.size(); i++) {
                 UserBean u = pending.get(i);
                 msg = String.format("%d. %s %s (%s)", (i + 1), u.getName(), u.getSurname(), u.getEmail());
-                logger.info(msg);
+                CLIReader.println(msg);
             }
 
-            int choice = CLIReader.readInt("\nSelect the number of the user to handle (0 to annul): ");
+            int choice = CLIReader.readInt("Select the number of the user to handle (0 to annul): ");
             if (choice > 0 && choice <= pending.size()) {
                 UserBean selected = pending.get(choice - 1);
-                String action = CLIReader.readString("\nWill you accept the User? y/n: ").toLowerCase();
+                String action;
+                do{
+                    action = CLIReader.readString("Will you accept the User? y/n: ").toLowerCase();
+                }while(!action.equals("y") && !action.equals("n"));
 
                 boolean accept = action.equals("y");
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
                 if(accept){
-                    logger.info("\n✅ User Accepted!");
+                    CLIReader.println("✅ User Accepted!");
                 }else{
-                    logger.info( "\n❌ User not accepted.");
+                    CLIReader.println( "❌ User not accepted.");
                 }
             }
         } catch (BaseException e) {
-            logger.severe("Errore: " + e.getMessage());
+            logger.severe("Errore: " + e.getMessage()+"\n");
         }
     }
 }

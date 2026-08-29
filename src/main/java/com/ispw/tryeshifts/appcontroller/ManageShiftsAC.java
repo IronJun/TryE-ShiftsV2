@@ -63,7 +63,7 @@ public class ManageShiftsAC {
         return viewMap;
     }
 
-    public void saveAvailabilities(List<AvailabilityBean> beans,UserBean user, WorkplaceBean workplace) throws BaseException {
+    public void saveAvailabilities(List<AvailabilityBean> beans,UserBean user, WorkplaceBean workplace,String weekId) throws BaseException {
         if(beans == null){throw new IllegalArgumentException("Bean passed null");}
 
 
@@ -72,18 +72,18 @@ public class ManageShiftsAC {
         String userEmail = user.getEmail();
         String wpName = workplace.getWorkplaceName();
 
-        String currentWeekId = beans.isEmpty() ?
+        /*String currentWeekId = beans.isEmpty() ?
                 calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
-                beans.get(0).getWeekId();
+                beans.get(0).getWeekId();*/
 
-        String currentWeekStatus = getWeekStatusShifts(wpName,currentWeekId);
+        String currentWeekStatus = getWeekStatusShifts(wpName,weekId);
 
         boolean isBoss = userEmail.equals(workplace.getOwnerEmail());
         if(!isBoss && !currentWeekStatus.equals("OPEN")){
             throw new ValidationException("Failed to save the avaialability, out of temporal window: "+currentWeekStatus, "Shifts");
         }
         // 1. CANCELLAZIONE disponibilità cambiate
-        availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, currentWeekId);
+        availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, weekId);
 
         // 2. SALVATAGGIO (deve essere garantito)
         try {

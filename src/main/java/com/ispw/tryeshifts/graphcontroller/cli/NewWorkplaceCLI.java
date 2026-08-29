@@ -2,6 +2,7 @@ package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.CreateWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
+import com.ispw.tryeshifts.exception.ValidationException;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
@@ -19,11 +20,11 @@ public class NewWorkplaceCLI {
     private  String msg;
 
     public void start(){
-            logger.info("\n--- CREAZIONE NUOVO WORKPLACE ---\n");
+            CLIReader.println("--- WORKPLACE CREATION ---");
 
             // 1. Dati base
-            String name = CLIReader.readString("Nome del Workplace: ");
-            String address = CLIReader.readString("Indirizzo: ");
+            String name = CLIReader.readString("Name of the workplace: ");
+            String address = CLIReader.readString("Address of the workplace: ");
 
             // 2. Selezione Giorni (Multi-selezione)
             List<String> selectedDays = selectOperatingDays();
@@ -36,12 +37,12 @@ public class NewWorkplaceCLI {
                 WorkplaceBean newWp = new WorkplaceBean(name,address,selectedDays,slots,SessionContext.getInstance().getLoggeduser().getEmail());
                 // Chiamata all'AC (usa il metodo che hai già per JavaFX)
                 new CreateWorkplaceAC().createWorkplace(newWp);
-                msg = "\n✅ Workplace '" + name + "' creato con successo!\n";
-                logger.info(msg);
+                msg = "✅ Workplace '" + name + "' succesfully created!";
+                CLIReader.println(msg);
             } catch (DuplicateEntityException e) {
-                logger.severe("\n Workplace already existing " + e.getMessage() + "\n");
+                logger.severe(" Workplace already existing " + e.getMessage() + "\n");
             } catch(DataFetchException e){
-                logger.severe("\n Error fetching workplaces: " + e.getMessage() + "\n");
+                logger.severe(" Error fetching workplaces: " + e.getMessage() + "\n");
             } catch (BaseException e) {
                 logger.severe("Generic error: " + e.getMessage() + "\n");
             }
@@ -52,33 +53,38 @@ public class NewWorkplaceCLI {
         List<String> selected = new ArrayList<>();
         String[] allDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-        logger.info("Select when the workplace is opened by numbers and separated by ',' example: 1,2,3):");
+        CLIReader.println("Select when the workplace is opened by numbers and separated by ',' example: 1,2,3):");
         for (int i = 0; i < allDays.length; i++) {
-            msg = (i + 1) + ". " + allDays[i] + "\n";
-            logger.info(msg);
+            msg = (i + 1) + ". " + allDays[i] + "";
+            CLIReader.println(msg);
         }
 
         String input = CLIReader.readString("> ");
         String[] parts = input.split(",");
         for (String p : parts) {
-            int index = Integer.parseInt(p.trim()) - 1;
-            if (index >= 0 && index < 7) selected.add(allDays[index]);
+            try {
+                int index = Integer.parseInt(p.trim()) - 1;
+                if (index >= 0 && index < 7) selected.add(allDays[index]);
+            } catch (NumberFormatException e) {
+                logger.warning("day not valid: " + p+"\n");
+            }
         }
         return selected;
+
     }
     public  List<String> defineTimeSlots() {
         List<String> slots = new ArrayList<>();
         boolean adding = true;
 
-        logger.info("\nSelect the shifts of the workplace with the following format : HH:mm - HH:mm.");
+        CLIReader.println("Select the shifts of the workplace with the following format : HH:mm - HH:mm.");
         while (adding) {
-            String start = CLIReader.readString("\nOra inizio (HH:mm): ");
-            String end = CLIReader.readString("\nOra fine (HH:mm): ");
+            String start = CLIReader.readString("Start Hour (HH:mm): ");
+            String end = CLIReader.readString("End Hour (HH:mm): ");
             try{
                 String[] startParts = start.trim().split(":");
                 String[] endParts = end.trim().split(":");
                 if(startParts.length != 2 || endParts.length != 2){
-                    logger.warning("\nInvalid time format. Be sure to use HH:mm (es: 08:30)");
+                    logger.warning("Invalid time format. Be sure to use HH:mm (es: 08:30)\n");
                     continue;
                 }
                 String startH = startParts[0];
@@ -89,14 +95,14 @@ public class NewWorkplaceCLI {
                 String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM,startH, endM, endH,slots);
                 slots.add(formattedShift);
                 msg = "✅ correctly added shift: "+formattedShift;
-                logger.info(msg);
+                CLIReader.println(msg);
             }catch(IllegalArgumentException e){
-                logger.warning("\nHour error: " +e.getMessage());
+                logger.warning("Hour error: " +e.getMessage()+"\n");
             }catch(BaseException e) {
-                logger.warning("\nShit error: " + e.getMessage());
+                logger.warning("Shit error: " + e.getMessage()+"\n");
             }
             // Formattiamo noi la stringa per essere sicuri del separatore " - "
-            String cont = CLIReader.readString("\nDo you want to add more shifts? (y/n): ");
+            String cont = CLIReader.readString("Do you want to add more shifts? (y/n): ");
             if (!cont.equalsIgnoreCase("y")) adding = false;
         }
         Collections.sort(slots);

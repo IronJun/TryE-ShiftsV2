@@ -8,7 +8,6 @@ import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.*;
-import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -37,11 +36,11 @@ public class HomeGC {
     @FXML private VBox vboxWorkplaceLegend;
     @FXML private TextField searchField;
     private final Map<String, String> workplaceColors = new HashMap<>();
-    @FXML Label lblWeekDisplay;
+    @FXML private Label lblWeekDisplay;
     @FXML private NavbarGC navbarController;
     private int weekOffset = 0;
     private String currentWeekId;
-    private String msg="";
+
     private final AccessWorkplaceAC accessWorkplaceAC = new AccessWorkplaceAC();
     private final ManageShiftsAC manageShiftsAC = new ManageShiftsAC();
     private final SearchWorkplacesAC searchWorkplacesAC = new SearchWorkplacesAC();
@@ -61,30 +60,13 @@ public class HomeGC {
         this.weekOffset = 0;
         this.currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
-            lblWeekDisplay.setText("Settimana: "+ manageShiftsAC.getWeekRangeString(weekOffset));
+            lblWeekDisplay.setText("Week: "+ manageShiftsAC.getWeekRangeString(weekOffset));
         }
         if (this.loggedUser != null) {
             refreshWorkplaceList();
             handleSearch("");
             currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
             buildHomeTable(shiftsGrid, this.loggedUser.getEmail(), currentWeekId);
-        }
-    }
-
-
-    public void handleGlobalSearchSelection(String workplaceName) {
-        try{
-            WorkplaceBean fullWp = accessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
-            SessionContext.getInstance().setLoggedWorkplace(fullWp);
-            SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
-        }catch(UserNotMemberException _) {
-            showJoinConfirmation(workplaceName);
-        }catch(MembershipPendingException _){
-            ErrorViewManager.screenError("richiesta pendente","hai già inviato una richiesta di accesso al workplace "+workplaceName+". Attendi la sua conferma");
-        }catch (EntityNotFoundException _){
-            ErrorViewManager.screenError("Errore Workplace","Impossibile trovare il workplace "+workplaceName);
-        }catch (BaseException e){
-            ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
         }
     }
 
@@ -98,9 +80,9 @@ public class HomeGC {
                     new ManageMembersAC().requestJoin(this.loggedUser,workplaceName);
                     SceneManager.getInstance().showInfoAlert("Success","Correctly sent the request");
                 }catch(EntityNotFoundException _){
-                    ErrorViewManager.screenError("Error Workplace","Could not find:  "+workplaceName);
+                    SceneManager.getInstance().showErrorAlert("Error Workplace","Could not find:  "+workplaceName);
                 }catch(BaseException e){
-                    ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
+                    SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,e.getMessage());
                 }
             }
     }
@@ -111,14 +93,13 @@ public class HomeGC {
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
             SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
         }catch (UserNotMemberException _) {
-            LOGGER.info("L'utente non è membro. Mostro popup di iscrizione per: " + workplaceName);
             showJoinConfirmation(workplaceName);
-        }catch (MembershipPendingException e){
-            ErrorViewManager.screenError("Richiesta Pendente", e.getMessage());
+        }catch (MembershipPendingException _){
+            SceneManager.getInstance().showErrorAlert("Pendant request","You have already sent a request to join: "+workplaceName);
         }catch(EntityNotFoundException _){
-            ErrorViewManager.screenError("Errore Workplace", "il workpalce selezionato non esiste");
+            SceneManager.getInstance().showErrorAlert("Workplace Error","Couldn't find the workplace: "+workplaceName);
         }catch(BaseException e){
-            ErrorViewManager.screenError(TECHNICAL_ERROR, e.getMessage());
+            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR, e.getMessage());
         }
     }
 
@@ -130,7 +111,7 @@ public class HomeGC {
             } else {
                 result = searchWorkplacesAC.searchByName(query);
             }
-            msg = "Risultati trovati: " + result.size();
+            String msg = "Risultati trovati: " + result.size();
             LOGGER.info(msg); // DEBUG
 
             workplaceListView.getItems().clear();
@@ -139,13 +120,12 @@ public class HomeGC {
                 LOGGER.info(msg); // DEBUG
                 workplaceListView.getItems().add(wp);
             }
-        }catch(DataFetchException e){
-            LOGGER.log(Level.SEVERE, "Errore durante la ricerca", e);
-            ErrorViewManager.screenError("Errore di Connessione",
+        }catch(DataFetchException _){
+            SceneManager.getInstance().showErrorAlert("Errore di Connessione",
                     "Non è stato possibile recuperare i dati. Riprova più tardi.");
             workplaceListView.getItems().clear();
         }catch(BaseException e){
-            ErrorViewManager.screenError(TECHNICAL_ERROR, e.getMessage());
+            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR, e.getMessage());
             workplaceListView.getItems().clear();
         }
     }
@@ -251,7 +231,7 @@ public class HomeGC {
 
                 //Efetto hover
                 card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #cccccc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
-                card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #white; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; "));
+                card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dddddd; -fx-border-radius: 8; -fx-background-radius: 8; "));
                 card.setOnMouseClicked(e -> handleWorkplaceSelection(wp.getWorkplaceName()));
 
                 //HBox name and color
@@ -287,7 +267,8 @@ public class HomeGC {
                 vboxWorkplaceLegend.getChildren().add(card);
             }
         } catch (BaseException e) {
-            ErrorViewManager.screenError(TECHNICAL_ERROR,e.getMessage());
+            SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,"Error during the Creation of the Workplace List");
+            LOGGER.severe(e.getMessage());
         }
 
     }
@@ -311,14 +292,14 @@ public class HomeGC {
             Window window = popupController.getNameField().getScene().getWindow();
 
             window.setOnHiding(e -> {
-                LOGGER.info("DEBUG HOME: Popup effettivamente chiuso. Ricarico tutto!");
-                refreshWorkplaceList();
-                refreshAllData(); // <--- SPOSTATO QUI DENTRO
-                handleSearch(""); // Opzionale: pulisce la ricerca per mostrare il nuovo item
+                searchField.clear();
+                //refreshWorkplaceList();
+                refreshAllData();
+                //handleSearch(""); //  pulisce la ricerca per mostrare il nuovo item
             });
 
         } else {
-            LOGGER.info("Errore nel caricamento del popup");
+            LOGGER.severe("Errore nel caricamento del popup");
         }
 
     }
@@ -358,7 +339,7 @@ public class HomeGC {
     private void setupWorkplaceListView() {
         workplaceListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                handleGlobalSearchSelection(newVal.getWorkplaceName());
+                handleWorkplaceSelection(newVal.getWorkplaceName());
             }
         });
 
@@ -390,7 +371,7 @@ public class HomeGC {
                 List<String> activeDayStr = wp.getSelectedDays();
                 String theOneString = (activeDayStr!=null && !activeDayStr.isEmpty()) ? String.join(", ",activeDayStr) : "No days for this workplace";
                 Label daysLabel = new Label("Days: "+theOneString);
-                daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");                    daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888;");
+                daysLabel.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #888888");
 
                 bottomBox.getChildren().addAll(addressLabel, spacer, daysLabel);
                 card.getChildren().addAll(nameLabel, bottomBox);

@@ -7,11 +7,8 @@ import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.utils.SecurityUtils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SignupAC {
-    private final Logger logger = Logger.getLogger(SignupAC.class.getName());
 
 
     public void registerUser(UserBean userbean) throws BaseException {
@@ -42,7 +39,7 @@ public class SignupAC {
             userentity.setPasswordHash(hashedPass);
             userRepo.save(userentity);
         }catch(DataFetchException e){
-            logger.log(Level.SEVERE, "Errore di persistenza durante la registrazione\n", e);
+            throw new DataFetchException("Persistency error during registration: ",e);
         }
 
 

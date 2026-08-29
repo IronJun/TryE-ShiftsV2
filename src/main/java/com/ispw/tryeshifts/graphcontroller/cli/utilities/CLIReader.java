@@ -1,28 +1,57 @@
 package com.ispw.tryeshifts.graphcontroller.cli.utilities;
 
+import java.io.Console;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class CLIReader {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Logger LOGGER = Logger.getLogger(CLIReader.class.getName());
+    private static Console console = System.console();
 
     private CLIReader(){
         throw new IllegalStateException("Utility class");
     }
+
+
     public static String readString(String message){
-        LOGGER.info(message);
+        if(console!=null){
+            String value = console.readLine("%s",message);
+            return value == null ? "" : value;
+        }
+        print(message);
         return scanner.nextLine();
     }
 
-    public static int readInt(String message){
-        LOGGER.info(message);
-        while(!scanner.hasNextInt()){
-            LOGGER.warning("Invalid input, please try again");
-            scanner.nextLine();
+    public static String readPassword(String message){
+        if(console!=null){
+            char[] password = console.readPassword("%s",message );
+            return password == null?"":new String(password);
         }
-        int val = scanner.nextInt();
-        scanner.nextLine();
-        return val;
+        print(message);
+        return scanner.nextLine();
+    }
+
+
+    public static int readInt(String message){
+        while(true){
+            try{
+                return Integer.parseInt(readString(message).trim());
+            }catch(NumberFormatException e){
+                println("Insert valid number");
+            }
+        }
+    }
+
+    public static void print(String message){
+        if(console!=null){
+            console.printf("%s",message);
+        }else{
+            System.out.println(message);
+        }
+    }
+
+    public static void println(String message){
+        print(message + System.lineSeparator());
     }
 }

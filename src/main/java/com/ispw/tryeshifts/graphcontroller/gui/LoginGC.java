@@ -30,13 +30,12 @@ public class LoginGC {
 
     public void initialize(){
         loginButton.setDefaultButton(true);
+        ErrorViewManager.setupAutoHide(errorLabel);
     }
     @FXML
     public void onLoginClicked() {
-        ErrorViewManager.setupAutoHide(errorLabel);
-
         String email = emailField != null ? emailField.getText().trim() : "";
-        String password = passwordField != null ? passwordField.getText().trim() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
 
         try{
             UserBean inputBean = new UserBean(email, password);
@@ -51,7 +50,7 @@ public class LoginGC {
         } catch (EntityNotFoundException | InvalidCredentialException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
         } catch (BaseException e) {
-            ErrorViewManager.screenError("Errore Tecnico", e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Errore Tecnico", e.getMessage());
         }
     }
     @FXML
@@ -62,7 +61,7 @@ public class LoginGC {
 
     public void togglePassword() {
         if(isPasswordVisible){
-            passwordField.setText(passwordField.getText());
+            passwordField.setText(passwordTextField.getText());
             passwordField.setVisible(true);
             passwordTextField.setVisible(false);
 

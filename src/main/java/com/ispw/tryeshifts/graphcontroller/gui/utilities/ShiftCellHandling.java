@@ -1,4 +1,4 @@
-package com.ispw.tryeshifts.graphcontroller.gui;
+package com.ispw.tryeshifts.graphcontroller.gui.utilities;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

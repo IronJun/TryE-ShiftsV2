@@ -17,14 +17,14 @@ public class SettingsCLI {
         boolean back = false;
 
         while (!back) {
-            logger.info("\n--- USER SETTINGS ---");
-            logger.info("\nEmail: " + user.getEmail() + " (Non modificabile)");
-            logger.info("\n1. NAME: " + user.getName());
-            logger.info("\n2. SURNAME: " + user.getSurname());
-            logger.info("\n3. Password: ********");
-            logger.info("\n0. Torna indietro");
+            CLIReader.println("--- USER SETTINGS ---");
+            CLIReader.println("Email: " + user.getEmail() + " (Non modificabile)");
+            CLIReader.println("1. NAME: " + user.getName());
+            CLIReader.println("2. SURNAME: " + user.getSurname());
+            CLIReader.println("3. Password: ********");
+            CLIReader.println("0. Torna indietro");
 
-            String choice = CLIReader.readString("\nSeleziona il numero del campo da modificare: ");
+            String choice = CLIReader.readString("Seleziona il numero del campo da modificare: ");
 
             switch (choice) {
                 case "1":
@@ -46,7 +46,7 @@ public class SettingsCLI {
                     back = true;
                     break;
                 default:
-                    logger.warning("Scelta non valida.");
+                    logger.warning("Scelta non valida.\n");
             }
         }
     }
@@ -58,14 +58,14 @@ public class SettingsCLI {
         while (!back) {
 
 
-            logger.info("\n--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
-            logger.info("1. Nome: " + wp.getWorkplaceName());
-            logger.info("2. Indirizzo: " + wp.getAddress());
-            logger.info("3. Giorni Operativi: " + wp.getSelectedDays());
-            logger.info("4. Fasce Orarie: " + wp.getShiftsBean());
-            logger.info("0. Torna indietro");
+            CLIReader.println("--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
+            CLIReader.println("1. Nome: " + wp.getWorkplaceName());
+            CLIReader.println("2. Indirizzo: " + wp.getAddress());
+            CLIReader.println("3. Giorni Operativi: " + wp.getSelectedDays());
+            CLIReader.println("4. Fasce Orarie: " + wp.getShiftsBean());
+            CLIReader.println("0. Torna indietro");
 
-            String choice = CLIReader.readString("\nCosa vuoi modificare?: ");
+            String choice = CLIReader.readString("Cosa vuoi modificare?: ");
 
             switch (choice) {
                 case "1":
@@ -84,7 +84,7 @@ public class SettingsCLI {
                     back = true;
                     continue; // Salta il salvataggio se vuoi solo uscire
                 default:
-                    logger.warning("Scelta non valida.");
+                    logger.warning("Scelta non valida.\n");
             }
 
             try {
@@ -92,12 +92,12 @@ public class SettingsCLI {
 
                 oldname = wp.getWorkplaceName();
 
-                logger.info("\n✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
+                CLIReader.println("✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
                 String answer = CLIReader.readString("").toUpperCase();
                 if (!answer.equals("Y")) back = true;
 
             } catch (BaseException e) {
-                logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
+                logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage()+"\n");
             }
         }
     }
@@ -106,9 +106,9 @@ public class SettingsCLI {
         try {
             // Usa l'App Controller che gestisce il profilo (es. LoginAC o ProfileAC)
             ac.updateUserProfile(user);
-            logger.info("✅ Profilo aggiornato correttamente!");
+            CLIReader.println("✅ Profilo aggiornato correttamente!");
         } catch (BaseException e) {
-            logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage());
+            logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage()+"\n");
         }
     }
 }

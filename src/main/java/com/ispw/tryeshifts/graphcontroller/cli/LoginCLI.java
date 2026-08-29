@@ -17,17 +17,17 @@ public class LoginCLI{
 
 
     public  void start() throws BaseException {
-        logger.info("\n--- LOGIN E-SHIFTS ---\n");
-        logger.info("Inserisci le tue credenziali per accedere al sistema.\n");
+        CLIReader.println("--- LOGIN E-SHIFTS ---");
+        CLIReader.println("Insert your credential to get in the App.");
 
         while(true) {
             try {
-                logger.info("Press Q to SignUP if you don't have an account at any moment\n");
+                CLIReader.println("Press Q to SignUP if you don't have an account at any moment");
                 String email = CLIReader.readString("Email: ");
                 if(email.equalsIgnoreCase("Q")){
                     return;
                 }
-                String password = CLIReader.readString("Password: ");
+                String password = CLIReader.readPassword("Password: ");
                 if (password.equalsIgnoreCase("Q")) {
                     return;
                 }
@@ -38,14 +38,14 @@ public class LoginCLI{
 
                 handleRememberMe(inputUser);
 
-                logger.info("Login completed correctly!! \n");
+                CLIReader.println("Login completed correctly!! ");
                 homeCLI.start();
                 return;
 
             } catch (InvalidCredentialException e) {
-                logger.severe("ERRORE: " + e.getMessage() +"\n");
+                logger.severe("ERROR: " + e.getMessage() +"\n");
             }catch (BaseException e){
-                logger.severe("ERRORE: " + e.getMessage() +"\n");
+                logger.severe("ERROR: " + e.getMessage() +"\n");
             }
         }
     }

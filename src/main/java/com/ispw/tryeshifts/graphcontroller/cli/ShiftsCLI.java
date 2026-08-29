@@ -25,7 +25,9 @@ public class ShiftsCLI {
     private  int weekOffset ;
     private  String currentWeekId;
     private static final String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-    static String SpaceSlot = "%-15s";
+    private static final int TIME_COLUMN_WIDTH =12;
+    private static final int DAY_COLUMN_WIDTH= 12;
+    private static final String SPACE_SLOT = "%-" + TIME_COLUMN_WIDTH +"s";
     private final ManageShiftsAC ac = new ManageShiftsAC();
     private final PublishShiftsAC pubAc = new PublishShiftsAC();
 
@@ -52,7 +54,7 @@ public class ShiftsCLI {
                     handleAction(choice, wp, status, user);
                 }
             } catch (BaseException e) {
-                logger.severe("Error: " + e.getMessage());
+                logger.severe("Error: " + e.getMessage()+"\n");
             }
         }
     }
@@ -61,34 +63,34 @@ public class ShiftsCLI {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean isLocked = status.equals(LOCKED_STATUS) || status.equals(PUBLISHED_STATUS);
 
-        logger.info("\n--- SHIFTS DASHBOARD: " + wp.getWorkplaceName() + " ---\n");
+        CLIReader.println("--- SHIFTS DASHBOARD: " + wp.getWorkplaceName() + " ---");
         printWorkerTable(wp);
 
-        logger.info("\nAVAILABLE ACTIONS:\n");
+        CLIReader.println("AVAILABLE ACTIONS:");
         if (user.getEmail().equals(wp.getOwnerEmail())) {
             printOwnerMenu(status);
         } else {
             printWorkerMenu(isLocked);
         }
 
-        logger.info("N. Next Week \nP. Previous Week \n0. Back to the Home\n");
+        CLIReader.println("N. Next Week P. Previous Week 0. Back to the Home");
 
     }
 
     private  void printOwnerMenu(String status) {
         if (status.equals(OPEN_STATUS)) {
-            logger.info("1. Lock Availability (Worker's will not be able to give other shifts)\n");
+            CLIReader.println("1. Lock Availability (Worker's will not be able to give other shifts)");
         } else if (status.equals(LOCKED_STATUS)) {
-            logger.info("1. Pubblica Turni Definitivi\n");
+            CLIReader.println("1. Publish Shifts");
         }
-        logger.info("2. Modify Shifts Manually\n");
+        CLIReader.println("2. Modify Shifts Manually");
     }
 
     private  void printWorkerMenu(boolean isLocked) {
         if (!isLocked) {
-            logger.info("1. Insert/modify your availaibility\n");
+            CLIReader.println("1. Insert/modify your availaibility");
         } else {
-            logger.info("[WEEK LOCKED - Availability not mutable]\n");
+            CLIReader.println("[WEEK LOCKED - Availability not mutable]");
         }
     }
     private  void handleAction(String choice, WorkplaceBean wp, String status, UserBean user) {
@@ -100,13 +102,18 @@ public class ShiftsCLI {
                 if (user.getEmail().equals(wp.getOwnerEmail())) modifyShifts();
                 break;
             case "N":
-                weekOffset++;
+                if(weekOffset<2)weekOffset++;
+                else logger.warning("You can give shifts for up to 2 weeks\n");
                 break;
             case "P":
-                weekOffset--;
+                if(weekOffset>0){
+                    weekOffset--;
+                } else{
+                    logger.warning("You can't go back to previous weeks\n");
+                }
                 break;
             default:
-                logger.warning("Invalid operation!");
+                logger.warning("Invalid operation!\n");
         }
     }
 
@@ -122,7 +129,7 @@ public class ShiftsCLI {
         if (status.equals(OPEN_STATUS)) lockshifts(wp);
         else if (status.equals(LOCKED_STATUS)) publishShifts(wp);
         else if (status.equals(PUBLISHED_STATUS)) {
-            logger.info("I turni sono già stati pubblicati.");
+            CLIReader.println("The Shifts have already been published");
         }
     }
 
@@ -136,7 +143,7 @@ public class ShiftsCLI {
             return;
         }
 
-        logger.info("\n--- Availability Insertion ---");
+        CLIReader.println("--- Availability Insertion ---");
 
         // 1. Selezione Giorno
         String selectedDay = promptDaySelection(wp.getSelectedDays());
@@ -149,20 +156,20 @@ public class ShiftsCLI {
         // 3. Elaborazione e Salvataggio
         try {
             processAndSave(user, wp, selectedDay, fullSlot);
-            logger.info("Sincronizzazione completata!\n");
+            CLIReader.println("Completed Synchronization!");
         } catch (BaseException e) {
-            logger.severe("Errore: " + e.getMessage());
+            logger.severe("Error: " + e.getMessage()+"\n");
         }
     }
 
     private  String promptDaySelection(List<String> activeDays) {
-        logger.info("Select the days (1-7) and 0 to annul and exit.\n: ");
+        CLIReader.println("Select the days (1-7) and 0 to annul and exit.: ");
         int dayChoice = CLIReader.readInt("> ");
         if (dayChoice <= 0 || dayChoice > 7) return null;
 
         String selectedDay = days[dayChoice - 1];
         if (!activeDays.contains(selectedDay)) {
-            msg = "ATTENZIONE: Il locale è chiuso di " + selectedDay + ". Scegli un altro giorno.\n";
+            msg = "ATTENTION: the workplace is closed on " + selectedDay + ". select another day.\n";
             logger.warning(msg);
             return null;
         }
@@ -171,9 +178,9 @@ public class ShiftsCLI {
     private  String promptSlotSelection(List<String> slots) {
             for (int i = 0; i < slots.size(); i++) {
                 msg = (i + 1) + ". " + slots.get(i) + "\n";
-                logger.info(msg);
+                CLIReader.println(msg);
             }
-            int slotChoice = CLIReader.readInt("Seleziona la fascia oraria: ");
+            int slotChoice = CLIReader.readInt("Select hour slot: ");
             if (slotChoice <= 0 || slotChoice > slots.size()) return null;
             return slots.get(slotChoice - 1);
         }
@@ -194,12 +201,12 @@ public class ShiftsCLI {
             }
             beansToSave.add(new AvailabilityBean(user.getEmail(), wp.getWorkplaceName(),
                     selectedDay, parts[0], parts[1], currentWeekId));
-            logger.info("Aggiunta disponibilità...");
+            CLIReader.println("Adding availability..");
         } else {
-            logger.info("Rimozione disponibilità...");
+            CLIReader.println("Removing Availability...");
         }
 
-        ac.saveAvailabilities(beansToSave,user,wp);
+        ac.saveAvailabilities(beansToSave,user,wp,currentWeekId);
     }
 
     private  List<AvailabilityBean> convertMapToBeans(Map<String, List<String>> currentData,
@@ -230,9 +237,9 @@ public class ShiftsCLI {
         try {
         // Cambiamo lo stato da OPEN a LOCKED
         ac.updateWeekStatusShifts(wp.getWorkplaceName(), currentWeekId, LOCKED_STATUS);
-        logger.info("✅ Settimana bloccata con successo! I lavoratori non possono più inserire dati.");
+        CLIReader.println("✅ Week succesfully locked! Workers can no long insert data.");
     } catch (BaseException e) {
-        logger.severe("Errore durante il blocco: " + e.getMessage());
+        logger.severe("Error during the Locking: " + e.getMessage()+"\n");
     }}
     private  void printWorkerTable(WorkplaceBean wp) {
         try {
@@ -251,7 +258,7 @@ public class ShiftsCLI {
             printGrid(wp, status, isOwner, shifts, assignments, loggedUser);
 
         } catch (BaseException e) {
-            logger.warning("Errore tecnico: Impossibile recuperare i turni - " + e.getMessage());
+            logger.warning("Technical error, could not fetch the shifts - " + e.getMessage()+"\n");
         }
     }
 
@@ -311,70 +318,78 @@ public class ShiftsCLI {
 
             // Solo sulla prima riga del blocco stampiamo l'orario, altrimenti spazi vuoti
             if (r == 0) {
-                line.append(String.format(SpaceSlot, slot));
+                line.append(String.format(SPACE_SLOT, slot));
             } else {
-                line.append(String.format(SpaceSlot, ""));
+                line.append(String.format(SPACE_SLOT, ""));
             }
 
             for (String day : days) {
                 List<String> namesInCell = cellData.get(day);
                 String nameToPrint = (r < namesInCell.size()) ? namesInCell.get(r) : "";
-                line.append(String.format("| %-20s", nameToPrint));
+                line.append(String.format("| %-" +DAY_COLUMN_WIDTH +"s",fitCellContent(nameToPrint)));
             }
-            msg =line + "\n";
-            logger.info(msg);
+            msg =line + "";
+            CLIReader.println(msg);
         }
-        msg = "-".repeat(15 + (days.length * 22)) + "\n";
+        msg = "-".repeat(TIME_COLUMN_WIDTH + (days.length * DAY_COLUMN_WIDTH +2 )) ;
         // Una linea di separazione opzionale tra una fascia oraria e l'altra
-        logger.info(msg);
+        CLIReader.println(msg);
     }
+
+
     private  void printDashboardHeader(String status) {
         // Creiamo la riga di stato
         String statusLine = String.format("STATUS: %s | WEEK: %s",
                 status, ac.getWeekRangeString(weekOffset));
-        msg = statusLine+"\n";
-        logger.info(msg);
+        msg = statusLine+"";
+        CLIReader.println(msg);
 
-        StringBuilder header = new StringBuilder(String.format(SpaceSlot, "ORA"));
+        StringBuilder header = new StringBuilder(String.format(SPACE_SLOT, "ORA"));
         for (String day : days) {
-            header.append(String.format("| %-20s", day.toUpperCase())); // <--- Portato a 20
+            header.append(String.format("| %-"+DAY_COLUMN_WIDTH+"s", day.toUpperCase())); // <--- Portato a 20
         }
-        msg = header.toString()+"\n";
-        logger.info(msg);
-        msg = "-".repeat(header.length())+"\n";
-        logger.info(msg);
+        msg = header.toString();
+        CLIReader.println(msg);
+        msg = "-".repeat(header.length());
+        CLIReader.println(msg);
+    }
+    private String fitCellContent(String content) {
+        if(content == null){
+            return "";
+        }
+        return content.length() <= DAY_COLUMN_WIDTH ? content : content.substring(0, DAY_COLUMN_WIDTH-3)+"...";
     }
     private  void publishShifts(WorkplaceBean wp){
         try {
-            logger.info("\n--- PUBBLICAZIONE TURNI DEFINITIVI ---");
-            logger.info("\nStai per rendere i turni visibili a tutti i lavoratori.");
-            String conferma = CLIReader.readString("Confermi la pubblicazione per la settimana " + currentWeekId + "? (y/n): ");
+            CLIReader.println("--- Shifts Publication ---");
+            CLIReader.println("The workers will be able to see the official shifts.");
+            String conferma = CLIReader.readString("Do you confirm the pubblication of the shifts for the week: " + currentWeekId + "? (y/n): ");
 
             if (conferma.equalsIgnoreCase("y")) {
 
                 // Chiamata al tuo Applicativo
                 pubAc.handlePublishAction(wp, currentWeekId);
 
-                logger.info("\n✅ Turni pubblicati con successo! La settimana è ora in sola lettura.");
+                CLIReader.println("✅ Shifts Publication successfully, now the week is only read mode");
             } else {
-                logger.info("\nOperazione annullata.");
+                CLIReader.println("Operation annulled.");
             }
         } catch (BaseException e) {
-            logger.severe("❌ Errore durante la pubblicazione: " + e.getMessage());
+            logger.severe("❌ Error during the publication " + e.getMessage()+"\n");
         }
     }
     private  void modifyShifts() {
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(wp == null){
-            logger.info("error uploading the current workplace");
+            CLIReader.println("error uploading the current workplace");
             return;
         }
         UserBean user = SessionContext.getInstance().getLoggeduser();
         if(user == null){
-            logger.info("error uploading the current user");
+            CLIReader.println("error uploading the current user");
         }
 
-        logger.info("\n--- RIMOZIONE MANUALE LAVORATORE ---");
+        CLIReader.println("---MANUAL REMOVAL OF WORKERS ---");
 
         // 1. Chiediamo al Boss il Giorno (sfruttando il tuo metodo esistente)
         String selectedDay = promptDaySelection(wp.getSelectedDays());
@@ -393,22 +408,22 @@ public class ShiftsCLI {
             List<String> candidates = currentData.getOrDefault(searchKey, new ArrayList<>());
 
             if (candidates.isEmpty()) {
-                logger.info("Nessun lavoratore prenotato per questo turno.\n");
+                CLIReader.println("No worker has reserved this shift .");
                 return;
             }
 
             // 4. Mostriamo l'elenco numerato dei candidati
-            logger.info(()-> "\nLavoratori prenotati per " + selectedDay + " alle " + fullSlot + ":");
+            CLIReader.println("Workers reserved for " + selectedDay + " at " + fullSlot + ":");
             for (int i = 0; i < candidates.size(); i++) {
                 final int index = i;
-                logger.info(()->"[" + (index + 1) + "] " + candidates.get(index));
+                CLIReader.println("[" + (index + 1) + "] " + candidates.get(index));
             }
-            logger.info("[0] Annulla");
+            CLIReader.println("[0] Cancel");
 
             // 5. Acquisiamo la scelta del Boss
-            int workerChoice = CLIReader.readInt("Seleziona il lavoratore da rimuovere: ");
+            int workerChoice = CLIReader.readInt("Select the worker to remove: ");
             if (workerChoice <= 0 || workerChoice > candidates.size()) {
-                logger.info("Operazione annullata.\n");
+                CLIReader.println("Operation Canceled.");
                 return;
             }
 
@@ -418,10 +433,10 @@ public class ShiftsCLI {
             // Usiamo LO STESSO IDENTICO METODO creato per JavaFX!
             ac.removeWorkerFromShift(workerEmail, wp.getWorkplaceName(), currentWeekId, selectedDay, fullSlot);
 
-            logger.info(()->"✅ Worker '" + workerEmail + "' removed succesfully!\n");
+            CLIReader.println("✅ Worker '" + workerEmail + "' removed succesfully!");
 
         } catch (BaseException e) {
-            logger.severe("Errore during the remtion: " + e.getMessage());
+            logger.severe("Error during the remotion: " + e.getMessage()+"\n");
         }
     }
     private  String getCellText(String status, boolean isOwner, String key,

@@ -5,11 +5,11 @@ import com.ispw.tryeshifts.graphcontroller.gui.utilities.NavPage;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
 import com.ispw.tryeshifts.appcontroller.ManageShiftsAC;
 import com.ispw.tryeshifts.appcontroller.SettingsAC;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.ShiftCellHandling;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
-import com.ispw.tryeshifts.exception.InvalidCredentialException;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -141,7 +141,7 @@ public class SettingsGC {
 
             SettingsAC ac = new SettingsAC();
             ac.updateWorkplace(updatedBean, oldName);
-
+            SessionContext.getInstance().setLoggedWorkplace(updatedBean);
             SceneManager.getInstance().showInfoAlert("Success", "Workplace updated correctly");
         }catch (IllegalArgumentException e){
             ErrorViewManager.showError(errorlabel,e.getMessage());

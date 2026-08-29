@@ -75,27 +75,15 @@ public class ShiftsGC {
             lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
         }
 
-        if (info != null) {
-            this.selectedWorkplace = info;
-            setSelectedWorkplace(info);
-        }
-        try{
-            TableContext context = fetchTableContext(); // Recuperiamo i dati freschi
+        if (info == null || loggeduser == null) {
+            ErrorViewManager.showError(errorlbl,"Select a workplace from the home to see the shifts");
+            return;
 
-            ShiftsUIStrat strat;
-            if(loggeduser.getEmail().equals(selectedWorkplace.getOwnerEmail())){
-                strat = new BossShiftsStrat();
-            }else{
-                strat = new WorkerShiftsStrat();
-            }
-            strat.customizeUI(instructionLabel, saveShiftsBtn,publicShiftsBtn,context.status());
-            String shiftsMode = "Manual ";
-            lblMode.setText("Shifts handling mode: "+ shiftsMode);
-            buildDynamicTable();
-            setupStateTimer();
-        }catch(BaseException e){
-            logger.log(Level.SEVERE, "Errore durante l'inizializzazione della UI", e);
         }
+        setSelectedWorkplace(info);
+        lblMode.setText("Shifts handling mode: Manual");
+        setupStateTimer();
+
 
     }
 
@@ -151,7 +139,6 @@ public class ShiftsGC {
     public void setSelectedWorkplace(WorkplaceBean wp) {
         this.selectedWorkplace = wp;
         this.workplaceTitleLabel.setText(wp.getWorkplaceName());
-        // Qui potrai caricare i turni specifici di questo workplace
         buildDynamicTable();
 
     }
@@ -248,8 +235,7 @@ public class ShiftsGC {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(user == null || wp == null) {
-            ErrorViewManager.showError(errorlbl,"user or workplace is null!");
-            return null;
+            throw new BaseException("User ora Workplace not found");
         }
         return new TableContext(
                 manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
@@ -347,8 +333,9 @@ public class ShiftsGC {
 
         }
         try {
-            manageAC.saveAvailabilities(availabilityBeans,loggedUser,wp);
 
+
+            manageAC.saveAvailabilities(availabilityBeans,loggedUser,wp,currentWeekId);
             // Messaggio di successo
             SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
 
@@ -387,6 +374,7 @@ public class ShiftsGC {
             String resultMSG = pubAc.handlePublishAction(wp, this.currentWeekId);
             SceneManager.getInstance().showInfoAlert("Shifts Operation", resultMSG);
             buildDynamicTable();
+            setupStateTimer();
         }catch(BaseException e){
             SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR,e.getMessage());
         }
@@ -416,6 +404,7 @@ public class ShiftsGC {
         lblWeekDisplay.setText("Week: "+ manageAC.getWeekRangeString(weekOffset));
         // Ridisegna la tabella (questo metodo ora userà currentWeekId per le chiavi)
         buildDynamicTable();
+        setupStateTimer();
     }
 
     private void handleRemoveWorker(String cellKey,String email){

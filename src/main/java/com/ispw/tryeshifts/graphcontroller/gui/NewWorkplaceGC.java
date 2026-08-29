@@ -7,6 +7,7 @@ import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.ErrorViewManager;
+import com.ispw.tryeshifts.graphcontroller.gui.utilities.ShiftCellHandling;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;

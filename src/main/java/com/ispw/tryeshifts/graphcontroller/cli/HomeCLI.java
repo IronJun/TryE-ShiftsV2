@@ -9,6 +9,7 @@ import com.ispw.tryeshifts.exception.MembershipPendingException;
 import com.ispw.tryeshifts.exception.UserNotMemberException;
 import com.ispw.tryeshifts.exception.ValidationException;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,25 +30,25 @@ public class  HomeCLI {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         NotificationAC notification = new NotificationAC();
         if(user == null){
-            logger.severe("User not logged in");
+            logger.severe("User not logged in\n");
             return;
         }
         try {
             boolean exit = false;
             while (!exit) {
                 int notifCount = notification.getNotificationNumberforUserEmail(user.getEmail());
-                logger.info("\n--- HOME ---\n");
-                logger.info("Welcome! " + user.getName() + " " + user.getSurname() + "\n");
-                logger.info("---------------------------------------\n");
-                logger.info("Insert one of the options: \n");
-                logger.info("1. Watch the Workplace List to search and join one\n");
-                logger.info("2. Create a new Workplace \n");
-                logger.info("3. Watch your Workplace List\n");
-                logger.info("4. See your Working days of the week\n");
-                logger.info("5. Manage your Account\n");
-                logger.info(()->"6. Watch your notification(" + notifCount + ")\n");
-                logger.info("Q. Logout\n"); // Nuova opzione
-                logger.info("0. To close the application \n");
+                CLIReader.println("--- HOME ---");
+                CLIReader.println("Welcome! " + user.getName() + " " + user.getSurname() + "");
+                CLIReader.println("---------------------------------------");
+                CLIReader.println("Insert one of the options: ");
+                CLIReader.println("1. Watch the Workplace List to search and join one");
+                CLIReader.println("2. Create a new Workplace ");
+                CLIReader.println("3. Watch your Workplace List");
+                CLIReader.println("4. See your Working days of the week");
+                CLIReader.println("5. Manage your Account");
+                CLIReader.println("6. Watch your notification(" + notifCount + ")");
+                CLIReader.println("Q. Logout"); // Nuova opzione
+                CLIReader.println("0. To close the application ");
 
                 String choice = CLIReader.readString("Select an option: ").toUpperCase();
                 switch (choice) {
@@ -70,7 +71,7 @@ public class  HomeCLI {
                         notificationCLI.start();
                         break;
                     case "0":
-                        logger.info("Closing application... Goodbye!");
+                        CLIReader.println("Closing application... Goodbye!");
                         System.exit(0);
                         break;
                     case "Q":
@@ -78,18 +79,18 @@ public class  HomeCLI {
                         exit = true;
                         break;
                     default:
-                        logger.warning("Invalid option!");
+                        logger.warning("Invalid option!\n");
                 }
             }
         }catch (BaseException e){
-            logger.severe(e.getMessage());
+            logger.severe(e.getMessage()+"\n");
         }
     }
 
     private  void showWorkplacesList(boolean isPersonal) {
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null){
-            logger.severe("User not logged in");
+            logger.severe("User not logged in\n");
             return;
         }
         try {
@@ -103,7 +104,7 @@ public class  HomeCLI {
             }
 
             if (allWorkplaces.isEmpty()) {
-                logger.info("No workplaces found in the system.\n");
+                CLIReader.println("No workplaces found in the system.");
                 return;
             }
             workplacePrint(allWorkplaces, isPersonal);
@@ -117,13 +118,13 @@ public class  HomeCLI {
         List<WorkplaceBean> currentList = new ArrayList<>(allWorkplaces);
 
         while (true) {
-            logger.info("\n--- ELENCO WORKPLACE ---\n");
+            CLIReader.println("--- WORKPLACE LIST ---");
             for (int i = 0; i < currentList.size(); i++) {
                 WorkplaceBean wb = currentList.get(i);
-                msg = String.format("%d. %s (%s)", (i + 1), wb.getWorkplaceName(), wb.getAddress())+"\n";
-                logger.info(msg);
+                msg = String.format("%d. %s (%s)", (i + 1), wb.getWorkplaceName(), wb.getAddress())+"";
+                CLIReader.println(msg);
             }
-            logger.info("0. Back to Home\n");
+            CLIReader.println("0. Back to Home");
 
             String input = CLIReader.readString("Select a number or type a name to search: ");
 
@@ -136,7 +137,7 @@ public class  HomeCLI {
                     showWorkplaceDetails(currentList.get(choiceInt - 1), isPersonal);
                     return;
                 } else {
-                    logger.warning("Invalid number!");
+                    logger.warning("Invalid number!\n");
                 }
 
             } catch (NumberFormatException _) {
@@ -146,7 +147,7 @@ public class  HomeCLI {
                         .toList();
 
                 if (filtered.isEmpty()) {
-                    logger.warning("No workplace found matching: " + input);
+                    logger.warning("No workplace found matching: " + input +"\n");
                     currentList = allWorkplaces; // Reset per non restare bloccati su una lista vuota
                 } else {
                     currentList = filtered; // Aggiorna la visualizzazione al prossimo ciclo
@@ -156,24 +157,34 @@ public class  HomeCLI {
     }
     private  void showWorkplaceDetails(WorkplaceBean wb, boolean isPersonal) {
         if(wb == null){
-            logger.warning("Workplace details are null!");
+            logger.warning("Workplace details are null!\n");
             return;
         }
-        logger.info("\n--- WORKPLACE DETAILS ---\n");
-        logger.info("Name: " + wb.getWorkplaceName() + "\n");
-        logger.info("Address: " + wb.getAddress() + "\n");
-
-        if(isPersonal) logger.info("\n1. Access this workplace\n");
-        else logger.info("\n1.Ask to join this Workplace \n");
-        logger.info("0. Back to list");
-        int action = CLIReader.readInt("\nSelect action: ");
+        CLIReader.println("--- WORKPLACE DETAILS ---");
+        CLIReader.println("Name: " + wb.getWorkplaceName() + "");
+        CLIReader.println("Address: " + wb.getAddress() + "");
+        UserBean user = SessionContext.getInstance().getLoggeduser();
+        try{
+            AccessWorkplaceAC ac = new AccessWorkplaceAC();
+            ac.canAccess(user,wb.getWorkplaceName());
+            CLIReader.println("1.Access this workplace");
+        }catch(UserNotMemberException _){
+            CLIReader.println("1. Ask to join this workplace");
+        }catch(MembershipPendingException _){
+            CLIReader.println("1. Your request has not been accepted yet, see the status");
+        }catch (BaseException e){
+            logger.warning("Impossible to verify the access to this workplace: " + e.getMessage()+"\n" );
+            CLIReader.println("1. Select this workplace");
+        }
+        CLIReader.println("0. Back to list");
+        int action = CLIReader.readInt("Select action: ");
         if (action == 1) {
             handleWorkplaceSelection(wb);
         }
     }
     private  void handleWorkplaceSelection(WorkplaceBean wp){
         if(wp==null){
-            logger.warning("Workplace selection empty!");
+            logger.warning("Workplace selection empty!\n");
             return;
         }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
@@ -182,16 +193,16 @@ public class  HomeCLI {
             SessionContext.getInstance().setLoggedWorkplace(accessedWp);
             boolean exit= false;
             while(!exit) {
-                logger.info("---------"+ accessedWp.getWorkplaceName() + "---------\n");
-                logger.info("Choose one of the options:\n");
-                logger.info("1. Give/see the shifts for this workplace\n");
-                logger.info("2. See Active Workers for this workplace\n");
+                CLIReader.println("---------"+ accessedWp.getWorkplaceName() + "---------");
+                CLIReader.println("Choose one of the options:");
+                CLIReader.println("1. Give/see the shifts for this workplace");
+                CLIReader.println("2. See Active Workers for this workplace");
                 if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
-                    logger.info("3. See pending Workers for this workplace\n");
-                    logger.info("4. Manage settings for this workplace\n");
+                    CLIReader.println("3. See pending Workers for this workplace");
+                    CLIReader.println("4. Manage settings for this workplace");
 
                 }
-                logger.info("0. Back to Home\n");
+                CLIReader.println("0. Back to Home");
                 int choice = CLIReader.readInt("Select an option: ");
                 switch (choice) {
                     case 1:
@@ -201,10 +212,18 @@ public class  HomeCLI {
                         workersCLI.activeWorkers(accessedWp);
                         break;
                     case 3:
-                        workersCLI.pendingWorkers(accessedWp);
+                        if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
+                            workersCLI.pendingWorkers(accessedWp);
+                        }else{
+                            logger.warning("Only the owner can see the pendant request!\n");
+                        }
                         break;
                     case 4:
-                        settingsCLI.workplaceSettings(accessedWp);
+                        if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
+                            settingsCLI.workplaceSettings(accessedWp);
+                        }else{
+                            logger.warning("Only can change the workplace Settings!\n");
+                        }
                         break;
                     case 0:
                         exit = true;
@@ -216,7 +235,7 @@ public class  HomeCLI {
         }catch(UserNotMemberException _){
             executeJoinRequest(loggedUser, wp.getWorkplaceName());
         }catch (MembershipPendingException _){
-            logger.info("Membership pending for " + wp.getWorkplaceName() + "!\n");
+            CLIReader.println("Membership pending for " + wp.getWorkplaceName() + "!");
             CLIReader.readString("Press ENTER to continue...");
         }catch (BaseException e){
             logger.severe("Error accessing workplace: " + e.getMessage() + "\n");
@@ -226,7 +245,7 @@ public class  HomeCLI {
         try {
             // Supponendo che requestJoin sia in WorkplaceAC o simile
             new ManageMembersAC().requestJoin(user, wpName);
-            logger.info("Join request sent successfully! Wait for Boss approval.\n");
+            CLIReader.println("Join request sent successfully! Wait for Boss approval.");
         } catch (ValidationException e) {
             logger.warning("Information: " + e.getMessage() + "\n");
         } catch (BaseException e) {
@@ -252,19 +271,19 @@ public class  HomeCLI {
             // Estraiamo i dati dalla mappa "Object"
             Map<String, String> assignments = (Map<String, String>) data.get("assignments");
             TreeSet<String> slots = (TreeSet<String>) data.get("slots");
-            msg = "\n--- IL TUO CALENDARIO SETTIMANALE (" + ac.getWeekRangeString(offset) + ") ---";
-            logger.info(msg);
+            msg = "--- Your Week Shifts (" + ac.getWeekRangeString(offset) + ") ---";
+            CLIReader.println(msg);
 
             if (slots.isEmpty()) {
-                logger.info("\nNessun turno assegnato per questa settimana.");
+                CLIReader.println("No Shifts assigned for this week.");
             } else {
                 // Intestazione
-                StringBuilder header = new StringBuilder(String.format("%-15s", "ORA"));
+                StringBuilder header = new StringBuilder(String.format("%-15s", "HOUR"));
                 for (String day : days) {
                     header.append(String.format("| %-15s", day.toUpperCase()));
                 }
-                msg = header.toString() + "\n" + "-".repeat(header.length()) + "\n";
-                logger.info(msg);
+                msg = header.toString() + "" + "-".repeat(header.length()) + "";
+                CLIReader.println(msg);
 
                 // Ciclo sulle fasce orarie trovate dal tuo TreeSet
                 for (String slot : slots) {
@@ -279,20 +298,21 @@ public class  HomeCLI {
 
                         row.append(String.format("| %-15s", wpName));
                     }
-                    msg = row.toString() + "\n";
-                    logger.info(msg);
+                    msg = row.toString() + "";
+                    CLIReader.println(msg);
                 }
             }
 
-            CLIReader.readString("\nPremi INVIO per tornare alla Home...");
+            CLIReader.readString("Press Enter to go back to the home...");
 
         } catch (BaseException e) {
-            logger.severe("Errore nel recupero del calendario: " + e.getMessage());
+            logger.severe("Error fetching the calendar: " + e.getMessage()+"\n");
         }
     }
     private  void logout() {
-        logger.info("Logging out...\n");
+        CLIReader.println("Logging out...");
         // 1. Puliamo il SessionContext
+        PreferencesManager.clearPreferences();
         SessionContext.getInstance().setLoggeduser(null);
         SessionContext.getInstance().setLoggedWorkplace(null);
         // 2. Eventuali altri cleanup

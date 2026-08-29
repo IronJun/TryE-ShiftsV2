@@ -75,11 +75,15 @@ public class UserDAOCsvDecorator extends UserDAODecorator {
                 String[] parts = line.split(";");
 
                 if(parts[0].equals(email)){
-                   return  new UserInfo(parts[0],parts[1],parts[2],parts[3]);
+                    UserInfo userInfo = new UserInfo(parts[0],parts[1],parts[2],parts[3]);
+                    super.save(userInfo);
+                    return  userInfo;
                 }
             }
         }catch (IOException e){
             throw new DataFetchException("Error reading the CSV file ",e);
+        } catch (DuplicateEntityException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }

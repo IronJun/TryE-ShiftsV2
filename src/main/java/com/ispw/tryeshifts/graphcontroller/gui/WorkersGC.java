@@ -81,9 +81,9 @@ public class WorkersGC {
 
             setupCells();
         }catch(EntityNotFoundException e){
-            ErrorViewManager.screenError("Errore",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Errore",e.getMessage());
         }catch(BaseException e){
-            ErrorViewManager.screenError("Errore tecnico",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Errore Tecnico",e.getMessage());
         }
     }
 
@@ -108,9 +108,9 @@ public class WorkersGC {
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
         }catch(EntityNotFoundException e){
-            ErrorViewManager.screenError("Errore",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Errore",e.getMessage());
         }catch(BaseException e){
-            ErrorViewManager.screenError("Errore tecnico",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Errore tecnico",e.getMessage());
         }
 
     }

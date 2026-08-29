@@ -28,7 +28,7 @@ public class SignUpCLI {
                 // Se l'utente fa Logout dalla Home, il codice prosegue sotto nel loop.
             }
         } catch (BaseException e) {
-            logger.warning("Auto-login failed: " + e.getMessage());
+            logger.warning("Auto-login failed: " + e.getMessage()+"\n");
             PreferencesManager.clearPreferences();
         }
 
@@ -54,7 +54,7 @@ public class SignUpCLI {
             try {
                 loginCLI.start();
             } catch (BaseException e) {
-                logger.severe("ERRORE: " + e.getMessage());
+                logger.severe("ERROR: " + e.getMessage()+"\n");
             }
         } else {
             performRegistration();
@@ -72,27 +72,27 @@ public class SignUpCLI {
             String surname = nameRegister();
             while (!passwordValid) {
                 pwd = CLIReader.readString("Password: ");
-                pwdRepeat = CLIReader.readString("Conferma Password: ");
+                pwdRepeat = CLIReader.readString("Confirm Password: ");
                 passwordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
                 if (!passwordValid) {
                     if (pwd.length() < 6) {
-                        logger.warning("La password deve essere di almeno 6 caratteri! Riprova.\n");
+                        logger.warning("The password must be at least 6 characters\n.");
                     }
                     if (!pwd.equals(pwdRepeat)) {
-                        logger.warning("Le password non coincidono! Riprova.\n");
+                        logger.warning("Password doesn't match\n");
                     }
                 }
             }
             UserBean user = new UserBean(email, pwd, name, surname, pwdRepeat);
             new SignupAC().registerUser(user);
 
-            logger.info("\n✅ Registrazione avvenuta con successo! Ora puoi effettuare il login.\n");
+            CLIReader.println("✅ Regsitration completed succesfully now you can move on to the login");
 
             // Non serve chiamare LoginCLI.start() qui, perché il loop nel metodo start()
             // ricomincerà e chiederà "Do you already have an account?", permettendo all'utente di premere 'Y'.
 
         } catch (BaseException e) {
-            logger.severe("❌ Errore durante la registrazione: " + e.getMessage() + "\n");
+            logger.severe("❌ Error during registration: " + e.getMessage() + "\n");
         }
     }
     private  String emailRegister(){
@@ -102,7 +102,7 @@ public class SignUpCLI {
             email = CLIReader.readString("Email: ");
             emailValid = email.contains("@") && email.contains(".");
             if (!emailValid) {
-                logger.warning("Formato email non valido! Riprova.\n");
+                logger.warning("Mail format invalid, retry.\n");
             }
         }
         return email;
@@ -115,7 +115,7 @@ public class SignUpCLI {
             name = CLIReader.readString("Name: ");
             nameValid = name != null && format.matcher(name).matches();
             if (!nameValid) {
-                logger.warning("Nome non valido! Riprova.\n");
+                logger.warning("Name invalid, retry.\n");
             }
         }
         return name;

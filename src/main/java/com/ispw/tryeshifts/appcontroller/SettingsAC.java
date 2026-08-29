@@ -12,10 +12,8 @@ import com.ispw.tryeshifts.exception.EntityNotFoundException;
 import com.ispw.tryeshifts.exception.DataFetchException;
 import com.ispw.tryeshifts.utils.SecurityUtils;
 
-import java.util.logging.Logger;
 
 public class SettingsAC {
-    private final Logger logger = Logger.getLogger(SettingsAC.class.getName());
     private final UserDAO userRepo ;
     private final WorkplaceDAO workplaceRepo ;
 
@@ -38,8 +36,8 @@ public class SettingsAC {
             try {
                 String hashedPass = SecurityUtils.hashPassword(user.getPassword());
                 existingUser.setPasswordHash(hashedPass);
-            }catch (DataFetchException _){
-                logger.info("errore nell'hashing di password0");
+            }catch (DataFetchException e){
+                throw new DataFetchException("persistency error while changing the password: ",e);
             }
         }
 
