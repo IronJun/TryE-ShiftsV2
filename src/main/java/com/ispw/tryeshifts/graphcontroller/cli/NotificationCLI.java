@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.NotificationBean;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.exception.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import com.ispw.tryeshifts.session.SessionContext;
 
 import java.util.List;
@@ -19,52 +19,52 @@ public class NotificationCLI {
         boolean back = false;
         UserBean user = SessionContext.getInstance().getLoggeduser();
         if (user == null) {
-            CLIReader.println("User not logged in");
+            CLIService.println("User not logged in");
             return;
         }
         String userEmail = user.getEmail();
         if(userEmail == null){
-            CLIReader.println("User email is null");
+            CLIService.println("User email is null");
             return;
         }
         while (!back) {
             printHeader();
-            CLIReader.println("loading notifications...");
+            CLIService.println("loading notifications...");
             try {
                 // 1. Fetching notifications via the Application Controller
                 List<NotificationBean> notifications = notificationAC.getUserNotificationsAsync(userEmail).join();
                 if (notifications.isEmpty()) {
-                    CLIReader.println("No notifications found, going back to the home ->");
+                    CLIService.println("No notifications found, going back to the home ->");
                     break;
                 } else {
                     renderNotifications(notifications);
                     printMenu();
 
-                    String choice = CLIReader.readString("Select an option: ");
+                    String choice = CLIService.readString("Select an option: ");
                     back = handleChoice(choice);
                 }
             }catch (CompletionException e){
                 String detail = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
                 logger.warning("Error fetching notifications: " + detail+"\n");
-                CLIReader.println("[ERROR] Unable to load notifications. Please try again later.");
+                CLIService.println("[ERROR] Unable to load notifications. Please try again later.");
                 back = true;
             } catch (BaseException e) {
                 logger.warning("Error fetching notifications: " + e.getMessage()+"\n");
-                CLIReader.println("[ERROR] Unable to load notifications. Please try again later.");
+                CLIService.println("[ERROR] Unable to load notifications. Please try again later.");
                 back = true;
             }
         }
     }
 
     private void printHeader() {
-        CLIReader.println("========================================");
-        CLIReader.println("           NOTIFICATIONS CENTER");
-        CLIReader.println("========================================");
+        CLIService.println("========================================");
+        CLIService.println("           NOTIFICATIONS CENTER");
+        CLIService.println("========================================");
     }
 
     private void renderNotifications(List<NotificationBean> notifications) {
         if (notifications == null || notifications.isEmpty()) {
-            CLIReader.println("No notifications found.");
+            CLIService.println("No notifications found.");
             return;
         }
         String msg;
@@ -72,16 +72,16 @@ public class NotificationCLI {
         for (int i = 0; i < notifications.size(); i++) {
             NotificationBean n = notifications.get(i);
             msg = ""+ (i + 1)+" "+ n.getTimestamp()+" "+ n.getMessage();
-            CLIReader.println(msg);
+            CLIService.println(msg);
         }
     }
 
     private void printMenu() {
-        CLIReader.println("----------------------------------------");
-        CLIReader.println("Available Actions:");
-        CLIReader.println("[m] Mark all as read and cancel all");
-        CLIReader.println("[b] Back to main menu");
-        CLIReader.println("----------------------------------------");
+        CLIService.println("----------------------------------------");
+        CLIService.println("Available Actions:");
+        CLIService.println("[m] Mark all as read and cancel all");
+        CLIService.println("[b] Back to main menu");
+        CLIService.println("----------------------------------------");
     }
 
     private boolean handleChoice(String choice) throws BaseException {
@@ -90,11 +90,11 @@ public class NotificationCLI {
                 try {
                     UserBean user = SessionContext.getInstance().getLoggeduser();
                     if(user == null){
-                        CLIReader.println("User not logged in");
+                        CLIService.println("User not logged in");
                         return false;
                     }
                     notificationAC.markAllAsRead(user.getEmail());
-                    CLIReader.println("[SUCCESS] All notifications marked as read.");
+                    CLIService.println("[SUCCESS] All notifications marked as read.");
                 }catch(BaseException e){
                     logger.severe("[ERROR] Unable to set all notifications marked as read."+e.getMessage()+"\n");
                 }
@@ -102,7 +102,7 @@ public class NotificationCLI {
             case "b":
                 return true; // Go back
             default:
-                CLIReader.println("ATTENTION unrecognized choice.");
+                CLIService.println("ATTENTION unrecognized choice.");
                 return false;
         }
     }

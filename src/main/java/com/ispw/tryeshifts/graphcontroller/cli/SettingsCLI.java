@@ -4,7 +4,7 @@ import com.ispw.tryeshifts.appcontroller.SettingsAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import java.util.logging.Logger;
 
 
@@ -17,28 +17,28 @@ public class SettingsCLI {
         boolean back = false;
 
         while (!back) {
-            CLIReader.println("--- USER SETTINGS ---");
-            CLIReader.println("Email: " + user.getEmail() + " (Non modificabile)");
-            CLIReader.println("1. NAME: " + user.getName());
-            CLIReader.println("2. SURNAME: " + user.getSurname());
-            CLIReader.println("3. Password: ********");
-            CLIReader.println("0. Torna indietro");
+            CLIService.println("--- USER SETTINGS ---");
+            CLIService.println("Email: " + user.getEmail() + " (Non modificabile)");
+            CLIService.println("1. NAME: " + user.getName());
+            CLIService.println("2. SURNAME: " + user.getSurname());
+            CLIService.println("3. Password: ********");
+            CLIService.println("0. Torna indietro");
 
-            String choice = CLIReader.readString("Seleziona il numero del campo da modificare: ");
+            String choice = CLIService.readString("Seleziona il numero del campo da modificare: ");
 
             switch (choice) {
                 case "1":
-                    String newName = CLIReader.readString("Nuovo nome: ");
+                    String newName = CLIService.readString("Nuovo nome: ");
                     user.setName(newName);
                     updateUser(user);
                     break;
                 case "2":
-                    String newSurname = CLIReader.readString("Nuovo cognome: ");
+                    String newSurname = CLIService.readString("Nuovo cognome: ");
                     user.setSurname(newSurname);
                     updateUser(user);
                     break;
                 case "3":
-                    String newPass = CLIReader.readString("Nuova password: ");
+                    String newPass = CLIService.readString("Nuova password: ");
                     user.setPassword(newPass);
                     updateUser(user);
                     break;
@@ -58,21 +58,21 @@ public class SettingsCLI {
         while (!back) {
 
 
-            CLIReader.println("--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
-            CLIReader.println("1. Nome: " + wp.getWorkplaceName());
-            CLIReader.println("2. Indirizzo: " + wp.getAddress());
-            CLIReader.println("3. Giorni Operativi: " + wp.getSelectedDays());
-            CLIReader.println("4. Fasce Orarie: " + wp.getShiftsBean());
-            CLIReader.println("0. Torna indietro");
+            CLIService.println("--- IMPOSTAZIONI WORKPLACE: " + wp.getWorkplaceName() + " ---");
+            CLIService.println("1. Nome: " + wp.getWorkplaceName());
+            CLIService.println("2. Indirizzo: " + wp.getAddress());
+            CLIService.println("3. Giorni Operativi: " + wp.getSelectedDays());
+            CLIService.println("4. Fasce Orarie: " + wp.getShiftsBean());
+            CLIService.println("0. Torna indietro");
 
-            String choice = CLIReader.readString("Cosa vuoi modificare?: ");
+            String choice = CLIService.readString("Cosa vuoi modificare?: ");
 
             switch (choice) {
                 case "1":
-                    wp.setWorkplaceName(CLIReader.readString("Nuovo nome: "));
+                    wp.setWorkplaceName(CLIService.readString("Nuovo nome: "));
                     break;
                 case "2":
-                    wp.setAddress(CLIReader.readString("Nuovo indirizzo: "));
+                    wp.setAddress(CLIService.readString("Nuovo indirizzo: "));
                     break;
                 case "3":
                     wp.setSelectedDays(newWorkplaceCLI.selectOperatingDays());
@@ -92,8 +92,8 @@ public class SettingsCLI {
 
                 oldname = wp.getWorkplaceName();
 
-                CLIReader.println("✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
-                String answer = CLIReader.readString("").toUpperCase();
+                CLIService.println("✅ Modifica salvata. Vuoi cambiare altro? (y/n)");
+                String answer = CLIService.readString("").toUpperCase();
                 if (!answer.equals("Y")) back = true;
 
             } catch (BaseException e) {
@@ -106,7 +106,7 @@ public class SettingsCLI {
         try {
             // Usa l'App Controller che gestisce il profilo (es. LoginAC o ProfileAC)
             ac.updateUserProfile(user);
-            CLIReader.println("✅ Profilo aggiornato correttamente!");
+            CLIService.println("✅ Profilo aggiornato correttamente!");
         } catch (BaseException e) {
             logger.severe("❌ Errore durante l'aggiornamento: " + e.getMessage()+"\n");
         }

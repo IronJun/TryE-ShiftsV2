@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.appcontroller.SignupAC;
 import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.exception.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
@@ -41,7 +41,7 @@ public class SignUpCLI {
         boolean accVal = false;
         String acc = "";
         while (!accVal) {
-            acc = CLIReader.readString("Do you already have an account? Y/n (or 0 to exit): ").toUpperCase();
+            acc = CLIService.readString("Do you already have an account? Y/n (or 0 to exit): ").toUpperCase();
             if (acc.equals("0")) System.exit(0);
 
             accVal = acc.equals("Y") || acc.equals("N");
@@ -71,8 +71,8 @@ public class SignUpCLI {
             String name = nameRegister();
             String surname = nameRegister();
             while (!passwordValid) {
-                pwd = CLIReader.readString("Password: ");
-                pwdRepeat = CLIReader.readString("Confirm Password: ");
+                pwd = CLIService.readString("Password: ");
+                pwdRepeat = CLIService.readString("Confirm Password: ");
                 passwordValid = pwd.length() >= 6 && pwd.equals(pwdRepeat);
                 if (!passwordValid) {
                     if (pwd.length() < 6) {
@@ -86,7 +86,7 @@ public class SignUpCLI {
             UserBean user = new UserBean(email, pwd, name, surname, pwdRepeat);
             new SignupAC().registerUser(user);
 
-            CLIReader.println("✅ Regsitration completed succesfully now you can move on to the login");
+            CLIService.println("✅ Regsitration completed succesfully now you can move on to the login");
 
             // Non serve chiamare LoginCLI.start() qui, perché il loop nel metodo start()
             // ricomincerà e chiederà "Do you already have an account?", permettendo all'utente di premere 'Y'.
@@ -99,7 +99,7 @@ public class SignUpCLI {
         boolean emailValid = false;
         String email = "";
         while (!emailValid) {
-            email = CLIReader.readString("Email: ");
+            email = CLIService.readString("Email: ");
             emailValid = email.contains("@") && email.contains(".");
             if (!emailValid) {
                 logger.warning("Mail format invalid, retry.\n");
@@ -112,7 +112,7 @@ public class SignUpCLI {
         boolean nameValid = false;
         String name = "";
         while (!nameValid) {
-            name = CLIReader.readString("Name: ");
+            name = CLIService.readString("Name: ");
             nameValid = name != null && format.matcher(name).matches();
             if (!nameValid) {
                 logger.warning("Name invalid, retry.\n");

@@ -1,11 +1,10 @@
 package com.ispw.tryeshifts.graphcontroller.cli;
 
 import com.ispw.tryeshifts.appcontroller.ManageMembersAC;
-import com.ispw.tryeshifts.appcontroller.NotificationAC;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.exception.BaseException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import com.ispw.tryeshifts.session.SessionContext;
 
 import java.util.List;
@@ -17,19 +16,19 @@ public class WorkersCLI {
     private  String msg;
     public  void activeWorkers(WorkplaceBean wp){
         try {
-            CLIReader.println("--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
+            CLIService.println("--- ACTIVE MEMBERS OF : " + wp.getWorkplaceName() + " ---");
             List<UserBean> active = ac.getActiveMembers(wp.getWorkplaceName());
             if(active.isEmpty()){
-                CLIReader.println("No active members yet.");
+                CLIService.println("No active members yet.");
             }else{
                 msg = String.format("%n %-20s | %-20s | %-30s", "NOME", "COGNOME", "EMAIL");
-                CLIReader.println(msg);
+                CLIService.println(msg);
                 for(UserBean ub : active){
                     msg = String.format("%n %-20s | %-20s | %-30s", ub.getName(), ub.getSurname(), ub.getEmail());
-                    CLIReader.println(msg);
+                    CLIService.println(msg);
                 }
             }
-            CLIReader.readString("Press Enter to continue...");
+            CLIService.readString("Press Enter to continue...");
         }catch (BaseException e){
             logger.severe("Errore: " + e.getMessage()+"\n");
         }
@@ -43,30 +42,30 @@ public class WorkersCLI {
             }
             List<UserBean> pending = ac.getPendingRequests(wp.getWorkplaceName());
             if (pending.isEmpty()) {
-                CLIReader.println("No pending requests.");
+                CLIService.println("No pending requests.");
                 return;
             }
-            CLIReader.println("--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---");
+            CLIService.println("--- PENDING REQUESTS OF :"+ wp.getWorkplaceName() + " ---");
             for (int i = 0; i < pending.size(); i++) {
                 UserBean u = pending.get(i);
                 msg = String.format("%d. %s %s (%s)", (i + 1), u.getName(), u.getSurname(), u.getEmail());
-                CLIReader.println(msg);
+                CLIService.println(msg);
             }
 
-            int choice = CLIReader.readInt("Select the number of the user to handle (0 to annul): ");
+            int choice = CLIService.readInt("Select the number of the user to handle (0 to annul): ");
             if (choice > 0 && choice <= pending.size()) {
                 UserBean selected = pending.get(choice - 1);
                 String action;
                 do{
-                    action = CLIReader.readString("Will you accept the User? y/n: ").toLowerCase();
+                    action = CLIService.readString("Will you accept the User? y/n: ").toLowerCase();
                 }while(!action.equals("y") && !action.equals("n"));
 
                 boolean accept = action.equals("y");
                 ac.acceptWorker(selected.getEmail(), wp.getWorkplaceName(), accept);
                 if(accept){
-                    CLIReader.println("✅ User Accepted!");
+                    CLIService.println("✅ User Accepted!");
                 }else{
-                    CLIReader.println( "❌ User not accepted.");
+                    CLIService.println( "❌ User not accepted.");
                 }
             }
         } catch (BaseException e) {

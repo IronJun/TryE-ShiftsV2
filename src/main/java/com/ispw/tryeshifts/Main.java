@@ -2,7 +2,7 @@ package com.ispw.tryeshifts;
 
 
 import com.ispw.tryeshifts.graphcontroller.cli.SignUpCLI;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import com.ispw.tryeshifts.graphcontroller.cli.utilities.Configurator;
 import javafx.application.Application;
 
@@ -16,7 +16,7 @@ public class Main {
         Configurator.configureLogger();
         // 2. Scelta dell'interfaccia
         LOGGER.info("Seleziona interfaccia: [1] GUI | [2] CLI");
-        int choice = CLIReader.readInt(" >");
+        int choice = CLIService.readInt(" >");
         switch(choice) {
             case 1:
                 Application.launch(JavaFXLauncher.class, args);

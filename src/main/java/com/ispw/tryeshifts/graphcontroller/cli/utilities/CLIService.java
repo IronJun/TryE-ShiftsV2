@@ -4,12 +4,12 @@ import java.io.Console;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class CLIReader {
+public class CLIService {
     private static final Scanner scanner = new Scanner(System.in);
-    private static final Logger LOGGER = Logger.getLogger(CLIReader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CLIService.class.getName());
     private static Console console = System.console();
 
-    private CLIReader(){
+    private CLIService(){
         throw new IllegalStateException("Utility class");
     }
 
@@ -37,7 +37,7 @@ public class CLIReader {
         while(true){
             try{
                 return Integer.parseInt(readString(message).trim());
-            }catch(NumberFormatException e){
+            }catch(NumberFormatException _){
                 println("Insert valid number");
             }
         }

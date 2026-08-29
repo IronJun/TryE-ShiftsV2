@@ -293,9 +293,7 @@ public class HomeGC {
 
             window.setOnHiding(e -> {
                 searchField.clear();
-                //refreshWorkplaceList();
                 refreshAllData();
-                //handleSearch(""); //  pulisce la ricerca per mostrare il nuovo item
             });
 
         } else {

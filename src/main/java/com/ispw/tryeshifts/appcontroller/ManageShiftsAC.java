@@ -72,9 +72,6 @@ public class ManageShiftsAC {
         String userEmail = user.getEmail();
         String wpName = workplace.getWorkplaceName();
 
-        /*String currentWeekId = beans.isEmpty() ?
-                calculateWeekId(1) : // Se è la settimana prossima, serve l'offset corretto
-                beans.get(0).getWeekId();*/
 
         String currentWeekStatus = getWeekStatusShifts(wpName,weekId);
 

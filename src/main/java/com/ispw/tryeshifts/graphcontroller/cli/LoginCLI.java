@@ -5,7 +5,7 @@ import com.ispw.tryeshifts.session.SessionContext;
 import com.ispw.tryeshifts.bean.UserBean;
 import com.ispw.tryeshifts.exception.BaseException;
 import com.ispw.tryeshifts.exception.InvalidCredentialException;
-import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIReader;
+import com.ispw.tryeshifts.graphcontroller.cli.utilities.CLIService;
 import com.ispw.tryeshifts.utils.PreferencesManager;
 
 import java.util.logging.Logger;
@@ -17,17 +17,17 @@ public class LoginCLI{
 
 
     public  void start() throws BaseException {
-        CLIReader.println("--- LOGIN E-SHIFTS ---");
-        CLIReader.println("Insert your credential to get in the App.");
+        CLIService.println("--- LOGIN E-SHIFTS ---");
+        CLIService.println("Insert your credential to get in the App.");
 
         while(true) {
             try {
-                CLIReader.println("Press Q to SignUP if you don't have an account at any moment");
-                String email = CLIReader.readString("Email: ");
+                CLIService.println("Press Q to SignUP if you don't have an account at any moment");
+                String email = CLIService.readString("Email: ");
                 if(email.equalsIgnoreCase("Q")){
                     return;
                 }
-                String password = CLIReader.readPassword("Password: ");
+                String password = CLIService.readPassword("Password: ");
                 if (password.equalsIgnoreCase("Q")) {
                     return;
                 }
@@ -38,7 +38,7 @@ public class LoginCLI{
 
                 handleRememberMe(inputUser);
 
-                CLIReader.println("Login completed correctly!! ");
+                CLIService.println("Login completed correctly!! ");
                 homeCLI.start();
                 return;
 
@@ -53,7 +53,7 @@ public class LoginCLI{
     private  void handleRememberMe(UserBean user){
         boolean memValidation = false;
         while (!memValidation) {
-            String mem = CLIReader.readString("Do you want to remember credentials? Y/n: ").toUpperCase();
+            String mem = CLIService.readString("Do you want to remember credentials? Y/n: ").toUpperCase();
             if (mem.equals("Y")) {
                 PreferencesManager.saveUserToPreferences(user.getEmail());
                 memValidation = true;
