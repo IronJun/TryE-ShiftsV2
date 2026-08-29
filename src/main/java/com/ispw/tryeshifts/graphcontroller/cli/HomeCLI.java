@@ -187,51 +187,14 @@ public class  HomeCLI {
             logger.warning("Workplace selection empty!\n");
             return;
         }
+
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
+
         try{
             WorkplaceBean accessedWp = new AccessWorkplaceAC().canAccess(loggedUser,wp.getWorkplaceName());
             SessionContext.getInstance().setLoggedWorkplace(accessedWp);
-            boolean exit= false;
-            while(!exit) {
-                CLIService.println("---------"+ accessedWp.getWorkplaceName() + "---------");
-                CLIService.println("Choose one of the options:");
-                CLIService.println("1. Give/see the shifts for this workplace");
-                CLIService.println("2. See Active Workers for this workplace");
-                if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
-                    CLIService.println("3. See pending Workers for this workplace");
-                    CLIService.println("4. Manage settings for this workplace");
+            openWorkplaceMenu(wp,loggedUser);
 
-                }
-                CLIService.println("0. Back to Home");
-                int choice = CLIService.readInt("Select an option: ");
-                switch (choice) {
-                    case 1:
-                        shiftsCLI.shiftsDashboard(accessedWp);
-                        break;
-                    case 2:
-                        workersCLI.activeWorkers(accessedWp);
-                        break;
-                    case 3:
-                        if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
-                            workersCLI.pendingWorkers(accessedWp);
-                        }else{
-                            logger.warning("Only the owner can see the pendant request!\n");
-                        }
-                        break;
-                    case 4:
-                        if(loggedUser.getEmail().equals(accessedWp.getOwnerEmail())) {
-                            settingsCLI.workplaceSettings(accessedWp);
-                        }else{
-                            logger.warning("Only can change the workplace Settings!\n");
-                        }
-                        break;
-                    case 0:
-                        exit = true;
-                        break;
-                    default:
-                        logger.warning("Invalid option!\n");
-                }
-            }
         }catch(UserNotMemberException _){
             executeJoinRequest(loggedUser, wp.getWorkplaceName());
         }catch (MembershipPendingException _){
@@ -239,6 +202,57 @@ public class  HomeCLI {
             CLIService.readString("Press ENTER to continue...");
         }catch (BaseException e){
             logger.severe("Error accessing workplace: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void printWorkplaceMenu(WorkplaceBean wp, boolean isOwner){
+        CLIService.println("---------"+ wp.getWorkplaceName() + "---------");
+        CLIService.println("Choose one of the options:");
+        CLIService.println("1. Give/see the shifts for this workplace");
+        CLIService.println("2. See Active Workers for this workplace");
+        if(isOwner) {
+            CLIService.println("3. See pending Workers for this workplace");
+            CLIService.println("4. Manage settings for this workplace");
+        }
+        CLIService.println("0. Back to Home");
+    }
+
+    private void openWorkplaceMenu(WorkplaceBean wp, UserBean user){
+        boolean exit = false;
+        boolean isOwner = user.getEmail().equals(wp.getOwnerEmail());
+        while (!exit) {
+            printWorkplaceMenu(wp,isOwner);
+            int choice = CLIService.readInt("Select an option: ");
+            exit = handleWokrplaceMenuChoice(choice,wp,isOwner);
+        }
+    }
+
+    private boolean handleWokrplaceMenuChoice(int choice, WorkplaceBean workplace,boolean isOwner){
+        switch (choice) {
+            case 1:
+                shiftsCLI.shiftsDashboard(workplace);
+                return false;
+            case 2:
+                workersCLI.activeWorkers(workplace);
+                return false;
+            case 3:
+                executeOwnerAction(isOwner,()->workersCLI.pendingWorkers(workplace),"only the owner can see pending requests\n");
+                return false;
+            case 4:
+                executeOwnerAction(isOwner,()->settingsCLI.workplaceSettings(workplace),"only the owner can change the settings of the workplace\n");
+                return false;
+            case 0:
+                return true;
+            default:
+                logger.warning("Invalid option!\n");
+                return false;
+        }
+    }
+    private void executeOwnerAction(boolean isOwner, Runnable ownerAction, String message){
+        if(isOwner){
+            ownerAction.run();
+        }else{
+            logger.warning(message);
         }
     }
     private  void executeJoinRequest(UserBean user, String wpName) {
