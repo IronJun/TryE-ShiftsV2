@@ -27,7 +27,7 @@ public class WorkerCellFactory implements ShiftCellProvider {
             cell.setStyle("-fx-border-color: #D1CFE2; -fx-padding: 5; -fx-background-color: #f2f2f2;");
             cell.setCursor(Cursor.DEFAULT); // Niente manina
 
-            Label status = new Label("CHIUSO");
+            Label status = new Label("Closed");
             status.setStyle("-fx-text-fill: #bdc3c7; -fx-font-size: 10px; -fx-font-weight: bold;");
             cell.getChildren().add(status);
 
@@ -56,7 +56,7 @@ public class WorkerCellFactory implements ShiftCellProvider {
 
             // Se è bloccata, non aggiungiamo il listener setOnMouseClicked
             // Opzionalmente aggiungiamo un tooltip o un piccolo testo
-            Label lockText = new Label("Sola Lettura");
+            Label lockText = new Label("Read only");
             lockText.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
             cell.getChildren().addAll(statusLabel, lockText);
         } else {

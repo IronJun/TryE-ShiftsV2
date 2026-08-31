@@ -50,7 +50,7 @@ public class LoginGC {
         } catch (EntityNotFoundException | InvalidCredentialException e) {
             ErrorViewManager.showError(errorLabel, e.getMessage());
         } catch (BaseException e) {
-            SceneManager.getInstance().showErrorAlert("Errore Tecnico", e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Technical error", e.getMessage());
         }
     }
     @FXML

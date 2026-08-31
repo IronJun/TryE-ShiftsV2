@@ -11,17 +11,17 @@
     <center>
         <VBox spacing="20" style="-fx-padding: 20;" >
             <children>
-                <Label fx:id="titleLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Gestione Lavoratori" />
+                <Label fx:id="titleLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Handle Workers" />
 
                 <HBox spacing="30" VBox.vgrow="ALWAYS">
                     <children>
                         <VBox spacing="10" HBox.hgrow="ALWAYS">
-                            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Team Attivo" />
+                            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Active Team" />
                             <ListView fx:id="activeWorkersList" VBox.vgrow="ALWAYS" />
                         </VBox>
 
                         <VBox spacing="10" HBox.hgrow="ALWAYS">
-                            <Label fx:id="titlePending" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #e67e22;" text="Richieste Pendenti" />
+                            <Label fx:id="titlePending" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #e67e22;" text="Pending requests" />
                             <ListView fx:id="pendingWorkersList" VBox.vgrow="ALWAYS" />
                         </VBox>
                     </children>

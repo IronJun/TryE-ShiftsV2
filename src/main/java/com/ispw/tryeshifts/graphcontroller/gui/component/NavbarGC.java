@@ -68,7 +68,7 @@ public class NavbarGC {
     public void onShiftsClicked() {
         ErrorViewManager.hideError(errorlbl);
         if (SessionContext.getInstance().getLoggedWorkplace() == null) {
-            ErrorViewManager.showError(errorlbl,"Per vedere i turni torna alla home e seleziona un workpalce");
+            ErrorViewManager.showError(errorlbl,"To see the shifts selecte a workplace");
         } else {
             SceneManager.getInstance().switchScene("Shifts.fxml", "Shifts", 900, 600);
         }

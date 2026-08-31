@@ -18,24 +18,11 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
     <children>
-        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Configura Nuovo Workplace" />
-<!--        <StackPane fx:id="imageContainer" onMouseClicked="#onImageSelectionClicked"-->
-<!--                   prefHeight="100.0" prefWidth="100.0" maxWidth="100.0"-->
-<!--                   style="-fx-border-color: #4B4488; -fx-border-width: 2; -fx-border-style: dashed; -fx-background-color: #f8f9fa; -fx-cursor: hand; -fx-background-radius: 10; -fx-border-radius: 10;">-->
+        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Workplace Configuration" />
 
-<!--            &lt;!&ndash; L'immagine vera e propria (inizialmente vuota) &ndash;&gt;-->
-<!--            <ImageView fx:id="workplaceImageView" fitHeight="90.0" fitWidth="90.0" preserveRatio="true" />-->
-
-<!--            &lt;!&ndash; Il testo e il "+" (spariscono quando carichi la foto) &ndash;&gt;-->
-<!--            <VBox fx:id="placeholderBox" alignment="CENTER" spacing="5" mouseTransparent="true">-->
-<!--                <Label text="+" style="-fx-font-size: 24; -fx-text-fill: #4B4488; -fx-font-weight: bold;" />-->
-<!--                <Label text="Aggiungi Logo" style="-fx-font-size: 10; -fx-text-fill: #4B4488;" wrapText="true" textAlignment="CENTER"/>-->
-<!--            </VBox>-->
-<!--        </StackPane>-->
-
-        <TextField fx:id="nameField" promptText="Nome Workplace" />
-        <TextField fx:id="addressField" promptText="Indirizzo" />
-        <Label text="Giorni di Apertura:" style="-fx-font-weight: bold;" />
+        <TextField fx:id="nameField" promptText="Workplace Name" />
+        <TextField fx:id="addressField" promptText="Address" />
+        <Label text="Working days:" style="-fx-font-weight: bold;" />
         <HBox spacing="10">
             <CheckBox fx:id="checkMon" text="Lun" />
             <CheckBox fx:id="checkTue" text="Mar" />
@@ -50,7 +37,7 @@
         <VBox spacing="10">
             <HBox spacing="10" alignment="BOTTOM_LEFT">
                 <VBox spacing="5">
-                    <Label text="Inizio turno:" style="-fx-font-weight: bold;"/>
+                    <Label text="Shift Start:" style="-fx-font-weight: bold;"/>
                     <HBox spacing="5">
                         <ComboBox fx:id="startHourCombo" promptText="HH" prefWidth="70"/>
                         <ComboBox fx:id="startMinuteCombo" promptText="mm" prefWidth="70"/>
@@ -58,7 +45,7 @@
                 </VBox>
 
                 <VBox spacing="5">
-                    <Label text="Fine turno:" style="-fx-font-weight: bold;"/>
+                    <Label text="End Shift:" style="-fx-font-weight: bold;"/>
                     <HBox spacing="5">
                         <ComboBox fx:id="endHourCombo" promptText="HH" prefWidth="70"/>
                         <ComboBox fx:id="endMinuteCombo" promptText="mm" prefWidth="70"/>
@@ -67,15 +54,15 @@
                 <Button fx:id="btnAddShift" text="+" onAction="#addShiftToList"
                         style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
             </HBox>
-            <Label fx:id="errorLabel" textFill="red" visible="false" managed="false" text="Inserzione orari non valida. Orario chiusura precedente a quello apertura"/>
+            <Label fx:id="errorLabel" textFill="red" visible="false" managed="false" text="invalid shifts insertion"/>
 
         </VBox>
 
         <ListView fx:id="shiftsListView" prefHeight="100" />
         <HBox alignment="CENTER_RIGHT" spacing="10.0">
             <children>
-                <Button onAction="#onCancel" style="-fx-background-color: transparent; -fx-text-fill: gray;" text="Annulla" />
-                <Button onAction="#onSave" style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-font-weight: bold;" text="Crea" />
+                <Button onAction="#onCancel" style="-fx-background-color: transparent; -fx-text-fill: gray;" text="Cancel" />
+                <Button onAction="#onSave" style="-fx-background-color: #4B4488; -fx-text-fill: white; -fx-font-weight: bold;" text="Create" />
             </children>
         </HBox>
     </children>

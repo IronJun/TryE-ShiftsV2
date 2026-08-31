@@ -37,13 +37,13 @@ public class SceneManager {
         if(this.primaryStage == null){
             this.primaryStage = stage;
         }else{
-            logger.warning("Tentativo di sovrascrizione dello stage principale.");
+            logger.warning("Trying to overwrite primary stage");
         }
     }
 
     public void switchScene(String fxmlFileName, String title, double width, double height) {
         if (primaryStage == null) {
-            throw new IllegalStateException("Primary Stage non è stato inizializzato. Chiamare setPrimaryStage() prima.");
+            throw new IllegalStateException("Primary Stage has not been initialized.");
         }
 
         try {
@@ -72,7 +72,7 @@ public class SceneManager {
             fxmlLoader.getController();
 
         } catch (IOException e) {
-            logger.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
+            logger.info("Error loading the windows: " + fxmlFileName+" "+e.getMessage());
 
         }
     }
@@ -102,7 +102,7 @@ public class SceneManager {
             return controller;
 
         } catch (IOException e) {
-            logger.info("Errore nel caricamento della finestra: " + fxmlFileName+" "+e.getMessage());
+            logger.info("Error loading the windows: " + fxmlFileName+" "+e.getMessage());
             return null;
         }
     }
@@ -136,7 +136,7 @@ public class SceneManager {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");
         alert.setHeaderText(null); // Rimuove lo spazio grigio dell'header che può sembrare "vuoto"
-        alert.setContentText("Sei sicuro di voler effettuare il logout?");
+        alert.setContentText("Are you sure you want to logout?");
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;

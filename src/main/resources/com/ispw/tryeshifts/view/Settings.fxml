@@ -21,18 +21,18 @@
             </columnConstraints>
             <StackPane fx:id = "workplaceStackPane" GridPane.columnIndex="0">
                 <VBox fx:id = "leftPane" spacing="15" maxWidth="Infinity" style="-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #dcdde1; -fx-border-radius: 15;">
-                    <Label text="Impostazioni Workplace" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #4B4488;" />
+                    <Label text="Workplace Settings" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #4B4488;" />
 
-                    <Label text="Nome Posto di Lavoro" />
+                    <Label text="Workplace name" />
                     <TextField fx:id="nameField" />
 
-                    <Label text="Indirizzo" />
+                    <Label text="Address" />
                     <TextField fx:id="addressField" />
 
-                    <Label text="Giorni Lavorativi" />
+                    <Label text="Working days" />
                     <FlowPane fx:id="daysContainer" hgap="10" vgap="10" />
 
-                    <Label text="Turni Attivi" />
+                    <Label text="Active Shifts" />
                     <ListView fx:id="shiftsListView" prefHeight="150" />
 
                     <HBox spacing="5" alignment="CENTER_LEFT">
@@ -43,10 +43,10 @@
                         <ComboBox fx:id="endMinuteCombo" prefWidth="65" />
                         <Button text="+" onAction="#addShift" style="-fx-background-color: #4B4488; -fx-text-fill: white;" />
                     </HBox>
-                    <Label fx:id="errorlabel" textFill="red" visible="false" managed="false" text="Inserzione orari non valida. Orario chiusura precedente a quello apertura"/>
+                    <Label fx:id="errorlabel" textFill="red" visible="false" managed="false" text="Invalid Shifts, the end must be after the start"/>
 
                     <Region VBox.vgrow="ALWAYS" />
-                    <Button text="SALVA MODIFICHE" onAction="#saveWorkplaceChanges" maxWidth="Infinity"
+                    <Button text="Save Changes" onAction="#saveWorkplaceChanges" maxWidth="Infinity"
                             style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10;" />
                 </VBox>
 
@@ -70,30 +70,30 @@
             <VBox fx:id="rightPane" spacing="15" maxWidth="Infinity" GridPane.columnIndex="1"
                   style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #dcdde1; -fx-border-radius: 15;">
 
-                <Label text="Impostazioni Profilo" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #4B4488;" />
+                <Label text="User Settings" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #4B4488;" />
 
-                <Label text="Nome" />
+                <Label text="Name" />
                 <TextField fx:id="firstNameField" />
 
-                <Label text="Cognome" />
+                <Label text="Surname" />
                 <TextField fx:id="lastNameField" />
 
-                <Label text="Email (non modificabile)" />
+                <Label text="Email (not editable" />
                 <TextField fx:id="emailField" editable="false" style="-fx-background-color: #f4f4f4;" />
 
                 <Separator />
 
-                <Label text="Sicurezza" style="-fx-font-weight: bold;" />
+                <Label text="Security" style="-fx-font-weight: bold;" />
 
-                <Label text="Nuova Password" />
-                <PasswordField fx:id="newPasswordField" promptText="Lascia vuoto per non cambiare" />
+                <Label text="New Password" />
+                <PasswordField fx:id="newPasswordField" promptText="Leave blank to keep it unchanged" />
 
-                <Label text="Conferma Password" />
-                <PasswordField fx:id="confirmPasswordField" promptText="Ripeti la nuova password" />
+                <Label text="Confirm Password" />
+                <PasswordField fx:id="confirmPasswordField" promptText="Repeat the new password" />
 
                 <Region VBox.vgrow="ALWAYS" />
 
-                <Button text="SALVA PROFILO" onAction="#saveProfileChanges" maxWidth="Infinity"
+                <Button text="Save updated profile" onAction="#saveProfileChanges" maxWidth="Infinity"
                         style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10;" />
             </VBox>
         </GridPane>

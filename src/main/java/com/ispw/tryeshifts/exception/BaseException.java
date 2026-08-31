@@ -16,7 +16,4 @@ public class BaseException extends Exception {
         this.timestamp = LocalDateTime.now(ZoneId.systemDefault());
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
 }

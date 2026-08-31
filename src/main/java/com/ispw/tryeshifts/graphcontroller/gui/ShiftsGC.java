@@ -74,7 +74,7 @@ public class ShiftsGC {
         this.weekOffset = 1;
         this.currentWeekId = manageAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
-            lblWeekDisplay.setText("Settimana: "+ manageAC.getWeekRangeString(weekOffset));
+            lblWeekDisplay.setText("Week: "+ manageAC.getWeekRangeString(weekOffset));
         }
 
         if (info == null || loggeduser == null) {
@@ -224,14 +224,15 @@ public class ShiftsGC {
 
     @FXML
     private void onScheduleInfoClicked() {
-        String message ="Monday–Wednesday:\n" +
-                "Workers can submit their shift requests for the following week;\n" +
-                "Thursday–Friday:\n" +
-                "The boss can modify the shifts\n" +
-                "Saturday–Sunday: \n" +
-                "Shifts are published and cannot be changed by either the boss or the workers\n" +
-                "\n" +
-                "The boss can also decide to lock and publish shifts whenever he or she wants; he or she does not have to wait for specific deadlines." ;
+        String message ="""
+                Monday–Wednesday: 
+                Workers can submit their shift requests for the following week;
+                Thursday–Friday
+                The boss can modify the shifts
+                Saturday–Sunday:
+                Shifts are published and cannot be changed by either the boss or the workers
+                
+                The boss can also decide to lock and publish shifts whenever he or she wants; he or she does not have to wait for specific deadlines.""";
         SceneManager.getInstance().showInfoAlert("How Shifts Work ", message);
     }
 
@@ -249,7 +250,7 @@ public class ShiftsGC {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
         if(user == null || wp == null) {
-            throw new BaseException("User ora Workplace not found");
+            throw new BaseException("User or Workplace not found");
         }
 
         WorkplaceBean refreshWp = new AccessWorkplaceAC().canAccess(user,selectedWorkplace.getWorkplaceName());
@@ -323,15 +324,11 @@ public class ShiftsGC {
         // 1. Recuperiamo i dati contestuali
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
-        msg = "DEBUG SAVE: Inizio scansione mappa. Dimensioni mappa: " + selectedCellsMap.size();
-        logger.log(Level.FINE, msg);
         // 2. Creiamo una lista di AvailabilityBean
         List<AvailabilityBean> availabilityBeans = new ArrayList<>();
 
         // Scorriamo la mappa delle celle selezionate
         for (Map.Entry<String, Boolean> entry : selectedCellsMap.entrySet()) {
-            msg = "DEBUG SAVE: Cella " + entry.getKey() + " stato: " + entry.getValue();
-            logger.log(Level.FINE, msg);
             if (Boolean.TRUE.equals(entry.getValue())) { // Se la cella è selezionata (true)
                 String key = entry.getKey(); // "Mon_18:30"
                 String[] parts = key.split("_");
@@ -345,10 +342,6 @@ public class ShiftsGC {
 
                 }
             }
-            msg ="DEBUG SAVE: Bean pronti al salvataggio: " + availabilityBeans.size();
-            logger.log(Level.FINE, msg);
-
-            // 3. Chiamiamo il Controller Applicativo
 
         }
         try {
@@ -356,10 +349,10 @@ public class ShiftsGC {
 
             manageAC.saveAvailabilities(availabilityBeans,loggedUser,wp,currentWeekId);
             // Messaggio di successo
-            SceneManager.getInstance().showInfoAlert("Salvataggio", "Le tue disponibilità sono state inviate al Boss!");
+            SceneManager.getInstance().showInfoAlert("Saving", "Your Shifts have been sent to the boss!");
 
         } catch (BaseException e) {
-            SceneManager.getInstance().showErrorAlert("Errore", e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Error", e.getMessage());
         }
     }
 

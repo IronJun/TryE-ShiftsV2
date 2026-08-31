@@ -63,7 +63,7 @@ public class WorkersGC {
         activeWorkersList.setVisible(true);
 
         if(currentWorkplace != null){
-            titleLabel.setText("Lavoratori: "+ currentWorkplace.getWorkplaceName());
+            titleLabel.setText("Workers: "+ currentWorkplace.getWorkplaceName());
             loadLists();
         }
     }
@@ -81,9 +81,9 @@ public class WorkersGC {
 
             setupCells();
         }catch(EntityNotFoundException e){
-            SceneManager.getInstance().showErrorAlert("Errore",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Error",e.getMessage());
         }catch(BaseException e){
-            SceneManager.getInstance().showErrorAlert("Errore Tecnico",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Technical error",e.getMessage());
         }
     }
 
@@ -108,9 +108,9 @@ public class WorkersGC {
             SceneManager.getInstance().showInfoAlert("Success","Correctly updated the DB");
             loadLists();
         }catch(EntityNotFoundException e){
-            SceneManager.getInstance().showErrorAlert("Errore",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Error",e.getMessage());
         }catch(BaseException e){
-            SceneManager.getInstance().showErrorAlert("Errore tecnico",e.getMessage());
+            SceneManager.getInstance().showErrorAlert("Technical error",e.getMessage());
         }
 
     }
@@ -134,7 +134,7 @@ public class WorkersGC {
                 // Composzione del nome in modo sicuro contro i null
                 String fullName = (item.getName() != null ? item.getName() : "") + " " +
                         (item.getSurname() != null ? item.getSurname() : "");
-                Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+                Label nameLabel = new Label(fullName.trim().isEmpty() ? "User" : fullName);
                 nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
 
 
@@ -175,7 +175,7 @@ public class WorkersGC {
                 // Nome
                 String fullName = (item.getName() != null ? item.getName() : "") + " " +
                         (item.getSurname() != null ? item.getSurname() : "");
-                Label nameLabel = new Label(fullName.trim().isEmpty() ? "Utente" : fullName);
+                Label nameLabel = new Label(fullName.trim().isEmpty() ? "User" : fullName);
                 nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;");
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, ALWAYS);

@@ -57,7 +57,7 @@ public class HomeGC {
         });
 
         setupWorkplaceListView();
-        this.weekOffset = 0;
+        this.weekOffset = 1;
         this.currentWeekId = manageShiftsAC.calculateWeekId(weekOffset);
         if(lblWeekDisplay!=null){
             lblWeekDisplay.setText("Week: "+ manageShiftsAC.getWeekRangeString(weekOffset));
@@ -91,7 +91,7 @@ public class HomeGC {
         try {
             WorkplaceBean wpBean = accessWorkplaceAC.canAccess(this.loggedUser, workplaceName);
             SessionContext.getInstance().setLoggedWorkplace(wpBean);
-            SceneManager.getInstance().switchScene("Shifts.fxml", "Turni", 900, 600);
+            SceneManager.getInstance().switchScene("Shifts.fxml", "Shifts", 900, 600);
         }catch (UserNotMemberException _) {
             showJoinConfirmation(workplaceName);
         }catch (MembershipPendingException _){
@@ -111,18 +111,12 @@ public class HomeGC {
             } else {
                 result = searchWorkplacesAC.searchByName(query);
             }
-            String msg = "Risultati trovati: " + result.size();
-            LOGGER.info(msg); // DEBUG
-
             workplaceListView.getItems().clear();
             for (WorkplaceBean wp : result) {
-                msg = "Aggiungo: " + wp.getWorkplaceName();
-                LOGGER.info(msg); // DEBUG
                 workplaceListView.getItems().add(wp);
             }
         }catch(DataFetchException _){
-            SceneManager.getInstance().showErrorAlert("Errore di Connessione",
-                    "Non è stato possibile recuperare i dati. Riprova più tardi.");
+            SceneManager.getInstance().showErrorAlert("Connection Error", "Unable to fetch the data");
             workplaceListView.getItems().clear();
         }catch(BaseException e){
             SceneManager.getInstance().showErrorAlert(TECHNICAL_ERROR, e.getMessage());
@@ -196,9 +190,9 @@ public class HomeGC {
                 rowIndex++;
             }
         }catch(BaseException e){
-            LOGGER.log(Level.SEVERE, "Errore durante la generazione della tabella Home", e);
+            LOGGER.log(Level.SEVERE, "Error during home table generation", e);
 
-            Label errorLabel = new Label("Impossibile caricare i turni: " + e.getMessage());
+            Label errorLabel = new Label("Unable to fetch the shifts: " + e.getMessage());
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-style: italic;");
             grid.add(errorLabel, 0, 0, 8, 1);
         }
@@ -275,12 +269,12 @@ public class HomeGC {
 
     public void newWpClicked(){
         if (this.loggedUser == null) {
-            LOGGER.warning("ERRORE: Impossibile aprire il popup, loggedUser è null!");
+            LOGGER.warning("Error: Logged User is null!");
             return;
         }
 
         NewWorkplaceGC popupController = (NewWorkplaceGC) SceneManager.getInstance()
-                .showModalDialog("NewWorkplace.fxml", "Configura Nuovo Workplace");
+                .showModalDialog("NewWorkplace.fxml", "Create a new Workplace");
 
 
         // 2. Passiamo l'utente loggato al controller del popup
@@ -297,7 +291,7 @@ public class HomeGC {
             });
 
         } else {
-            LOGGER.severe("Errore nel caricamento del popup");
+            LOGGER.severe("Error showing the popup windows");
         }
 
     }
@@ -360,7 +354,7 @@ public class HomeGC {
                 HBox bottomBox = new HBox();
                 bottomBox.setAlignment(Pos.BOTTOM_LEFT);
 
-                Label addressLabel = new Label(wp.getAddress() != null ? wp.getAddress() : "Nessun indirizzo");
+                Label addressLabel = new Label(wp.getAddress() != null ? wp.getAddress() : "No address found");
                 addressLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666666;");
 
                 Region spacer = new Region();

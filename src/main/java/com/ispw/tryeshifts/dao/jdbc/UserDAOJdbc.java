@@ -37,7 +37,7 @@ public class UserDAOJdbc implements UserDAO {
             }
         } catch (SQLException e) {
             // Incapsuliamo l'errore tecnico
-            throw new DataFetchException("Errore durante la ricerca dell'utente: " + email,e);
+            throw new DataFetchException("Error finding the user: " + email,e);
         }
     }
     public void save(UserInfo user) throws DuplicateEntityException, DataFetchException {
@@ -57,7 +57,7 @@ public class UserDAOJdbc implements UserDAO {
             if (e.getErrorCode() == 1062) { // Codice errore MySQL per "Duplicate Entry"
                 throw new DuplicateEntityException("User",user.getEmail());
             } else {
-                throw new DataFetchException("Errore durante il salvataggio dell'utente: ",e);
+                throw new DataFetchException("Error saving the user: ",e);
             }
         }
     }

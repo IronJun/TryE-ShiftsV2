@@ -9,12 +9,12 @@ public class WorkerShiftsStrat implements ShiftsUIStrat {
         publicBtn.setManaged(false);
 
         if ("OPEN".equals(status)) {
-            label.setText("Clicca sui turni per dare la tua disponibilità.");
+            label.setText("Click on the shifts to give your availabilities.");
             saveBtn.setVisible(true);
             saveBtn.setManaged(true);
         } else {
             // Se LOCKED o PUBLISHED, il lavoratore può solo guardare
-            label.setText("Le disponibilità per questa settimana sono chiuse (Sola Lettura).");
+            label.setText("The shifts for this week have been locked.");
             saveBtn.setVisible(false);
             saveBtn.setManaged(false);
         }

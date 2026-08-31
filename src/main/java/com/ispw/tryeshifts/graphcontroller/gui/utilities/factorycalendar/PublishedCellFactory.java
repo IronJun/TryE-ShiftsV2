@@ -30,7 +30,7 @@ public class PublishedCellFactory implements ShiftCellProvider {
         List<String> assignedWorkers = finalAssignments.get(cellKey);
 
         if(assignedWorkers == null || assignedWorkers.isEmpty()){
-            Label nameLable = new Label("Libero");
+            Label nameLable = new Label("Free");
             nameLable.setStyle("-fx-text-fill: #95a5a6; -fx-font-style: italic;");
             cell.getChildren().add(nameLable);
         }else{

@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 public class BossShiftsStrat implements ShiftsUIStrat {
 
     public void customizeUI(Label label, Button saveBtn, Button publicBtn,String status) {
-        label.setText("Gestione turni - Stato attuale: " + status);
+        label.setText("Shifts - Current status: " + status);
         saveBtn.setVisible(false);
         saveBtn.setManaged(false);
 
@@ -19,7 +19,7 @@ public class BossShiftsStrat implements ShiftsUIStrat {
         } else if ("LOCKED".equals(status)) {
             publicBtn.setText("Public Shifts");
         } else if ("PUBLISHED".equals(status)) {
-            publicBtn.setText("Turni Pubblicati");
+            publicBtn.setText("Published shifts");
             publicBtn.setDisable(true); // Opzionale: disabilita se già fatto
         }
     }

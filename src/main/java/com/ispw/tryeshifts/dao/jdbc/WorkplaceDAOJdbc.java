@@ -42,62 +42,64 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             if (conn != null) {
                 try { conn.rollback(); } catch (SQLException ex) { Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, ex); }
             }
-            throw new DataFetchException("Errore nel salvataggio del workplace: ", e);
+            throw new DataFetchException("Error saving workplace: ", e);
         } finally {
             try { if (conn != null) conn.close(); } catch (SQLException e) { Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, e); }
         }
     }
     @Override
-    public void updateWorkplace(Workplace updateWp, String oldName)throws DataFetchException, DuplicateEntityException,
-            EntityNotFoundException {
+    public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException, DuplicateEntityException, EntityNotFoundException {
 
-        if (updateWp == null ||oldName == null || oldName.isBlank()) {
-            throw new IllegalArgumentException("Workplace non valido");
+        if (updateWp == null || oldName == null || oldName.isBlank()) {
+            throw new IllegalArgumentException("Not valid Workplace");
         }
-
-        String updateWorkplaceSql =
-                "UPDATE workplaces SET name = ?, address = ? "
-                        + "WHERE TRIM(name) = TRIM(?)";
-
         try (Connection conn = DBconnection.getInstance().getConnection()) {
-            conn.setAutoCommit(false);
-
-            try {
-                int workplaceId = findWorkplaceId(conn, oldName);
-
-                try (PreparedStatement pstmt =
-                             conn.prepareStatement(updateWorkplaceSql)) {
-
-                    pstmt.setString(1, updateWp.getName());
-                    pstmt.setString(2, updateWp.getAddress());
-                    pstmt.setString(3, oldName);
-
-                    pstmt.executeUpdate();
-                }
-
-                replaceWorkplaceConfiguration(conn, workplaceId, updateWp);
-
-                conn.commit();
-
-            } catch (SQLException | EntityNotFoundException e) {
-                conn.rollback();
-                throw e;
-            }
-
+            updateWorkplaceTransaction(conn, updateWp, oldName);
         } catch (EntityNotFoundException e) {
             throw e;
-
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
-                throw new DuplicateEntityException(
-                        "Workplace",
-                        updateWp.getName(),
-                        e
-                );
+                throw new DuplicateEntityException("Workplace", updateWp.getName(), e);
             }
+            throw new DataFetchException("Error updating the workplace", e);
+        }
+    }
+    private void updateWorkplaceTransaction(Connection conn, Workplace updateWp, String oldName) throws SQLException, EntityNotFoundException {
+        boolean previousAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
 
-            throw new DataFetchException(
-                    "Errore durante l'aggiornamento del workplace", e);
+        try {
+            int workplaceId = findWorkplaceId(conn, oldName);
+
+            updateWorkplaceMainData(conn, updateWp, oldName);
+
+            replaceWorkplaceConfiguration(conn, workplaceId, updateWp);
+
+            conn.commit();
+
+        } catch (SQLException | EntityNotFoundException e) {
+            conn.rollback();
+            throw e;
+
+        } finally {
+            conn.setAutoCommit(previousAutoCommit);
+        }
+    }
+
+    private void updateWorkplaceMainData(Connection conn, Workplace updateWp, String oldName) throws SQLException {
+
+        String query = """
+            UPDATE workplaces
+            SET name = ?, address = ?
+            WHERE TRIM(name) = TRIM(?)
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, updateWp.getName());
+            pstmt.setString(2, updateWp.getAddress());
+            pstmt.setString(3, oldName);
+
+            pstmt.executeUpdate();
         }
     }
 
@@ -153,7 +155,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore durante la ricerca del workplace: ",e);
+            throw new DataFetchException("Error finding the workplace : ",e);
         }
     }
     public Workplace findWorkplaceByName(String name) throws DataFetchException {
@@ -180,7 +182,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero della lista workplace: ",e);
+            throw new DataFetchException("Error listing the workplace: ",e);
         }
         return null;
     }
@@ -219,7 +221,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero della lista workplace: ",e);
+            throw new DataFetchException("Error retrieving the wokrplace list: ",e);
         }
         return list;
     }
@@ -237,7 +239,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 list.add(wp);
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore recupero totale workplace: ",e);
+            throw new DataFetchException("Error retrieving all workplaces: ",e);
         }
         return list;
     }
@@ -258,7 +260,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore ricerca per nome: ",e);
+            throw new DataFetchException("Error in the search by name: ",e);
         }
         return list;
     }
@@ -271,7 +273,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) return rs.getString("status_name");
         } catch (SQLException e) {
-            throw new DataFetchException("Impossibile recuperare lo stato della settimana:",e);
+            throw new DataFetchException("Unable to retrieve week status",e);
         }
         return null;
     }
@@ -287,7 +289,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             pstmt.setString(4, newStatus);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataFetchException("Impossibile aggiornare lo stato della settimana:",e);
+            throw new DataFetchException("Unable to update week status",e);
         }
     }
     public void savePublishedShifts(String workplace, String weekId, Map<String, List<String>> assignments) throws DataFetchException{
@@ -296,7 +298,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             conn.setAutoCommit(false); // Transazione per sicurezza
             mapPopulation(conn, workplace, weekId, assignments, query);
         } catch (SQLException e) {
-            throw new DataFetchException("Errore DB: impossibile salvare le assegnazioni",e);
+            throw new DataFetchException("DB Error",e);
         }
     }
     public Map<String, List<String>> getPublishedShiftsByWeek(String workplaceName, String weekId) throws DataFetchException {
@@ -318,7 +320,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 shifts.computeIfAbsent(fullKeyForUi, k -> new ArrayList<>()).add(email);
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore DB: impossibile recuperare le assegnazioni",e);
+            throw new DataFetchException("DB Error: unable to retrieve the reports",e);
         }
         return shifts;
     }
@@ -359,7 +361,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
                 if (rs.next()) {
                     return rs.getInt(1);
                 } else {
-                    throw new SQLException("Salvataggio fallito, nessun ID generato.");
+                    throw new SQLException("Saving failed, id not generated.");
                 }
             }
         }

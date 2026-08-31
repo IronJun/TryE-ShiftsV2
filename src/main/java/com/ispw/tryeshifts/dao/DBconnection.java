@@ -39,10 +39,6 @@ public class DBconnection {
         return LazyContainer.instance;
     }
 
-    private void connect() throws SQLException {
-
-    }
-
     public Connection getConnection() throws SQLException {
         String password = System.getenv("DB_password");
         if (password == null || password.isEmpty()){

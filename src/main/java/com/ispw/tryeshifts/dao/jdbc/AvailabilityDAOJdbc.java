@@ -48,7 +48,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                         availability.getUserEmail() + " il " + availability.getDay(),e);
             }
             // 2. Errore generico di database (Connessione, permessi, tabella mancante)
-            throw new DataFetchException("Impossibile salvare la disponibilità nel database",e);        }
+            throw new DataFetchException("Impossible to save availability to database",e);        }
     }
 
     public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
@@ -60,7 +60,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
             pstmt.setString(3, weekId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataFetchException("Errore durante la cancellazione delle disponibilità: " ,e);
+            throw new DataFetchException("Error during the deletion of this availability: " ,e);
         }
     }
     public List<Availability> getAvailabilitiesByWorkplace(String workplaceName,String weekId) throws DataFetchException {
@@ -89,7 +89,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero disponibilità per il workplace " + workplaceName + ": ",e);
+            throw new DataFetchException("Error fetch workplace availability" + workplaceName + ": ",e);
         }
         return list;
     }
@@ -118,7 +118,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("Errore nel recupero disponibilità: " ,e);
+            throw new DataFetchException("Error loading availability: " ,e);
         }
         return list;
     }
@@ -154,7 +154,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataFetchException("impossibile recupare le diposniblità dalla settimana",e);
+            throw new DataFetchException("Error loading Week availabilities ",e);
         }
 
         return availabilitiesMap;
@@ -188,7 +188,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
                 throw new EntityNotFoundException("No availability found to eliminate for: ", ava.getUserEmail());
             }
         }catch(SQLException e){
-            throw new DataFetchException("Impossibile eliminare le availability: ",e);
+            throw new DataFetchException("Unable to cancel availability: ",e);
         }
     }
 
@@ -227,7 +227,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
         } catch (SQLException e) {
             throw new DataFetchException(
-                    "Impossibile recuperare le disponibilità dell'utente", e);
+                    "Unable to load the user availabilities", e);
         }
 
         return availabilities;
@@ -247,7 +247,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
         } catch (SQLException e) {
             throw new DataFetchException(
-                    "Impossibile eliminare le disponibilità del workplace", e);
+                    "Unable to delete workplace availabilities", e);
         }
     }
 }

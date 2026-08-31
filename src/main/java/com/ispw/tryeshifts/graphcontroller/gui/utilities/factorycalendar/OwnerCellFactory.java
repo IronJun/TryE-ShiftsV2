@@ -28,7 +28,7 @@ public class OwnerCellFactory implements ShiftCellProvider {
             // Applichiamo uno stile grigio scuro/neutro per indicare la chiusura
             cell.setStyle("-fx-border-color: #D1CFE2; -fx-padding: 5; -fx-background-color: #f2f2f2;");
 
-            Label closedLabel = new Label("CHIUSO");
+            Label closedLabel = new Label("Closed");
             closedLabel.setStyle("-fx-text-fill: #bdc3c7; -fx-font-size: 10px; -fx-font-weight: bold;");
             cell.getChildren().add(closedLabel);
 

@@ -75,7 +75,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
             pstmt.setString(2, notif.getMessage());
             pstmt.setString(3, notif.getType());
             pstmt.setBoolean(4, false); // Appena creata è non letta
-            pstmt.setString(5, "Proprio Ora");
+            pstmt.setString(5, "Right nowP");
 
             pstmt.executeUpdate();
         }catch (SQLException e){
