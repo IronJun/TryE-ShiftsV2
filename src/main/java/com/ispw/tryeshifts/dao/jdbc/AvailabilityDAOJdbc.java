@@ -191,4 +191,63 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
             throw new DataFetchException("Impossibile eliminare le availability: ",e);
         }
     }
+
+    @Override
+    public List<Availability> getAvailabilitiesByUserAndWeek(
+            String email,
+            String weekId
+    ) throws DataFetchException {
+
+        String query = """
+            SELECT workplace_name, day_name, start_shift, end_shift, week_id
+            FROM availabilities
+            WHERE user_email = ? AND week_id = ?
+            """;
+
+        List<Availability> availabilities = new ArrayList<>();
+
+        try (Connection conn = DBconnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, email);
+            pstmt.setString(2, weekId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    availabilities.add(new Availability(
+                            email,
+                            rs.getString(WORKPLACE_STR_NAME),
+                            rs.getString(DAY_NAME),
+                            rs.getString(START_SHIFT),
+                            rs.getString(END_SHIFT),
+                            rs.getString(WEEK_ID)
+                    ));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataFetchException(
+                    "Impossibile recuperare le disponibilità dell'utente", e);
+        }
+
+        return availabilities;
+    }
+
+    @Override
+    public void deleteAvailabilitiesByWorkplace(String workplaceName)
+            throws DataFetchException {
+
+        String query = "DELETE FROM availabilities WHERE workplace_name = ?";
+
+        try (Connection conn = DBconnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, workplaceName);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DataFetchException(
+                    "Impossibile eliminare le disponibilità del workplace", e);
+        }
+    }
 }

@@ -140,8 +140,8 @@ public class SettingsGC {
             WorkplaceBean updatedBean = new WorkplaceBean(nameField.getText(), addressField.getText(), selectedDays, shiftsListView.getItems(), currentWp.getOwnerEmail());
 
             SettingsAC ac = new SettingsAC();
-            ac.updateWorkplace(updatedBean, oldName);
-            SessionContext.getInstance().setLoggedWorkplace(updatedBean);
+            WorkplaceBean savedWp = ac.updateWorkplace(updatedBean, oldName);
+            SessionContext.getInstance().setLoggedWorkplace(savedWp);
             SceneManager.getInstance().showInfoAlert("Success", "Workplace updated correctly");
         }catch (IllegalArgumentException e){
             ErrorViewManager.showError(errorlabel,e.getMessage());
@@ -166,20 +166,21 @@ public class SettingsGC {
                 }
             }
 
-            UserBean updatedUser = SessionContext.getInstance().getLoggeduser();
-            if(updatedUser == null){
+            UserBean currentUser = SessionContext.getInstance().getLoggeduser();
+            if(currentUser == null){
                 ErrorViewManager.showError(errorlbl2,"User not found");
                 return;
             }
-            updatedUser.setName(firstNameField.getText());
-            updatedUser.setSurname(lastNameField.getText());
 
-            if(!newPwd.isEmpty()){
-                updatedUser.setPassword(newPwd);
-            }
+            UserBean updateRequest = new UserBean(currentUser.getEmail(),newPwd, firstNameField.getText(), lastNameField.getText(), confirmPwd);
+            updateRequest.setRole(currentUser.getRole());
+
 
             SettingsAC ac = new SettingsAC();
-            ac.updateUserProfile(updatedUser);
+            UserBean savedUser = ac.updateUserProfile(updateRequest);
+            savedUser.setRole(currentUser.getRole());
+
+            SessionContext.getInstance().setLoggeduser(savedUser);
 
             SceneManager.getInstance().showInfoAlert("Success","Profile updated correctly");
 

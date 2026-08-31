@@ -7,6 +7,8 @@ import com.ispw.tryeshifts.utils.SecurityUtils;
 import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.exception.*;
 
+import java.util.Locale;
+
 
 public class LoginAC {
     private final UserDAO userRepo;
@@ -19,13 +21,14 @@ public class LoginAC {
     }
     public  UserBean loginUser(UserBean userBean) throws BaseException{
         UserInfo savedUser;
-        savedUser=userRepo.findByEmail(userBean.getEmail());
+        String email = userBean.getEmail().trim().toLowerCase(Locale.ROOT);
+        savedUser=userRepo.findByEmail(email);
         if(savedUser == null){throw new InvalidCredentialException("Email not registered, please try again");}
         String hashedInputPassword = SecurityUtils.hashPassword(userBean.getPassword());
         if (!savedUser.getPasswordHash().equals(hashedInputPassword)) {
             throw new InvalidCredentialException("Incorrect password, please try again.");
         }
-
+        userBean.setEmail(savedUser.getEmail());
         userBean.setName(savedUser.getName());
         userBean.setSurname(savedUser.getSurname());
 

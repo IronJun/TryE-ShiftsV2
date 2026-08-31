@@ -1,5 +1,6 @@
 package com.ispw.tryeshifts.graphcontroller.gui;
 
+import com.ispw.tryeshifts.appcontroller.AccessWorkplaceAC;
 import com.ispw.tryeshifts.appcontroller.utils.WeekStatusCalc;
 import com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC;
 import com.ispw.tryeshifts.graphcontroller.gui.utilities.SceneManager;
@@ -22,6 +23,7 @@ import com.ispw.tryeshifts.graphcontroller.gui.utilities.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -220,6 +222,18 @@ public class ShiftsGC {
         }
     }
 
+    @FXML
+    private void onScheduleInfoClicked() {
+        String message ="Monday–Wednesday:\n" +
+                "Workers can submit their shift requests for the following week;\n" +
+                "Thursday–Friday:\n" +
+                "The boss can modify the shifts\n" +
+                "Saturday–Sunday: \n" +
+                "Shifts are published and cannot be changed by either the boss or the workers\n" +
+                "\n" +
+                "The boss can also decide to lock and publish shifts whenever he or she wants; he or she does not have to wait for specific deadlines." ;
+        SceneManager.getInstance().showInfoAlert("How Shifts Work ", message);
+    }
 
 
     private record TableContext(
@@ -237,13 +251,18 @@ public class ShiftsGC {
         if(user == null || wp == null) {
             throw new BaseException("User ora Workplace not found");
         }
+
+        WorkplaceBean refreshWp = new AccessWorkplaceAC().canAccess(user,selectedWorkplace.getWorkplaceName());
+        SessionContext.getInstance().setLoggedWorkplace(refreshWp);
+        selectedWorkplace = refreshWp;
+        workplaceTitleLabel.setText(refreshWp.getWorkplaceName());
         return new TableContext(
-                manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId),
-                user.getEmail().equals(wp.getOwnerEmail()),
-                manageAC.getShiftData(user, wp,currentWeekId),
-                pubAc.getAssignmentsForWeek(wp, currentWeekId),
+                manageAC.getWeekStatusShifts(refreshWp.getWorkplaceName(), currentWeekId),
+                user.getEmail().equals(refreshWp.getOwnerEmail()),
+                manageAC.getShiftData(user, refreshWp,currentWeekId),
+                pubAc.getAssignmentsForWeek(refreshWp, currentWeekId),
                 user,
-                wp);
+                refreshWp);
     }
     private void addTableHeaders() {
         // Header ORA
@@ -267,7 +286,7 @@ public class ShiftsGC {
     private void addTimeSlotLabel(String slotText, int rowIndex) {
         RowConstraints rowConstraint = new RowConstraints();
         rowConstraint.setMinHeight(80);
-        rowConstraint.setPrefHeight(80);
+        rowConstraint.setPrefHeight(Region.USE_COMPUTED_SIZE);
         rowConstraint.setVgrow(Priority.ALWAYS);
         shiftsGrid.getRowConstraints().add(rowConstraint);
 

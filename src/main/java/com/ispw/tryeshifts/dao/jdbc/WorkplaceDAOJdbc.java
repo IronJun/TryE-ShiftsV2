@@ -47,28 +47,102 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
             try { if (conn != null) conn.close(); } catch (SQLException e) { Logger.getLogger(WorkplaceDAOJdbc.class.getName()).log(Level.SEVERE, null, e); }
         }
     }
-    public void updateWorkplace(Workplace updateWp, String oldName) throws DataFetchException,DuplicateEntityException,EntityNotFoundException {
-        String sql = "UPDATE workplaces SET name = ?, address = ? WHERE TRIM(name) = TRIM(?)";
-        try (Connection conn = DBconnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    @Override
+    public void updateWorkplace(Workplace updateWp, String oldName)throws DataFetchException, DuplicateEntityException,
+            EntityNotFoundException {
 
-            pstmt.setString(1, updateWp.getName());
-            pstmt.setString(2, updateWp.getAddress());
-            pstmt.setString(3, oldName);
+        if (updateWp == null ||oldName == null || oldName.isBlank()) {
+            throw new IllegalArgumentException("Workplace non valido");
+        }
 
-            int affectedRows = pstmt.executeUpdate();
+        String updateWorkplaceSql =
+                "UPDATE workplaces SET name = ?, address = ? "
+                        + "WHERE TRIM(name) = TRIM(?)";
 
-            if (affectedRows == 0) {
-                throw new EntityNotFoundException("Workplace", oldName);
+        try (Connection conn = DBconnection.getInstance().getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                int workplaceId = findWorkplaceId(conn, oldName);
+
+                try (PreparedStatement pstmt =
+                             conn.prepareStatement(updateWorkplaceSql)) {
+
+                    pstmt.setString(1, updateWp.getName());
+                    pstmt.setString(2, updateWp.getAddress());
+                    pstmt.setString(3, oldName);
+
+                    pstmt.executeUpdate();
+                }
+
+                replaceWorkplaceConfiguration(conn, workplaceId, updateWp);
+
+                conn.commit();
+
+            } catch (SQLException | EntityNotFoundException e) {
+                conn.rollback();
+                throw e;
             }
+
+        } catch (EntityNotFoundException e) {
+            throw e;
+
         } catch (SQLException e) {
-            // Gestione errore duplicato (se il nuovo nome esiste già)
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
-                throw new DuplicateEntityException("Workplace", updateWp.getName(),e);
+                throw new DuplicateEntityException(
+                        "Workplace",
+                        updateWp.getName(),
+                        e
+                );
             }
-            throw new DataFetchException("Errore database: ",e);
+
+            throw new DataFetchException(
+                    "Errore durante l'aggiornamento del workplace", e);
         }
     }
+
+    private int findWorkplaceId(Connection conn, String workplaceName)
+            throws SQLException, EntityNotFoundException {
+
+        String query = "SELECT id FROM workplaces WHERE TRIM(name) = TRIM(?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, workplaceName);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        }
+
+        throw new EntityNotFoundException("Workplace", workplaceName);
+    }
+
+    private void replaceWorkplaceConfiguration(
+            Connection conn,
+            int workplaceId,
+            Workplace workplace
+    ) throws SQLException {
+
+        try (PreparedStatement deleteDays = conn.prepareStatement(
+                "DELETE FROM workplace_days WHERE workplace_id = ?");
+             PreparedStatement deleteShifts = conn.prepareStatement(
+                     "DELETE FROM workplace_shifts WHERE workplace_id = ?")) {
+
+            deleteDays.setInt(1, workplaceId);
+            deleteDays.executeUpdate();
+
+            deleteShifts.setInt(1, workplaceId);
+            deleteShifts.executeUpdate();
+        }
+
+        // Sono già presenti nella tua classe e riusano la stessa connessione.
+        insertWorkplaceDays(conn, workplaceId, workplace);
+        insertWorkplaceShifts(conn, workplaceId, workplace);
+    }
+
+
     public boolean existsWorkplaceByName(String name) throws DataFetchException {
         String query = "SELECT COUNT(*) FROM workplaces WHERE name = ?";
         try (Connection conn = DBconnection.getInstance().getConnection();

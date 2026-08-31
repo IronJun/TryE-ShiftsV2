@@ -28,11 +28,6 @@ public class DBconnection {
     }
 
     private DBconnection(){
-        try{
-            connect();
-        }catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "error during DB connection", e);
-        }
     }
 
     private static class LazyContainer {
@@ -45,19 +40,14 @@ public class DBconnection {
     }
 
     private void connect() throws SQLException {
+
+    }
+
+    public Connection getConnection() throws SQLException {
         String password = System.getenv("DB_password");
         if (password == null || password.isEmpty()){
             LOGGER.warning("CRITICAL ERROR: environment variable DB_password is null or empty");
         }
-        this.connection = DriverManager.getConnection(props.getProperty("db.url"),
-            props.getProperty("db.user"),password);
-    }
-
-    public Connection getConnection() throws SQLException {
-        if(connection == null || connection.isClosed()) {
-            LOGGER.warning("CRITICAL ERROR: connection is expired or closed, i try to open it again...");
-            connect();
-        }
-        return connection;
+        return DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.user"),password);
     }
 }

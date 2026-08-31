@@ -3,7 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ispw.tryeshifts.graphcontroller.gui.ShiftsGC">
 
     <top>
@@ -37,7 +40,7 @@
                 </HBox>
                 <Label fx:id ="errorlbl" textFill="#4B4488" visible="false" managed="false"/>
 
-                <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                <ScrollPane VBox.vgrow="ALWAYS"  fitToHeight="false" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
                     <GridPane fx:id="shiftsGrid" gridLinesVisible="true" style="-fx-background-color: white;">
                         <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="80.0" prefWidth="100.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="120.0" halignment="CENTER" /> </columnConstraints>
@@ -70,12 +73,38 @@
             <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 10;">
                 <Label fx:id = "countdownLabel" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-font-size: 15;"/>
 
+
+                <Label fx:id="lblMode" text="Shifts publication mode: " style="-fx-font-weight: bold; -fx-text-fill: #4B4488;" />
+                <Label text="other modes will be soon implemented" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button onAction="#onScheduleInfoClicked" prefWidth="30" prefHeight="30"
+                        style="-fx-background-color: transparent;
+                        -fx-border-color: #transparent;
+                        -fx-border-radius: 5;
+                        -fx-text-fill: #4B4488;
+                        -fx-cursor: hand;" >
+
+                    <graphic>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@assets/infoLogo.png" backgroundLoading="true" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="How does Shifts works?"/>
+                    </tooltip>
+                </Button>
+
+
+
                 <padding>
                     <Insets left="10.0" />
                 </padding>
-                <Label fx:id="lblMode" text="Shifts publication mode: " style="-fx-font-weight: bold; -fx-text-fill: #4B4488;" />
-                <Label text="go to the settings to change that" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
             </HBox>
+
+
         </VBox>
     </center>
 </BorderPane>

@@ -53,4 +53,14 @@ public class NotificationAC {
         notificationDAO.markAllAsread(email);
         notificationDAO.deleteNotification(email);
     }
+
+    public CompletableFuture<Integer> getUnreadNotificationCountAsync(String email) {
+        return CompletableFuture.supplyAsync(()-> {
+            try{
+                return notificationDAO.countNotificationByUserEmail(email);
+            }catch(BaseException e){
+                throw new CompletionException(e);
+            }
+        });
+    }
 }

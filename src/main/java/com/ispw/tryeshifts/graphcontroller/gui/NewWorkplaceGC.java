@@ -64,7 +64,7 @@ public class NewWorkplaceGC {
     @FXML
     public void onSave() {
         if (loggedUser == null) {
-            LOGGER.warning("ERRORE: Il popup non ha ricevuto l'utente loggato!");
+            LOGGER.warning("ERROR: not received the logged user!");
             return;
         }
 
@@ -127,9 +127,7 @@ public class NewWorkplaceGC {
             String formattedShift = new ManageShiftsAC().addShiftstoWorkaplce(startM,startH,endM,endH,shiftsListView.getItems());
             shiftsListView.getItems().add(formattedShift);
             Collections.sort(shiftsListView.getItems());
-        }catch(IllegalArgumentException _){
-            ErrorViewManager.showError(errorLabel,"Invalid shift time!");
-        }catch(BaseException e){
+        }catch(IllegalArgumentException | BaseException e){
             ErrorViewManager.showError(errorLabel,e.getMessage());
         }
     }

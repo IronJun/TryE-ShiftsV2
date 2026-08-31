@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.AnchorPane?>
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.ispw.tryeshifts.graphcontroller.gui.component.NavbarGC">
     <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="20.0" style="-fx-background-color: #4B4488;">
@@ -34,11 +35,40 @@
         <Region HBox.hgrow="ALWAYS" />
 
         <HBox alignment="CENTER" spacing="20.0">
-            <StackPane onMouseClicked="#onNotificationBellClicked" style="-fx-cursor: hand;">
-                <Label text="🔔" style="-fx-font-size: 20;" textFill="WHITE"/>
-                <Label fx:id="lblBadgeCount" text="1" visible="false" StackPane.alignment="TOP_RIGHT"
-                       style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5 1 5; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-            </StackPane>
+            <AnchorPane prefWidth="28"
+                        prefHeight="28"
+                        minWidth="28"
+                        minHeight="28"
+                        maxWidth="28"
+                        maxHeight="28"
+                        onMouseClicked="#onNotificationBellClicked"
+                        style="-fx-cursor: hand;">
+
+                <Label text="🔔"
+                       layoutX="2"
+                       layoutY="1"
+                       style="-fx-font-size: 20;"
+                       textFill="WHITE" />
+
+                <Label fx:id="lblBadgeCount"
+                       visible="false"
+                       managed="false"
+                       mouseTransparent="true"
+                       layoutX="20"
+                       layoutY="1"
+                       minWidth="8"
+                       minHeight="8"
+                       maxWidth="8"
+                       maxHeight="8"
+                       style="-fx-background-color: #E74C3C;
+                  -fx-background-radius: 10;
+                  -fx-padding: 0;" />
+            </AnchorPane>
+<!--            <StackPane onMouseClicked="#onNotificationBellClicked" style="-fx-cursor: hand;">-->
+<!--                <Label text="🔔" style="-fx-font-size: 20;" textFill="WHITE"/>-->
+<!--                <Label fx:id="lblBadgeCount"  visible="false" managed = "false" mouseTransparent="true" StackPane.alignment="TOP_RIGHT" minWidth="8" minHeight="8" maxWidth="8" maxHeight="8"-->
+<!--                       style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5 1 5; -fx-font-size: 10px; -fx-font-weight: bold;"/>-->
+<!--            </StackPane>-->
 
             <Button fx:id="btnLogout" onAction="#onLogoutClicked" style="-fx-background-color: transparent; -fx-cursor: hand;">
                 <graphic>

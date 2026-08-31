@@ -28,8 +28,10 @@ public class NavbarGC {
 
     private static final String STYLE_INACTIVE = "-fx-background-color: transparent; -fx-text-fill: white;";
     private static final String STYLE_ACTIVE = "-fx-background-color: #6A62B3; -fx-text-fill: white; -fx-background-radius: 10;";
+    private final NotificationAC notificationAC =  new NotificationAC();
     public void initialize() {
         ErrorViewManager.hideError(errorlbl);
+        refreshNotificationBadge();
     }
 
 
@@ -98,15 +100,11 @@ public class NavbarGC {
 
     public void onNotificationBellClicked(MouseEvent event) throws BaseException {
         ErrorViewManager.hideError(errorlbl);
-        if(lblBadgeCount != null){
-            lblBadgeCount.setVisible(false);
-        }
         UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
         if(loggedUser == null) {
             ErrorViewManager.showError(errorlbl, "Error, logged user is null");
             return;
         }
-        NotificationAC notificationAC = new NotificationAC();
         String email = loggedUser.getEmail();
         Node sourceNode = (Node) event.getSource();
         notificationAC.getUserNotificationsAsync(loggedUser.getEmail())
@@ -114,6 +112,7 @@ public class NavbarGC {
                     NotificationService.showNotificationPopup(sourceNode, notification, () -> {
                         try {
                             notificationAC.markAllAsRead(email);
+                            updateNotificationBadge(false);
                         } catch (BaseException _) {
                             ErrorViewManager.showError(errorlbl,"Error marking all as read");
                         }
@@ -125,6 +124,33 @@ public class NavbarGC {
                 });
 
 
+    }
+
+
+    private void refreshNotificationBadge() {
+        UserBean loggedUser = SessionContext.getInstance().getLoggeduser();
+
+        if (loggedUser == null) {
+            updateNotificationBadge(false);
+            return;
+        }
+
+        notificationAC.getUnreadNotificationCountAsync(loggedUser.getEmail())
+                .thenAccept(count -> Platform.runLater(
+                        () -> updateNotificationBadge(count > 0)
+                ))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> updateNotificationBadge(false));
+                    return null;
+                });
+    }
+    private void updateNotificationBadge(boolean hasUnreadNotifications) {
+        if (lblBadgeCount == null) {
+            return;
+        }
+
+        lblBadgeCount.setVisible(hasUnreadNotifications);
+        lblBadgeCount.setManaged(hasUnreadNotifications);
     }
 
 

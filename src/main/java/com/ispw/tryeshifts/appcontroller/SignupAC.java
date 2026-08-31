@@ -7,6 +7,8 @@ import com.ispw.tryeshifts.entity.UserInfo;
 import com.ispw.tryeshifts.exception.*;
 import com.ispw.tryeshifts.utils.SecurityUtils;
 
+import java.util.Locale;
+
 
 public class SignupAC {
 
@@ -32,7 +34,7 @@ public class SignupAC {
             throw new DuplicateEntityException("User",userbean.getEmail());
         }
 
-        UserInfo userentity = new UserInfo(userbean.getEmail(), userbean.getName(), userbean.getSurname());
+        UserInfo userentity = new UserInfo(userbean.getEmail().trim().toLowerCase(Locale.ROOT), userbean.getName(), userbean.getSurname());
 
         try {
             String hashedPass = SecurityUtils.hashPassword(userbean.getPassword());

@@ -47,7 +47,7 @@ public class CLIService {
         if(console!=null){
             console.printf("%s",message);
         }else{
-            System.out.println(message);
+            LOGGER.info(message);
         }
     }
 

@@ -15,4 +15,6 @@ public interface AvailabilityDAO {
     List<Availability> getAvailabilitiesByUser(String email,String workplaceName,String weekId)throws DataFetchException;
     Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId)throws DataFetchException;
     void deleteSpecificAvailability(Availability availability)throws EntityNotFoundException, DataFetchException;
+    List<Availability> getAvailabilitiesByUserAndWeek(String email, String weekId) throws DataFetchException;
+    void deleteAvailabilitiesByWorkplace(String workplaceName) throws DataFetchException;
 }

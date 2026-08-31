@@ -79,6 +79,7 @@ public class ManageShiftsAC {
         if(!isBoss && !currentWeekStatus.equals("OPEN")){
             throw new ValidationException("Failed to save the avaialability, out of temporal window: "+currentWeekStatus, "Shifts");
         }
+        validateNoCrossWorkplaceConflicts(beans,userEmail,wpName,weekId);
         // 1. CANCELLAZIONE disponibilità cambiate
         availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, weekId);
 
@@ -101,6 +102,7 @@ public class ManageShiftsAC {
         }
     }
 
+    //torna lo status se è locked o published
     public String getWeekStatusShifts(String workplaceName, String weekId) throws BaseException {
         if(workplaceName == null || weekId == null){throw new NullPointerException("Missing research parameter");}
         String status = workplaceRepo.getWeekStatus(workplaceName, weekId);
@@ -156,30 +158,45 @@ public class ManageShiftsAC {
         return start.format(formatter) + " - " + end.format(formatter);
     }
 
-    public  String addShiftstoWorkaplce(String startM, String startH, String endM, String endH, List<String> existingShifts)throws BaseException{
-        int startTotalMinutes = parseToMinutes(startH+ timeSeparator +startM);
-        int endTotalMinutes = parseToMinutes(endH+ timeSeparator +endM);
+    public String addShiftstoWorkaplce(
+            String startM, String startH,
+            String endM, String endH,
+            List<String> existingShifts
+    ) throws BaseException {
 
-        if (endTotalMinutes  <= startTotalMinutes) {
-            throw new IllegalArgumentException("The Shifts must end after it started");
+        String startTime = startH + ":" + startM;
+        String endTime = endH + ":" + endM;
+
+        if (parseToMinutes(startTime) == parseToMinutes(endTime)) {
+            throw new IllegalArgumentException(
+                    "Un turno non può iniziare e finire allo stesso orario");
         }
 
-        String fullShift = startH + timeSeparator + startM + shiftSeparator + endH + timeSeparator + endM;
+        ShiftInterval newShift =
+                createShiftInterval("Mon", startTime, endTime);
 
+        String fullShift = startTime + " - " + endTime;
 
         for (String existing : existingShifts) {
             if (existing.equals(fullShift)) {
-                throw new DuplicateEntityException("shifts","this shifts already exists");
+                throw new DuplicateEntityException(
+                        "shifts", "This shift already exists");
             }
 
-            // Logica Overlap
             String[] parts = shiftSeparator.split(existing);
-            if (parts.length < 2) continue;
-            int existStart = parseToMinutes(parts[0]);
-            int existEnd = parseToMinutes(parts[1]);
+            if (parts.length != 2) {
+                continue;
+            }
 
-            if (startTotalMinutes<existEnd && existStart<= endTotalMinutes) {
-                    throw new IllegalArgumentException("not valid shift: overlapping other shifts");
+            ShiftInterval existingShift = createShiftInterval(
+                    "Mon",
+                    parts[0].trim(),
+                    parts[1].trim()
+            );
+
+            if (repeatedDailyShiftsOverlap(newShift, existingShift)) {
+                throw new IllegalArgumentException(
+                        "Not valid shift: overlapping another shift");
             }
         }
 
@@ -212,4 +229,128 @@ public class ManageShiftsAC {
         return hours * 60 + minutes;
     }
 
+    private void validateNoCrossWorkplaceConflicts(List<AvailabilityBean> newAvailabilities, String userEmail, String currentWorkplace, String weekId) throws BaseException {
+
+        List<Availability> savedAvailabilities =
+                availabilityRepo.getAvailabilitiesByUserAndWeek(userEmail, weekId);
+
+        for (AvailabilityBean newAvailability : newAvailabilities) {
+            for (Availability savedAvailability : savedAvailabilities) {
+
+                // Le disponibilità del workplace corrente vengono sostituite
+                // dal salvataggio attuale: non devono essere confrontate.
+                if (savedAvailability.getWorkplaceName().equals(currentWorkplace)) {
+                    continue;
+                }
+
+                if (shiftsOverlap(
+                        newAvailability.getDay(),
+                        newAvailability.getStartShift(),
+                        newAvailability.getEndShifts(),
+                        savedAvailability.getDay(),
+                        savedAvailability.getStartShift(),
+                        savedAvailability.getEndShift())) {
+
+                    String newShift = formatShift(
+                            newAvailability.getDay(),
+                            newAvailability.getStartShift(),
+                            newAvailability.getEndShifts()
+                    );
+
+                    String existingShift = formatShift(
+                            savedAvailability.getDay(),
+                            savedAvailability.getStartShift(),
+                            savedAvailability.getEndShift()
+                    );
+
+                    throw new ValidationException(
+                            "The shift "
+                                    + newShift
+                                    + " could not be saved for:  "
+                                    + currentWorkplace
+                                    + " because it's overlapping with:  "
+                                    + existingShift
+                                    + " for  "
+                                    + savedAvailability.getWorkplaceName()
+                                    + ".",
+                            "shifts"
+                    );
+                }
+            }
+        }
+    }
+    private boolean shiftsOverlap(String firstDay, String firstStart, String firstEnd, String secondDay, String secondStart, String secondEnd) {
+        ShiftInterval first = createShiftInterval(firstDay, firstStart, firstEnd);
+        ShiftInterval second = createShiftInterval(secondDay, secondStart, secondEnd);
+
+        // Intervalli consecutivi, es. 08:00-10:00 e 10:00-12:00,
+        // non sono sovrapposti.
+        return intervalsOverlap(first, second);
+    }
+    private ShiftInterval createShiftInterval(
+            String day,
+            String startTime,
+            String endTime
+    ) {
+        int dayOffset = getDayOffset(day);
+        int start = dayOffset + parseToMinutes(startTime);
+        int end = dayOffset + parseToMinutes(endTime);
+
+        // Il turno termina il giorno successivo, es. 18:00-02:00.
+        if (end < start) {
+            end += 24 * 60;
+        }
+
+        return new ShiftInterval(start, end);
+    }
+    private int getDayOffset(String day) {
+        return switch (day) {
+            case "Mon" -> 0;
+            case "Tue" -> 24 * 60;
+            case "Wed" -> 2 * 24 * 60;
+            case "Thu" -> 3 * 24 * 60;
+            case "Fri" -> 4 * 24 * 60;
+            case "Sat" -> 5 * 24 * 60;
+            case "Sun" -> 6 * 24 * 60;
+            default -> throw new IllegalArgumentException(
+                    "Giorno non valido: " + day);
+        };
+    }
+    private String formatShift(String day, String start, String end) {
+        return day + " " + start + " - " + end;
+    }
+
+    private record ShiftInterval(int start, int end) {
+    }
+    private boolean intervalsOverlap(
+            ShiftInterval first,
+            ShiftInterval second
+    ) {
+        return first.start() < second.end()
+                && second.start() < first.end();
+    }
+
+    private boolean repeatedDailyShiftsOverlap(
+            ShiftInterval first,
+            ShiftInterval second
+    ) {
+        int dayMinutes = 24 * 60;
+
+        // Serve per confrontare anche, per esempio:
+        // 18:00-02:00 con 01:00-03:00.
+        for (int offset = -dayMinutes; offset <= dayMinutes;
+             offset += dayMinutes) {
+
+            ShiftInterval shiftedSecond = new ShiftInterval(
+                    second.start() + offset,
+                    second.end() + offset
+            );
+
+            if (intervalsOverlap(first, shiftedSecond)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

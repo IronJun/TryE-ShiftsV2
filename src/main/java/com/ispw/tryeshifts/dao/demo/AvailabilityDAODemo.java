@@ -75,4 +75,27 @@ public class AvailabilityDAODemo implements AvailabilityDAO {
                         a.getDay().equalsIgnoreCase(ava.getDay()) &&
                         a.getFullShift().replace(" ", "").equals(ava.getFullShift().replace(" ", "")));
     }
+
+    @Override
+    public List<Availability> getAvailabilitiesByUserAndWeek(
+            String email,
+            String weekId
+    ) {
+        List<Availability> result = new ArrayList<>();
+
+        for (Availability availability : db.getAvailabilities()) {
+            if (availability.getUserEmail().equals(email)
+                    && availability.getWeekId().equals(weekId)) {
+                result.add(availability);
+            }
+        }
+
+        return result;
+    }
+
+    public void deleteAvailabilitiesByWorkplace(String workplaceName) {
+        db.getAvailabilities().removeIf(availability ->
+                availability.getWorkplaceName().equals(workplaceName)
+        );
+    }
 }
