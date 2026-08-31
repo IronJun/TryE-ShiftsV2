@@ -64,11 +64,7 @@
                   -fx-background-radius: 10;
                   -fx-padding: 0;" />
             </AnchorPane>
-<!--            <StackPane onMouseClicked="#onNotificationBellClicked" style="-fx-cursor: hand;">-->
-<!--                <Label text="🔔" style="-fx-font-size: 20;" textFill="WHITE"/>-->
-<!--                <Label fx:id="lblBadgeCount"  visible="false" managed = "false" mouseTransparent="true" StackPane.alignment="TOP_RIGHT" minWidth="8" minHeight="8" maxWidth="8" maxHeight="8"-->
-<!--                       style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5 1 5; -fx-font-size: 10px; -fx-font-weight: bold;"/>-->
-<!--            </StackPane>-->
+
 
             <Button fx:id="btnLogout" onAction="#onLogoutClicked" style="-fx-background-color: transparent; -fx-cursor: hand;">
                 <graphic>
