@@ -80,26 +80,12 @@ public class ManageShiftsAC {
             throw new ValidationException("Failed to save the avaialability, out of temporal window: "+currentWeekStatus, "Shifts");
         }
         validateNoCrossWorkplaceConflicts(beans,userEmail,wpName,weekId);
-        // 1. CANCELLAZIONE disponibilità cambiate
-        availabilityRepo.deleteAvailabilitiesByUser(userEmail, wpName, weekId);
-
-        // 2. SALVATAGGIO (deve essere garantito)
-        try {
-            for (AvailabilityBean bean : beans) {
-                Availability entity = new Availability(
-                        bean.getUserEmail(),
-                        bean.getWorkplaceName(),
-                        bean.getDay(),
-                        bean.getStartShift(),
-                        bean.getEndShifts(),
-                        bean.getWeekId()
-                );
-                availabilityRepo.saveAvailability(entity);
-            }
-        } catch(DataFetchException e) {
-            throw new DataFetchException("Failed to save the avaialability", e);
-             // Rilancia per far sapere alla GUI che è fallito
+        List<Availability> availabilities = new ArrayList<>();
+        for (AvailabilityBean bean : beans) {
+            availabilities.add(new Availability(userEmail, wpName, bean.getDay(), bean.getStartShift(), bean.getEndShifts(), weekId));
         }
+        availabilityRepo.replaceAvailabilities(userEmail, wpName, weekId, availabilities
+        );
     }
 
     //torna lo status se è locked o published
@@ -145,7 +131,7 @@ public class ManageShiftsAC {
 
     public  String calculateWeekId(int weekOffset) {
         LocalDate targetDate = LocalDate.now(ZoneId.systemDefault()).plusWeeks(weekOffset);
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        WeekFields weekFields = WeekFields.ISO;
         int weekNum = targetDate.get(weekFields.weekOfWeekBasedYear());
         int year = targetDate.get(weekFields.weekBasedYear());
         return year + "_" + String.format("%02d", weekNum);

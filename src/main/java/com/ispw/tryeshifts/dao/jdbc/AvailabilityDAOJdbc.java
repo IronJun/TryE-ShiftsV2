@@ -44,11 +44,11 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
-                throw new DuplicateEntityException("Availability",
-                        availability.getUserEmail() + " il " + availability.getDay(),e);
+                throw new DuplicateEntityException("Availability", availability.getUserEmail() + " il " + availability.getDay(),e);
             }
             // 2. Errore generico di database (Connessione, permessi, tabella mancante)
-            throw new DataFetchException("Impossible to save availability to database",e);        }
+            throw new DataFetchException("Impossible to save availability to database",e);
+        }
     }
 
     public void deleteAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
@@ -93,7 +93,6 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         }
         return list;
     }
-
     public List<Availability> getAvailabilitiesByUser(String email, String workplaceName,String weekId) throws DataFetchException {
         List<Availability> list = new ArrayList<>();
         String query = "SELECT workplace_name, week_id, day_name, start_shift, end_shift " +
@@ -122,11 +121,8 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
         }
         return list;
     }
-    @Override
     public Map<String, List<String>> getAvailabilitiesByWeek(String workplaceName, String weekId) throws DataFetchException {
         Map<String, List<String>> availabilitiesMap = new HashMap<>();
-
-        // Query che seleziona l'email e compone la chiave della cella
         String query = "SELECT user_email, day_name, start_shift, end_shift " +
                 "FROM availabilities " +
                 "WHERE workplace_name = ? AND week_id = ?";
@@ -139,24 +135,18 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    // 1. Ricostruiamo la cellKey per farla corrispondere a quella della UI
                     String day = rs.getString(DAY_NAME);
                     String start = rs.getString(START_SHIFT);
                     String end = rs.getString(END_SHIFT);
                     String cellKey = day + "_" + start + "-" + end;
-
-                    // 2. Recuperiamo l'email del lavoratore
                     String email = rs.getString(USER_EMAIL);
-
-                    // 3. Aggiungiamo l'email alla lista corrispondente a quella cella
-                    // Se la chiave non esiste, crea una nuova ArrayList
                     availabilitiesMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(email);
                 }
             }
         } catch (SQLException e) {
             throw new DataFetchException("Error loading Week availabilities ",e);
         }
-
+        //Torno mappa composta da giorni associati a liste di availability
         return availabilitiesMap;
     }
 
@@ -193,11 +183,7 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
     }
 
     @Override
-    public List<Availability> getAvailabilitiesByUserAndWeek(
-            String email,
-            String weekId
-    ) throws DataFetchException {
-
+    public List<Availability> getAvailabilitiesByUserAndWeek(String email, String weekId) throws DataFetchException {
         String query = """
             SELECT workplace_name, day_name, start_shift, end_shift, week_id
             FROM availabilities
@@ -236,18 +222,65 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
     @Override
     public void deleteAvailabilitiesByWorkplace(String workplaceName)
             throws DataFetchException {
-
         String query = "DELETE FROM availabilities WHERE workplace_name = ?";
-
         try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-
             pstmt.setString(1, workplaceName);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataFetchException("Unable to delete workplace availabilities", e);
+        }
+    }
+
+    @Override
+    public void replaceAvailabilities(String userEmail, String workplaceName, String weekId, List<Availability> availabilities) throws DataFetchException {
+        if (userEmail == null || workplaceName == null || weekId == null || availabilities == null) {
+            throw new IllegalArgumentException("Missing availability replacement data");
+        }
+
+        String deleteQuery = """
+            DELETE FROM availabilities
+            WHERE user_email = ? AND workplace_name = ? AND week_id = ?
+            """;
+
+        String insertQuery = """
+            INSERT INTO availabilities
+            (user_email, workplace_name, week_id, day_name, start_shift, end_shift)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """;
+
+        try (Connection conn = DBconnection.getInstance().getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement deleteStatement = conn.prepareStatement(deleteQuery);
+                 PreparedStatement insertStatement = conn.prepareStatement(insertQuery)) {
+                deleteStatement.setString(1, userEmail);
+                deleteStatement.setString(2, workplaceName);
+                deleteStatement.setString(3, weekId);
+                deleteStatement.executeUpdate();
+                for (Availability availability : availabilities) {
+                    insertStatement.setString(1, userEmail);
+                    insertStatement.setString(2, workplaceName);
+                    insertStatement.setString(3, weekId);
+                    insertStatement.setString(4, availability.getDay());
+                    insertStatement.setString(5, availability.getStartShift());
+                    insertStatement.setString(6, availability.getEndShift());
+                    insertStatement.addBatch();
+                }
+                if (!availabilities.isEmpty()) {
+                    insertStatement.executeBatch();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new DataFetchException(
+                        "Unable to replace the user's availabilities", e
+                );
+            }
 
         } catch (SQLException e) {
             throw new DataFetchException(
-                    "Unable to delete workplace availabilities", e);
+                    "Database error while replacing availabilities", e
+            );
         }
     }
 }

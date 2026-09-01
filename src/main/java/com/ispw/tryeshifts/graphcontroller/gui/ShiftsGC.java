@@ -94,19 +94,31 @@ public class ShiftsGC {
             WorkplaceBean wp = SessionContext.getInstance().getLoggedWorkplace();
             if(wp == null || this.currentWeekId == null){
                 ErrorViewManager.showError(errorlbl,"no workplace passed or week id null");
+                return;
             }
             String weekCurrentStatus = manageAC.getWeekStatusShifts(wp.getWorkplaceName(), currentWeekId);
 
-            WeekStatusCalc calc = new WeekStatusCalc();
+            if(PUBLISHED_STATUS.equals(weekCurrentStatus)){
+                if(timeline!=null){
+                    timeline.stop();
+                }
+                countdownLabel.setText("Shifts have been published!");
+                return;
+            }
 
+
+            WeekStatusCalc calc = new WeekStatusCalc();
             LocalDateTime deadline = calc.getNextDeadLine(this.currentWeekId, weekCurrentStatus);
-            if(deadline != null){
+            LocalDateTime now = LocalDateTime.now();
+
+
+            if(deadline != null&&!now.isAfter(deadline)){
                 String actionName ="OPEN".equals(weekCurrentStatus) ? "Until Lock " : "Until Publication";
                 startCountDownTimer(deadline,actionName);
-            }else{
-                if (timeline != null) timeline.stop();
-                countdownLabel.setText("official shifts published");
-                }
+            }
+            if (timeline != null) timeline.stop();
+            countdownLabel.setText("Waiting for the owner to publish the shifts");
+
             }catch(BaseException e){
                 ErrorViewManager.showError(errorlbl,e.getMessage());
             } catch (Exception e) {
@@ -227,10 +239,9 @@ public class ShiftsGC {
         String message ="""
                 Monday–Wednesday: 
                 Workers can submit their shift requests for the following week;
-                Thursday–Friday
-                The boss can modify the shifts
-                Saturday–Sunday:
-                Shifts are published and cannot be changed by either the boss or the workers
+                AFTER Wednesday:
+                the shifts will be locked and the workers won't be able to give shifts, 
+                the boss can now edit the availabilities and publish when he/she wants
                 
                 The boss can also decide to lock and publish shifts whenever he or she wants; he or she does not have to wait for specific deadlines.""";
         SceneManager.getInstance().showInfoAlert("How Shifts Work ", message);

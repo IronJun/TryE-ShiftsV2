@@ -186,7 +186,7 @@ public class WorkplaceDAOJdbc implements WorkplaceDAO {
         }
         return null;
     }
-    public List<Workplace> findWorkplacesbyEmail(String email) throws DataFetchException {
+    public List<Workplace> findWorkplacesByEmail(String email) throws DataFetchException {
         List<Workplace> list = new ArrayList<>();
 
         // Questa query prende:

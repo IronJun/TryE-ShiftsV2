@@ -49,7 +49,7 @@ public class SearchWorkplacesAC {
 
     }
     public List<WorkplaceBean> getWorkplacesByEmail(String email)throws BaseException{
-        List<Workplace> workplaceEntities = workplaceRepo.findWorkplacesbyEmail(email);
+        List<Workplace> workplaceEntities = workplaceRepo.findWorkplacesByEmail(email);
         if (workplaceEntities == null || workplaceEntities.isEmpty()) {
             return new ArrayList<>();
         }

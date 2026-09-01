@@ -98,4 +98,18 @@ public class AvailabilityDAODemo implements AvailabilityDAO {
                 availability.getWorkplaceName().equals(workplaceName)
         );
     }
+    @Override
+    public void replaceAvailabilities(String userEmail, String workplaceName, String weekId, List<Availability> availabilities) {
+        if (userEmail == null || workplaceName == null || weekId == null || availabilities == null) {
+            throw new IllegalArgumentException("Missing availability replacement data");
+        }
+        db.getAvailabilities().removeIf(availability ->
+                availability.getUserEmail().equals(userEmail)
+                        && availability.getWorkplaceName().equals(workplaceName)
+                        && availability.getWeekId().equals(weekId)
+        );
+
+        db.getAvailabilities().addAll(availabilities);
+    }
+
 }

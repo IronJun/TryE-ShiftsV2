@@ -111,10 +111,10 @@ public class NavbarGC {
                 .thenAcceptAsync(notification -> {
                     NotificationService.showNotificationPopup(sourceNode, notification, () -> {
                         try {
-                            notificationAC.markAllAsRead(email);
+                            notificationAC.deleteNotifications(email);
                             updateNotificationBadge(false);
                         } catch (BaseException _) {
-                            ErrorViewManager.showError(errorlbl,"Error marking all as read");
+                            ErrorViewManager.showError(errorlbl,"Unable to delete notifications");
                         }
                     });
                 }, Platform::runLater)

@@ -49,8 +49,7 @@ public class NotificationAC {
      }
 
 
-    public void markAllAsRead(String email) throws BaseException {
-        notificationDAO.markAllAsread(email);
+    public void deleteNotifications(String email) throws BaseException {
         notificationDAO.deleteNotification(email);
     }
 

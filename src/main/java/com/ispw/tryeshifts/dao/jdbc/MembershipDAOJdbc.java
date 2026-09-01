@@ -35,11 +35,8 @@ public class MembershipDAOJdbc implements MembershipDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState()) || e.getErrorCode() == 1062) {
-                throw new DuplicateEntityException("Membership",
-                        m.getUser().getEmail() + " per " + m.getWorkplace().getName(),e);
+                throw new DuplicateEntityException("Membership", m.getUser().getEmail() + " per " + m.getWorkplace().getName(),e);
             }
-
-            // 2. Errore tecnico (connessione, sintassi, etc.)
             throw new DataFetchException("CRITICAL ERROR while saving the request to join",e);
         }
     }
@@ -72,8 +69,7 @@ public class MembershipDAOJdbc implements MembershipDAO {
 
             // Se non abbiamo rimosso nulla, lanciamo l'errore di dominio
             if (rowsAffected == 0) {
-                throw new EntityNotFoundException("Membership",
-                        membership.getUser().getEmail() + " @ " + membership.getWorkplace().getName());
+                throw new EntityNotFoundException("Membership", membership.getUser().getEmail() + " @ " + membership.getWorkplace().getName());
             }
         } catch (SQLException e) {
             // Errore tecnico (connessione, permessi, etc.)
@@ -131,9 +127,9 @@ public class MembershipDAOJdbc implements MembershipDAO {
         try (Connection conn = DBconnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setString(1, email);      // Per la JOIN con memberships
-            pstmt.setString(2, workplaceName); // Per il filtro sul nome
-            pstmt.setString(3, email);      // Per il controllo owner_email
+            pstmt.setString(1, email);
+            pstmt.setString(2, workplaceName);
+            pstmt.setString(3, email);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;

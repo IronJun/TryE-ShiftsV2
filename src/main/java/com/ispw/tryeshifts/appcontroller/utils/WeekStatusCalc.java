@@ -7,7 +7,6 @@ import java.time.ZoneId;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Locale;
 
 public class WeekStatusCalc {
 
@@ -17,20 +16,17 @@ public class WeekStatusCalc {
         int week = Integer.parseInt(parts[1]);
 
         LocalDate targetMonday = LocalDate.ofYearDay(year, 1)
-                .with(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear(), week)
+                .with(WeekFields.ISO.weekOfWeekBasedYear(),week)
                 .with(DayOfWeek.MONDAY);
 
         LocalDateTime weDeadLine = targetMonday.minusDays(5).atTime(23,59,59);
         LocalDateTime friDeadline = targetMonday.minusDays(3).atTime(23,59,59);
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
-        if(now.isBefore(weDeadLine) || now.isEqual(weDeadLine)){
+        if(!now.isAfter(weDeadLine)){  // DA QUI partirebbe anche una logica di publicazione automatica futura
             return "OPEN";
         }
-        if(now.isBefore(friDeadline) || now.isEqual(friDeadline)){
-            return "LOCKED";
-        }
-        return  "PUBLISHED";
+        return "LOCKED";
     }
 
     public LocalDateTime getNextDeadLine(String weekId, String currentStatus){

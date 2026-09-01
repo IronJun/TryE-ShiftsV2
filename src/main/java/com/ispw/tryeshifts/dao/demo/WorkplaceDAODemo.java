@@ -62,7 +62,7 @@ public class WorkplaceDAODemo implements WorkplaceDAO {
         return wp;
     }
 
-    public List<Workplace> findWorkplacesbyEmail(String email) {
+    public List<Workplace> findWorkplacesByEmail(String email) {
         if (email == null) {
             throw new NullPointerException("email of the user cannot be null");
         }

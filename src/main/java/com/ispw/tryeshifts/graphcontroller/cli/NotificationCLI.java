@@ -79,21 +79,21 @@ public class NotificationCLI {
     private void printMenu() {
         CLIService.println("----------------------------------------");
         CLIService.println("Available Actions:");
-        CLIService.println("[m] Mark all as read and cancel all");
+        CLIService.println("[d] Delete all notifications");
         CLIService.println("[b] Back to main menu");
         CLIService.println("----------------------------------------");
     }
 
     private boolean handleChoice(String choice) throws BaseException {
         switch (choice) {
-            case "m":
+            case "d":
                 try {
                     UserBean user = SessionContext.getInstance().getLoggeduser();
                     if(user == null){
                         CLIService.println("User not logged in");
                         return false;
                     }
-                    notificationAC.markAllAsRead(user.getEmail());
+                    notificationAC.deleteNotifications(user.getEmail());
                     CLIService.println("[SUCCESS] All notifications marked as read.");
                 }catch(BaseException e){
                     logger.severe("[ERROR] Unable to set all notifications marked as read."+e.getMessage()+"\n");

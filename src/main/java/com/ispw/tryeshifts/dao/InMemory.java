@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemory {
-
+    //Emulo una sorta di database per gestire la parte in memoria
     // Sposta qui tutte le tue variabili demo
     private final Map<String, UserInfo> usersDbDemo = new HashMap<>();
     private final Map<String, Workplace> workplacesDbDemo = new HashMap<>();

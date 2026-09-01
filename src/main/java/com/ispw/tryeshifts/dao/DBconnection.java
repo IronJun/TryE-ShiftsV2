@@ -12,8 +12,6 @@ public class DBconnection {
     private static final Logger LOGGER = Logger.getLogger(DBconnection.class.getName());
     private static final Properties props = new Properties();
 
-    private Connection connection;
-
     static {
         // Carichiamo il file una sola volta all'avvio della classe
         try (InputStream input = DBconnection.class.getClassLoader().getResourceAsStream("db.properties")) {
@@ -42,7 +40,11 @@ public class DBconnection {
     public Connection getConnection() throws SQLException {
         String password = System.getenv("DB_password");
         if (password == null || password.isEmpty()){
-            LOGGER.warning("CRITICAL ERROR: environment variable DB_password is null or empty");
+            password = props.getProperty("db.password");
+        }
+        if (password == null || password.isEmpty()){
+            throw new SQLException("Database password is empty");
+
         }
         return DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.user"),password);
     }

@@ -36,7 +36,7 @@ public class ShiftsCLI {
     public  void shiftsDashboard(WorkplaceBean wp) {
         UserBean user = SessionContext.getInstance().getLoggeduser();
         boolean back = false;
-        weekOffset = 0;
+        weekOffset = 1;
 
         while (!back) {
             try {

@@ -13,7 +13,7 @@ public class NotificationService {
             throw new IllegalStateException("Utility class");
         }
 
-        public static void showNotificationPopup(Node sourceNode, List<NotificationBean> notificationBeanList, Runnable onMarkAllRead) {
+        public static void showNotificationPopup(Node sourceNode, List<NotificationBean> notificationBeanList, Runnable onDeleteAll) {
             ContextMenu notificationmenu = new ContextMenu();
             notificationmenu.setStyle("-fx-background-radius: 8; -fx-padding: 8;");
 
@@ -28,10 +28,10 @@ public class NotificationService {
                     notificationmenu.getItems().add(item);
                 }
                 SeparatorMenuItem separator = new SeparatorMenuItem();
-                MenuItem clearItem = new MenuItem("Mark all as read");
+                MenuItem clearItem = new MenuItem("Delete all notifications");
                 clearItem.setOnAction(e->{
-                    if(onMarkAllRead != null){
-                        onMarkAllRead.run();
+                    if(onDeleteAll != null){
+                        onDeleteAll.run();
                     }
                     notificationmenu.hide();
                 });

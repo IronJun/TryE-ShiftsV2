@@ -35,7 +35,8 @@ public class LoginAC {
         return userBean;
     }
     public  UserBean autoLogin(String email)throws BaseException{
-        UserInfo user = userRepo.findByEmail(email);
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        UserInfo user = userRepo.findByEmail(normalizedEmail);
         if(user == null){throw new EntityNotFoundException("User",email);}
         UserBean loggedUser = new UserBean();
         loggedUser.setEmail(user.getEmail());

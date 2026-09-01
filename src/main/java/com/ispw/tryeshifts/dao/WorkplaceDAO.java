@@ -13,7 +13,7 @@ public interface WorkplaceDAO {
     void updateWorkplace(Workplace updateWp,String oldName) throws DataFetchException,EntityNotFoundException,DuplicateEntityException;
     boolean existsWorkplaceByName(String name) throws DataFetchException;
     Workplace findWorkplaceByName(String name)throws DataFetchException,EntityNotFoundException;
-    List<Workplace> findWorkplacesbyEmail(String email)throws DataFetchException;
+    List<Workplace> findWorkplacesByEmail(String email)throws DataFetchException;
     List<Workplace> findAllWorkplaces()throws DataFetchException;
     List<Workplace> findWorkplacesByName(String name) throws DataFetchException;
     String getWeekStatus(String workplaceName, String weekId)throws DataFetchException;

@@ -273,7 +273,7 @@ public class  HomeCLI {
             logger.severe("User is null!\n");
             return;
         }
-        int offset = 0; // Settimana corrente
+        int offset = 1; // Settimana corrente
         String weekId = ac.calculateWeekId(offset);
         String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 

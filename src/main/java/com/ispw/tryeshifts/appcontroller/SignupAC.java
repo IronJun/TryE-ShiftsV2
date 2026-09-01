@@ -20,6 +20,8 @@ public class SignupAC {
         if (isDataInvalid(userbean)) {
             throw new ValidationException("All fields must be completed","Form");
         }
+        String normalizedEmail = userbean.getEmail().trim().toLowerCase(Locale.ROOT);
+        userbean.setEmail(normalizedEmail);
         if (pwdNotMatch(userbean.getPassword(), userbean.getPwdRep())) {
             throw new ValidationException("Password doesn't match","PwdRep");
         }
@@ -30,16 +32,17 @@ public class SignupAC {
             throw new ValidationException("Email address is invalid","Email");
         }
 
-        if(userRepo.findByEmail(userbean.getEmail())!= null){
-            throw new DuplicateEntityException("User",userbean.getEmail());
+
+        if(userRepo.findByEmail(normalizedEmail)!= null){
+            throw new DuplicateEntityException("User",normalizedEmail);
         }
 
-        UserInfo userentity = new UserInfo(userbean.getEmail().trim().toLowerCase(Locale.ROOT), userbean.getName(), userbean.getSurname());
+        UserInfo userEntity = new UserInfo(normalizedEmail, userbean.getName(), userbean.getSurname());
 
         try {
             String hashedPass = SecurityUtils.hashPassword(userbean.getPassword());
-            userentity.setPasswordHash(hashedPass);
-            userRepo.save(userentity);
+            userEntity.setPasswordHash(hashedPass);
+            userRepo.save(userEntity);
         }catch(DataFetchException e){
             throw new DataFetchException("Persistency error during registration: ",e);
         }

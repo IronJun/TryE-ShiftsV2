@@ -103,7 +103,7 @@ public class NotificationDAOJdbc implements NotificationDAO {
     }
 
     public int countNotificationByUserEmail(String email) throws DataFetchException {
-        String query = "SELECT COUNT(*) AS total FROM notification Where dest_user = ?";
+        String query = "SELECT COUNT(*) AS total FROM notification Where dest_user = ? AND is_read = false";
         int count = 0;
 
         try(Connection conn = DBconnection.getInstance().getConnection();
