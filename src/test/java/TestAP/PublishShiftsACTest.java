@@ -3,6 +3,7 @@ package TestAP;
 import com.ispw.tryeshifts.appcontroller.PublishShiftsAC;
 import com.ispw.tryeshifts.bean.WorkplaceBean;
 import com.ispw.tryeshifts.config.AppConfig;
+import com.ispw.tryeshifts.dao.InMemory;
 import com.ispw.tryeshifts.entity.Availability;
 import com.ispw.tryeshifts.entity.Membership;
 import com.ispw.tryeshifts.entity.UserInfo;
@@ -12,83 +13,95 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PublishShiftsACTest {
-    final String validWeek = "2026_10";
+
+    private static final String WEEK_ID = "2030_10";
+    private static final String WORKPLACE_NAME = "LocaleTest";
+    private static final String WORKER_EMAIL = "worker@test.com";
 
     @BeforeEach
-    void setup(){
-        AppConfig.getInstance().setTestMode(true,false);
+    void setup() throws Exception {
+        AppConfig.getInstance().setTestMode(true, false);
 
+        clearInMemoryData();
 
-        try{
-            UserInfo fakeWorker = AppConfig.getInstance().getUserRepository().findByEmail("worker@test.com");
-            if(fakeWorker==null){
-                fakeWorker = new UserInfo("worker@test.com","Mario","Rossi");
-                AppConfig.getInstance().getUserRepository().save(fakeWorker);
-            }
+        UserInfo worker = new UserInfo(WORKER_EMAIL, "Mario", "Rossi");
+        AppConfig.getInstance().getUserRepository().save(worker);
 
-            Workplace fakeWp;
-            if(!AppConfig.getInstance().getWorkplaceRepository().existsWorkplaceByName("LocaleTest")) {
-                fakeWp = new Workplace("LocaleTest", "Via Roma 1", null, null, "boss@test.com");
-                AppConfig.getInstance().getWorkplaceRepository().saveWorkplace(fakeWp);
-            } else {
-                fakeWp = AppConfig.getInstance().getWorkplaceRepository().findWorkplaceByName("LocaleTest");
-            }
+        Workplace workplace = new Workplace(
+                WORKPLACE_NAME,
+                "Via Roma 1",
+                null,
+                null,
+                "boss@test.com"
+        );
+        AppConfig.getInstance().getWorkplaceRepository().saveWorkplace(workplace);
 
-            if(AppConfig.getInstance().getMembershipRepository().findMembership("worker@test.com","LocaleTest")==null){
-                Membership fakeMem = new Membership(fakeWorker,fakeWp,"WORKER",true);
-                AppConfig.getInstance().getMembershipRepository().saveMembership(fakeMem);
-            }
+        Membership membership = new Membership(worker, workplace, "WORKER", true);
+        AppConfig.getInstance().getMembershipRepository().saveMembership(membership);
 
-            // Usa .isEmpty() perché il DAO restituisce una Mappa, non null!
-            if(AppConfig.getInstance().getAvailabilityRepository().getAvailabilitiesByWeek("LocaleTest", validWeek).isEmpty()){
-                Availability fakeAvail = new Availability("worker@test.com","LocaleTest","Mon","08:00","12:00", validWeek);
-                AppConfig.getInstance().getAvailabilityRepository().saveAvailability(fakeAvail);
-            }
-
-
-
-        }catch(Exception e){
-            fail("Error during the memory database setup: "+e.getMessage());
-        }
+        AppConfig.getInstance().getAvailabilityRepository().saveAvailability(
+                new Availability(WORKER_EMAIL, WORKPLACE_NAME, "Mon", "08:00", "12:00", WEEK_ID));
+        // Il test deve partire sempre da una settimana OPEN.
+        AppConfig.getInstance().getWorkplaceRepository()
+                .updateWeekStatus(WORKPLACE_NAME, WEEK_ID, "OPEN");
     }
 
     @Test
-    void testPublishNullParameter(){
+    void testPublishNullParameter() {
         PublishShiftsAC controller = new PublishShiftsAC();
-        NullPointerException npe = assertThrows(NullPointerException.class, ()->{
-            controller.handlePublishAction(null, validWeek);
-        });
-        assertEquals("Workplace or weekId passed null",npe.getMessage());
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> controller.handlePublishAction(null, WEEK_ID));
+
+        assertEquals("Workplace or weekId passed null", exception.getMessage());
     }
 
     @Test
-    void testWeekWithoutAvailability(){
-        String emptyweek = "2099_99";
+    void testWeekWithoutAvailability() {
         PublishShiftsAC controller = new PublishShiftsAC();
-        WorkplaceBean validwpBean = new WorkplaceBean("LocaleTest","Via Roma 1",new ArrayList<>(),new ArrayList<>(),"boss@test.com");
+        WorkplaceBean workplace = createWorkplaceBean();
 
-        ValidationException ecception = assertThrows(ValidationException.class, ()->{
-            controller.handlePublishAction(validwpBean,emptyweek);
-        });
-        assertTrue(ecception.getMessage().contains(emptyweek));
+        ValidationException exception = assertThrows(ValidationException.class, () -> controller.handlePublishAction(workplace, "2099_99"));
+
+        assertTrue(exception.getMessage().contains("2099_99"));
     }
 
     @Test
-    void testPublishSuccess(){
+    void testPublicationLocksThenPublishesAssignments() throws Exception {
         PublishShiftsAC controller = new PublishShiftsAC();
-        WorkplaceBean validwpBean = new WorkplaceBean("LocaleTest","Via Roma 1",new ArrayList<>(),new ArrayList<>(),"boss@test.com");
+        WorkplaceBean workplace = createWorkplaceBean();
+        String lockResult = controller.handlePublishAction(workplace, WEEK_ID);
 
+        assertEquals("Shifts have Been locked", lockResult);
+        assertEquals("LOCKED", AppConfig.getInstance().getWorkplaceRepository().getWeekStatus(WORKPLACE_NAME, WEEK_ID));
+        assertTrue(AppConfig.getInstance().getWorkplaceRepository().getUserPublishedShiftsByWeek(WORKER_EMAIL, WEEK_ID).isEmpty());
 
-        assertDoesNotThrow(()-> {
-            AppConfig.getInstance().getAvailabilityRepository().getAvailabilitiesByWeek(validwpBean.getWorkplaceName(), validWeek);
-        },"Error during the uploading of availabilities: ");
+        String publishResult = controller.handlePublishAction(workplace, WEEK_ID);
 
-        assertDoesNotThrow(()->{
-            controller.handlePublishAction(validwpBean, validWeek);
-        },"The publication should end well with valid data");
+        assertEquals("Shifts of " + WORKPLACE_NAME + " has been successfully published.", publishResult);
+        assertEquals("PUBLISHED", AppConfig.getInstance().getWorkplaceRepository().getWeekStatus(WORKPLACE_NAME, WEEK_ID)
+        );
+
+        Map<String, String> workerAssignments = AppConfig.getInstance().getWorkplaceRepository().getUserPublishedShiftsByWeek(WORKER_EMAIL, WEEK_ID);
+
+        assertEquals(WORKPLACE_NAME, workerAssignments.get("Mon_08:00-12:00"));
+    }
+
+    private WorkplaceBean createWorkplaceBean() {
+        return new WorkplaceBean(WORKPLACE_NAME, "Via Roma 1", new ArrayList<>(), new ArrayList<>(), "boss@test.com");
+    }
+
+    private void clearInMemoryData() {
+        InMemory memory = InMemory.getInstance();
+        memory.getUsers().clear();
+        memory.getWorkplaces().clear();
+        memory.getMemberships().clear();
+        memory.getAvailabilities().clear();
+        memory.getWeekStatusDbDemo().clear();
+        memory.getPublishedShifts().clear();
     }
 }
