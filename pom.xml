@@ -10,6 +10,7 @@
     <name>TryE-ShiftsV2</name>
 
     <properties>
+        <sonar.exclusions>src/main/resources/db.properties</sonar.exclusions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.1</junit.version>
     </properties>
