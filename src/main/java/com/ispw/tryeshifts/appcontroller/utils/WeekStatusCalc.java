@@ -20,7 +20,6 @@ public class WeekStatusCalc {
                 .with(DayOfWeek.MONDAY);
 
         LocalDateTime weDeadLine = targetMonday.minusDays(5).atTime(23,59,59);
-        LocalDateTime friDeadline = targetMonday.minusDays(3).atTime(23,59,59);
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
         if(!now.isAfter(weDeadLine)){  // DA QUI partirebbe anche una logica di publicazione automatica futura

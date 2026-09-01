@@ -233,11 +233,42 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
     }
 
     @Override
-    public void replaceAvailabilities(String userEmail, String workplaceName, String weekId, List<Availability> availabilities) throws DataFetchException {
-        if (userEmail == null || workplaceName == null || weekId == null || availabilities == null) {
+    public void replaceAvailabilities(
+            String userEmail,
+            String workplaceName,
+            String weekId,
+            List<Availability> availabilities
+    ) throws DataFetchException {
+
+        if (userEmail == null ||workplaceName == null ||weekId == null || availabilities == null) {
             throw new IllegalArgumentException("Missing availability replacement data");
         }
-
+        try (Connection conn = DBconnection.getInstance().getConnection()) {
+            executeAvailabilityReplacement(conn, userEmail, workplaceName, weekId, availabilities);
+        } catch (SQLException e) {
+            throw new DataFetchException("Database error while replacing availabilities", e);
+        }
+    }
+    private void executeAvailabilityReplacement(Connection conn, String userEmail, String workplaceName, String weekId, List<Availability> availabilities) throws SQLException {
+        boolean previousAutoCommit = conn.getAutoCommit();
+        try {
+            conn.setAutoCommit(false);
+            deleteAndInsertAvailabilities(
+                    conn,
+                    userEmail,
+                    workplaceName,
+                    weekId,
+                    availabilities
+            );
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(previousAutoCommit);
+        }
+    }
+    private void deleteAndInsertAvailabilities(Connection conn, String userEmail, String workplaceName, String weekId, List<Availability> availabilities) throws SQLException {
         String deleteQuery = """
             DELETE FROM availabilities
             WHERE user_email = ? AND workplace_name = ? AND week_id = ?
@@ -249,38 +280,28 @@ public class AvailabilityDAOJdbc implements AvailabilityDAO {
             VALUES (?, ?, ?, ?, ?, ?)
             """;
 
-        try (Connection conn = DBconnection.getInstance().getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement deleteStatement = conn.prepareStatement(deleteQuery);
-                 PreparedStatement insertStatement = conn.prepareStatement(insertQuery)) {
-                deleteStatement.setString(1, userEmail);
-                deleteStatement.setString(2, workplaceName);
-                deleteStatement.setString(3, weekId);
-                deleteStatement.executeUpdate();
-                for (Availability availability : availabilities) {
-                    insertStatement.setString(1, userEmail);
-                    insertStatement.setString(2, workplaceName);
-                    insertStatement.setString(3, weekId);
-                    insertStatement.setString(4, availability.getDay());
-                    insertStatement.setString(5, availability.getStartShift());
-                    insertStatement.setString(6, availability.getEndShift());
-                    insertStatement.addBatch();
-                }
-                if (!availabilities.isEmpty()) {
-                    insertStatement.executeBatch();
-                }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw new DataFetchException(
-                        "Unable to replace the user's availabilities", e
-                );
+        try (PreparedStatement deleteStatement = conn.prepareStatement(deleteQuery);
+                PreparedStatement insertStatement = conn.prepareStatement(insertQuery)) {
+            deleteStatement.setString(1, userEmail);
+            deleteStatement.setString(2, workplaceName);
+            deleteStatement.setString(3, weekId);
+            deleteStatement.executeUpdate();
+
+            // Parametri uguali per ogni disponibilità: impostati una sola volta.
+            insertStatement.setString(1, userEmail);
+            insertStatement.setString(2, workplaceName);
+            insertStatement.setString(3, weekId);
+
+            for (Availability availability : availabilities) {
+                insertStatement.setString(4, availability.getDay());
+                insertStatement.setString(5, availability.getStartShift());
+                insertStatement.setString(6, availability.getEndShift());
+                insertStatement.addBatch();
             }
 
-        } catch (SQLException e) {
-            throw new DataFetchException(
-                    "Database error while replacing availabilities", e
-            );
+            if (!availabilities.isEmpty()) {
+                insertStatement.executeBatch();
+            }
         }
     }
 }

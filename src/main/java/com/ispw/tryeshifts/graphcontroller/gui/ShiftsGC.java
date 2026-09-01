@@ -32,6 +32,7 @@ import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -109,7 +110,7 @@ public class ShiftsGC {
 
             WeekStatusCalc calc = new WeekStatusCalc();
             LocalDateTime deadline = calc.getNextDeadLine(this.currentWeekId, weekCurrentStatus);
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
 
             if(deadline != null&&!now.isAfter(deadline)){
