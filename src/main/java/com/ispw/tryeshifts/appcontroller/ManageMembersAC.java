@@ -64,7 +64,6 @@ public class ManageMembersAC {
                 NotificationBean notifBean = new NotificationBean(m.getUser().getEmail(),"You have been accepted to : "+workplaceName, "ACCEPTED");
                 nf.sendUserNotif(notifBean);
             } else {
-                // Se rifiuta, eliminiamo semplicemente la richiesta/membership
                 membershipRepo.removeMembership(m);
             }
     }
