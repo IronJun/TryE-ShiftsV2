@@ -116,6 +116,7 @@ public class ShiftsGC {
             if(deadline != null&&!now.isAfter(deadline)){
                 String actionName ="OPEN".equals(weekCurrentStatus) ? "Until Lock " : "Until Publication";
                 startCountDownTimer(deadline,actionName);
+                return;
             }
             if (timeline != null) timeline.stop();
             countdownLabel.setText("Waiting for the owner to publish the shifts");

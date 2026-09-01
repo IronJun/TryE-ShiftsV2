@@ -60,10 +60,8 @@ public class NotificationService {
                 msgLabel.setStyle("-fx-text-fill: #000000; -fx-font-weight: bold; -fx-font-size: 12px;");
             }
 
-            Label timeLabel = new Label(n.getTimestamp());
-            timeLabel.setStyle("-fx-text-fill: #999999; -fx-font-size: 9px;");
 
-            box.getChildren().addAll(msgLabel, timeLabel);
+            box.getChildren().addAll(msgLabel);
             return box;
         }
 }
