@@ -6,8 +6,8 @@ import com.ispw.tryeshifts.factory.DAOFactory;
 
 
 public class AppConfig {
-    private boolean isDemo = false;
-    private boolean saveCSV = false;
+    private boolean isDemo = true;
+    private boolean saveCSV = true;
 
     private DAOFactory daoFactory;
     private UserDAO userDAO;

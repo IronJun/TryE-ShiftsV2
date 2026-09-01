@@ -35,7 +35,7 @@ public class LoginGC {
     @FXML
     public void onLoginClicked() {
         String email = emailField != null ? emailField.getText().trim() : "";
-        String password = passwordField != null ? passwordField.getText() : "";
+        String password = isPasswordVisible?passwordTextField.getText() : passwordField.getText();
 
         try{
             UserBean inputBean = new UserBean(email, password);

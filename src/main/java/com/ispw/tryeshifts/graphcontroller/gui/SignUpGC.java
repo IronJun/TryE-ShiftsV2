@@ -44,8 +44,8 @@ public class SignUpGC {
         String email = emailField != null ? emailField.getText().trim() : "";
         String name = nameField != null ? nameField.getText().trim() : "";
         String surname = surnameField != null ? surnameField.getText().trim() : "";
-        String pwd = passwordField != null ? passwordField.getText() : "";
-        String repeat = repeatPasswordField != null ? repeatPasswordField.getText() : "";
+        String pwd = isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
+        String repeat = isRepeatPasswordVisibile ? repeatPasswordTextField.getText() : repeatPasswordField.getText();
 
         try {
             UserBean bean = new UserBean(email, pwd, name, surname, repeat);
@@ -75,7 +75,7 @@ public class SignUpGC {
 
     private boolean toggleGeneric(boolean currentVisibility, PasswordField pf, TextField tf, ImageView icon){
         if(currentVisibility){
-            pf.setText(passwordTextField.getText());
+            pf.setText(tf.getText());
             pf.setVisible(true);
             tf.setVisible(false);
             icon.setImage(new Image(getClass().getResourceAsStream("/com/ispw/tryeshifts/view/assets/closedEye.png")));
